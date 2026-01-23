@@ -75,14 +75,10 @@ DELETE http://localhost:8080/api/roles/1
 ### --- ASSIGN PERMISSION TO ROLE ---
 
 ### Assign permission to a role
-POST http://localhost:8080/api/roles/1/permissions
+POST http://localhost:8080/api/roles/1/permissions/1
 Content-Type: application/json
 
-{
-  "permissionId": 1
-}
-
-
+ 
 ### --- USERS ---
 
 ### Create a new user
@@ -116,13 +112,9 @@ DELETE http://localhost:8080/api/users/1
 ### --- ASSIGN ROLE TO USER ---
 
 ### Assign role to a user
-POST http://localhost:8080/api/users/1/roles
+POST http://localhost:8080/api/users/1/roles/3
 Content-Type: application/json
-
-{
-  "roleId": 1
-}
-
+ 
 
 ### --- TODOS ---
 
