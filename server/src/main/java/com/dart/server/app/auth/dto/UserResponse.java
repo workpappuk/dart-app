@@ -13,4 +13,10 @@ public class UserResponse {
     private Long id;
     private String username;
     private Set<RoleResponse> roles;
+
+    public UserResponse() {}
+    public UserResponse(Long id, String username) {
+        this.id = id;
+        this.username = username;
+    }
 }

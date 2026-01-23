@@ -8,6 +8,13 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+        public boolean existsByUsername(String username) {
+            return userRepository.existsByUsername(username);
+        }
+
+        public UserEntity findByUsername(String username) {
+            return userRepository.findByUsername(username).orElse(null);
+        }
     @Autowired
     private UserRepository userRepository;
 
