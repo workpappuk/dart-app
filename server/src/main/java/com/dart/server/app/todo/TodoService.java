@@ -36,16 +36,16 @@ public class TodoService {
     }
 
     public TodoResponse createTodo(TodoRequest request) {
-        Todo todo = TodoMapper.toEntity(request);
+        TodoEntity todo = TodoMapper.toEntity(request);
         return TodoMapper.toResponse(todoRepository.save(todo));
     }
 
     public Optional<TodoResponse> updateTodo(Long id, TodoRequest request) {
-        Optional<Todo> todoOptional = todoRepository.findById(id);
+        Optional<TodoEntity> todoOptional = todoRepository.findById(id);
         if (todoOptional.isEmpty()) {
             return Optional.empty();
         }
-        Todo todo = todoOptional.get();
+        TodoEntity todo = todoOptional.get();
         todo.setDescription(request.getDescription());
         todo.setCompleted(request.isCompleted());
         return Optional.of(TodoMapper.toResponse(todoRepository.save(todo)));

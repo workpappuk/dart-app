@@ -13,7 +13,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Todo {
+public class TodoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

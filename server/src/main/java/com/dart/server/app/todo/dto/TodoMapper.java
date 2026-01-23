@@ -1,9 +1,9 @@
 package com.dart.server.app.todo.dto;
 
-import com.dart.server.app.todo.Todo;
+import com.dart.server.app.todo.TodoEntity;
 
 public class TodoMapper {
-    public static TodoResponse toResponse(Todo todo) {
+    public static TodoResponse toResponse(TodoEntity todo) {
         TodoResponse response = new TodoResponse();
         response.setId(todo.getId());
         response.setDescription(todo.getDescription());
@@ -11,8 +11,8 @@ public class TodoMapper {
         return response;
     }
 
-    public static Todo toEntity(TodoRequest request) {
-        Todo todo = new Todo();
+    public static TodoEntity toEntity(TodoRequest request) {
+        TodoEntity todo = new TodoEntity();
         todo.setDescription(request.getDescription());
         todo.setCompleted(request.isCompleted());
         return todo;
