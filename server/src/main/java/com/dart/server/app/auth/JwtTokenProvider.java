@@ -1,11 +1,13 @@
 package com.dart.server.app.auth;
 
-import com.dart.server.app.auth.RoleEntity;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,14 +25,13 @@ public class JwtTokenProvider {
         String rolesString = roles.stream()
                 .map(RoleEntity::getName)
                 .collect(Collectors.joining(","));
+        SecretKey key = Keys.hmacShaKeyFor(Base64.getEncoder().encodeToString(jwtSecret.getBytes()).getBytes());
         return Jwts.builder()
                 .setSubject(username)
                 .claim("roles", rolesString)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
-
-    // Optionally, add methods to validate and parse the token
 }

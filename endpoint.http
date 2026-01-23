@@ -1,4 +1,5 @@
 
+
 ### --- PERMISSIONS ---
 
 ### Create a new read permission
@@ -147,3 +148,24 @@ DELETE http://localhost:8080/api/todos/1
 
 ### Search todos with pagination
 GET http://localhost:8080/api/todos/search?q=Sample&page=0&size=5
+
+
+### --- AUTH ---
+
+### Register a new user
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "user"
+}
+
+### Login
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "user"
+}
