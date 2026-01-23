@@ -1,33 +1,30 @@
-package com.dart.server.app.todo;
+package com.dart.server.app.auth;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-@Data
 @Entity
-@Table(name = "todos")
-public class TodoEntity {
+@Table(name = "permissions")
+@Data
+public class PermissionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String description;
-
-    private boolean completed;
+    @Column(nullable = false, unique = true)
+    private String name;
 
     @Column(nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-    @Column(nullable = true, updatable = false)
-    private String createdBy;
-
-    @Column(nullable = true)
-    private String updatedBy;
 
     @PrePersist
     protected void onCreate() {
