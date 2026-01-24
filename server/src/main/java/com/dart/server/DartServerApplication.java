@@ -10,10 +10,10 @@ import java.util.Base64;
 
 
 @SpringBootApplication
-public class ServerApplication implements CommandLineRunner {
+public class DartServerApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
-        SpringApplication.run(ServerApplication.class, args);
+        SpringApplication.run(DartServerApplication.class, args);
     }
 
     @Override
