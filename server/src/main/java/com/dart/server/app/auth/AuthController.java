@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,19 +22,13 @@ import java.util.Map;
 @Tag(name = "Authentication", description = "Authentication and user registration APIs")
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
+    private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "Debug Authentication", description = "Prints the current user's authorities to the console.")
     @ApiResponses({
@@ -62,7 +58,7 @@ public class AuthController {
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         // Assign default role 'user'
-        RoleEntity userRole = roleService.findByName("user");
+        RoleEntity userRole = roleService.findByName(ERole.USER.name());
         user.setRoles(Collections.singleton(userRole));
         userService.save(user);
         UserResponse userResponse = new UserResponse(user.getId(), user.getUsername());
@@ -88,7 +84,7 @@ public class AuthController {
                     .data(null)
                     .build();
         }
-        String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
+        String token = jwtTokenProvider.createToken(user.getId(), user.getRoles());
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
         return DartApiResponse.<Map<String, Object>>builder()

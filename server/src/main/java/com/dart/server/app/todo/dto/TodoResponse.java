@@ -14,4 +14,20 @@ public class TodoResponse {
 
     @Schema(description = "Completion status", example = "false")
     private boolean completed;
+
+    @Schema(description = "Creation timestamp", example = "2023-10-10T10:00:00")
+    private java.time.LocalDateTime createdAt;
+
+    @Schema(description = "Last update timestamp", example = "2023-10-10T10:00:00")
+    private java.time.LocalDateTime updatedAt;
+
+    @Schema(description = "User who created the todo", example = "john_doe")
+    private String createdBy;
+
+    @Schema(description = "User who last updated the todo", example = "john_doe")
+    private String updatedBy;
+
+    // createdAt and updatedAt should be set at the entity level (in TodoEntity) using @PrePersist and @PreUpdate methods.
+    // createdBy and updatedBy should be set at the entity level using an EntityListener (e.g., TodoAuditListener) that pulls the username from the security context.
+    // This DTO is correct for mapping these values from the entity for API responses.
 }

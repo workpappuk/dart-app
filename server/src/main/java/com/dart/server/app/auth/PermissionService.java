@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PermissionService {
@@ -26,4 +27,9 @@ public class PermissionService {
     public void deleteById(Long id) {
         permissionRepository.deleteById(id);
     }
+
+    public PermissionEntity findByName(String name) {
+        return permissionRepository.findByName(name);
+    }
+
 }

@@ -8,9 +8,6 @@ import java.util.Optional;
 
 @Service
 public class RoleService {
-        public RoleEntity findByName(String name) {
-            return roleRepository.findByName(name).orElse(null);
-        }
     @Autowired
     private PermissionService permissionService;
     @Autowired
@@ -35,7 +32,9 @@ public class RoleService {
         }
     }
 
-    // ...existing code...
+    public RoleEntity findByName(String name) {
+        return roleRepository.findByName(name).orElse(null);
+    }
 
     public List<RoleEntity> findAll() {
         return roleRepository.findAll();
