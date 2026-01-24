@@ -1,5 +1,6 @@
 package com.dart.server.app.auth;
 
+import com.dart.server.common.utils.DartApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,8 +24,13 @@ public class PermissionController {
             @ApiResponse(responseCode = "200", description = "List of permissions returned successfully")
     })
     @GetMapping
-    public List<PermissionEntity> getAllPermissions() {
-        return permissionService.findAll();
+    public DartApiResponse<List<PermissionEntity>> getAllPermissions() {
+        List<PermissionEntity> permissions = permissionService.findAll();
+        return DartApiResponse.<List<PermissionEntity>>builder()
+                .success(true)
+                .message("Permissions fetched successfully")
+                .data(permissions)
+                .build();
     }
 
     @Operation(summary = "Get permission by ID", description = "Returns a single permission by its ID.")
@@ -33,10 +39,18 @@ public class PermissionController {
             @ApiResponse(responseCode = "404", description = "Permission not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<PermissionEntity> getPermissionById(@Parameter(description = "ID of the permission") @PathVariable Long id) {
+    public DartApiResponse<PermissionEntity> getPermissionById(@Parameter(description = "ID of the permission") @PathVariable Long id) {
         return permissionService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(permission -> DartApiResponse.<PermissionEntity>builder()
+                        .success(true)
+                        .message("Permission found")
+                        .data(permission)
+                        .build())
+                .orElseGet(() -> DartApiResponse.<PermissionEntity>builder()
+                        .success(false)
+                        .message("Permission not found")
+                        .data(null)
+                        .build());
     }
 
     @Operation(summary = "Create a new permission", description = "Creates a new permission.")
@@ -44,8 +58,13 @@ public class PermissionController {
             @ApiResponse(responseCode = "200", description = "Permission created successfully")
     })
     @PostMapping
-    public PermissionEntity createPermission(@Parameter(description = "Permission request body") @RequestBody PermissionEntity permission) {
-        return permissionService.save(permission);
+    public DartApiResponse<PermissionEntity> createPermission(@Parameter(description = "Permission request body") @RequestBody PermissionEntity permission) {
+        PermissionEntity saved = permissionService.save(permission);
+        return DartApiResponse.<PermissionEntity>builder()
+                .success(true)
+                .message("Permission created successfully")
+                .data(saved)
+                .build();
     }
 
     @Operation(summary = "Update a permission", description = "Updates an existing permission.")
@@ -54,13 +73,21 @@ public class PermissionController {
             @ApiResponse(responseCode = "404", description = "Permission not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<PermissionEntity> updatePermission(
+    public DartApiResponse<PermissionEntity> updatePermission(
             @Parameter(description = "ID of the permission") @PathVariable Long id,
             @Parameter(description = "Updated permission request body") @RequestBody PermissionEntity permission) {
         permission.setId(id);
         return permissionService.findById(id)
-                .map(existing -> ResponseEntity.ok(permissionService.save(permission)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(existing -> DartApiResponse.<PermissionEntity>builder()
+                        .success(true)
+                        .message("Permission updated successfully")
+                        .data(permissionService.save(permission))
+                        .build())
+                .orElseGet(() -> DartApiResponse.<PermissionEntity>builder()
+                        .success(false)
+                        .message("Permission not found")
+                        .data(null)
+                        .build());
     }
 
     @Operation(summary = "Delete a permission", description = "Deletes a permission by its ID.")
@@ -69,11 +96,19 @@ public class PermissionController {
             @ApiResponse(responseCode = "404", description = "Permission not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePermission(@Parameter(description = "ID of the permission") @PathVariable Long id) {
+    public DartApiResponse<Void> deletePermission(@Parameter(description = "ID of the permission") @PathVariable Long id) {
         if (!permissionService.findById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
+            return DartApiResponse.<Void>builder()
+                    .success(false)
+                    .message("Permission not found")
+                    .data(null)
+                    .build();
         }
         permissionService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return DartApiResponse.<Void>builder()
+                .success(true)
+                .message("Permission deleted successfully")
+                .data(null)
+                .build();
     }
 }

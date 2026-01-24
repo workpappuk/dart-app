@@ -2,6 +2,7 @@ package com.dart.server.app.todo;
 
 import com.dart.server.app.todo.dto.TodoRequest;
 import com.dart.server.app.todo.dto.TodoResponse;
+import com.dart.server.common.utils.DartApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,8 +28,13 @@ public class TodoController {
     })
     @GetMapping
         @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-        public List<TodoResponse> getAllTodos() {
-                return todoService.getAllTodos();
+        public DartApiResponse<List<TodoResponse>> getAllTodos() {
+                List<TodoResponse> todos = todoService.getAllTodos();
+                return DartApiResponse.<List<TodoResponse>>builder()
+                        .success(true)
+                        .message("Todos fetched successfully")
+                        .data(todos)
+                        .build();
         }
 
     @Operation(summary = "Search todos", description = "Search todos by description with pagination.")
@@ -37,11 +43,16 @@ public class TodoController {
     })
     @GetMapping("/search")
         @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-        public Page<TodoResponse> searchTodos(
+        public DartApiResponse<Page<TodoResponse>> searchTodos(
             @Parameter(description = "Search query") @RequestParam(defaultValue = "") String q,
             @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size) {
-        return todoService.searchTodos(q, page, size);
+        Page<TodoResponse> result = todoService.searchTodos(q, page, size);
+        return DartApiResponse.<Page<TodoResponse>>builder()
+                .success(true)
+                .message("Todos search result fetched successfully")
+                .data(result)
+                .build();
     }
 
     @Operation(summary = "Get todo by ID", description = "Returns a single todo by its ID.")
@@ -50,10 +61,18 @@ public class TodoController {
             @ApiResponse(responseCode = "404", description = "Todo not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<TodoResponse> getTodoById(@Parameter(description = "ID of the todo") @PathVariable Long id) {
+    public DartApiResponse<TodoResponse> getTodoById(@Parameter(description = "ID of the todo") @PathVariable Long id) {
         return todoService.getTodoById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(todo -> DartApiResponse.<TodoResponse>builder()
+                        .success(true)
+                        .message("Todo found")
+                        .data(todo)
+                        .build())
+                .orElseGet(() -> DartApiResponse.<TodoResponse>builder()
+                        .success(false)
+                        .message("Todo not found")
+                        .data(null)
+                        .build());
     }
 
     @Operation(summary = "Create a new todo", description = "Creates a new todo item.")
@@ -62,10 +81,15 @@ public class TodoController {
     })
     @PostMapping
         @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-        public TodoResponse createTodo(@Parameter(description = "Todo request body") @RequestBody TodoRequest request, Authentication authentication) {
-                String username = authentication.getName();
-                return todoService.createTodo(request, username);
-        }
+        public DartApiResponse<TodoResponse> createTodo(@Parameter(description = "Todo request body") @RequestBody TodoRequest request, Authentication authentication) {
+        String username = authentication.getName();
+        TodoResponse todo = todoService.createTodo(request, username);
+        return DartApiResponse.<TodoResponse>builder()
+                .success(true)
+                .message("Todo created successfully")
+                .data(todo)
+                .build();
+    }
 
     @Operation(summary = "Update a todo", description = "Updates an existing todo item.")
     @ApiResponses({
@@ -74,14 +98,22 @@ public class TodoController {
     })
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<TodoResponse> updateTodo(
+    public DartApiResponse<TodoResponse> updateTodo(
             @Parameter(description = "ID of the todo") @PathVariable Long id,
             @Parameter(description = "Updated todo request body") @RequestBody TodoRequest request,
             Authentication authentication) {
         String username = authentication.getName();
         return todoService.updateTodo(id, request, username)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(todo -> DartApiResponse.<TodoResponse>builder()
+                        .success(true)
+                        .message("Todo updated successfully")
+                        .data(todo)
+                        .build())
+                .orElseGet(() -> DartApiResponse.<TodoResponse>builder()
+                        .success(false)
+                        .message("Todo not found")
+                        .data(null)
+                        .build());
     }
 
     @Operation(summary = "Delete a todo", description = "Deletes a todo item by its ID.")
@@ -91,10 +123,19 @@ public class TodoController {
     })
     @DeleteMapping("/{id}")
         @PreAuthorize("hasRole('ADMIN')")
-        public ResponseEntity<Void> deleteTodo(@Parameter(description = "ID of the todo") @PathVariable Long id) {
-                if (!todoService.deleteTodo(id)) {
-                        return ResponseEntity.notFound().build();
-                }
-                return ResponseEntity.noContent().build();
+        public DartApiResponse<Void> deleteTodo(@Parameter(description = "ID of the todo") @PathVariable Long id) {
+        boolean deleted = todoService.deleteTodo(id);
+        if (!deleted) {
+            return DartApiResponse.<Void>builder()
+                    .success(false)
+                    .message("Todo not found")
+                    .data(null)
+                    .build();
         }
+        return DartApiResponse.<Void>builder()
+                .success(true)
+                .message("Todo deleted successfully")
+                .data(null)
+                .build();
+    }
 }

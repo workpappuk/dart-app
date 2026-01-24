@@ -2,6 +2,7 @@ package com.dart.server.app.auth;
 
 import com.dart.server.app.auth.dto.UserRequest;
 import com.dart.server.app.auth.dto.UserResponse;
+import com.dart.server.common.utils.DartApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,9 +28,13 @@ public class AuthController {
     private JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRequest request) {
+    public DartApiResponse<UserResponse> register(@RequestBody UserRequest request) {
         if (userService.existsByUsername(request.getUsername())) {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Username already exists"));
+            return DartApiResponse.<UserResponse>builder()
+                    .success(false)
+                    .message("Username already exists")
+                    .data(null)
+                    .build();
         }
         UserEntity user = new UserEntity();
         user.setUsername(request.getUsername());
@@ -38,18 +43,31 @@ public class AuthController {
         RoleEntity userRole = roleService.findByName("user");
         user.setRoles(Collections.singleton(userRole));
         userService.save(user);
-        return ResponseEntity.ok(new UserResponse(user.getId(), user.getUsername()));
+        UserResponse userResponse = new UserResponse(user.getId(), user.getUsername());
+        return DartApiResponse.<UserResponse>builder()
+                .success(true)
+                .message("User registered successfully")
+                .data(userResponse)
+                .build();
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserRequest request) {
+    public DartApiResponse<Map<String, Object>> login(@RequestBody UserRequest request) {
         UserEntity user = userService.findByUsername(request.getUsername());
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(401).body(Collections.singletonMap("error", "Invalid credentials"));
+            return DartApiResponse.<Map<String, Object>>builder()
+                    .success(false)
+                    .message("Invalid credentials")
+                    .data(null)
+                    .build();
         }
         String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
-        return ResponseEntity.ok(response);
+        return DartApiResponse.<Map<String, Object>>builder()
+                .success(true)
+                .message("Login successful")
+                .data(response)
+                .build();
     }
 }

@@ -1,9 +1,9 @@
-// ...existing code...
 package com.dart.server.app.auth;
 
 import com.dart.server.app.auth.dto.UserMapper;
 import com.dart.server.app.auth.dto.UserRequest;
 import com.dart.server.app.auth.dto.UserResponse;
+import com.dart.server.common.utils.DartApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,10 +58,15 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "List of users returned successfully")
     })
     @GetMapping
-    public List<UserResponse> getAllUsers() {
-        return userService.findAll().stream()
+    public DartApiResponse<List<UserResponse>> getAllUsers() {
+        List<UserResponse> users = userService.findAll().stream()
                 .map(UserMapper::toResponse)
                 .collect(Collectors.toList());
+        return DartApiResponse.<List<UserResponse>>builder()
+                .success(true)
+                .message("Users fetched successfully")
+                .data(users)
+                .build();
     }
 
     @Operation(summary = "Get user by ID", description = "Returns a single user by its ID.")
@@ -70,11 +75,19 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@Parameter(description = "ID of the user") @PathVariable Long id) {
+    public DartApiResponse<UserResponse> getUserById(@Parameter(description = "ID of the user") @PathVariable Long id) {
         return userService.findById(id)
                 .map(UserMapper::toResponse)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(user -> DartApiResponse.<UserResponse>builder()
+                        .success(true)
+                        .message("User found")
+                        .data(user)
+                        .build())
+                .orElseGet(() -> DartApiResponse.<UserResponse>builder()
+                        .success(false)
+                        .message("User not found")
+                        .data(null)
+                        .build());
     }
 
     @Operation(summary = "Create a new user", description = "Creates a new user.")
@@ -82,9 +95,14 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User created successfully")
     })
     @PostMapping
-    public UserResponse createUser(@Parameter(description = "User request body") @RequestBody UserRequest userRequest) {
+    public DartApiResponse<UserResponse> createUser(@Parameter(description = "User request body") @RequestBody UserRequest userRequest) {
         UserEntity user = UserMapper.toEntity(userRequest);
-        return UserMapper.toResponse(userService.save(user));
+        UserResponse response = UserMapper.toResponse(userService.save(user));
+        return DartApiResponse.<UserResponse>builder()
+                .success(true)
+                .message("User created successfully")
+                .data(response)
+                .build();
     }
 
     @Operation(summary = "Update a user", description = "Updates an existing user.")
@@ -93,14 +111,22 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(
+    public DartApiResponse<UserResponse> updateUser(
             @Parameter(description = "ID of the user") @PathVariable Long id,
             @Parameter(description = "Updated user request body") @RequestBody UserRequest userRequest) {
         UserEntity user = UserMapper.toEntity(userRequest);
         user.setId(id);
         return userService.findById(id)
-                .map(existing -> ResponseEntity.ok(UserMapper.toResponse(userService.save(user))))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(existing -> DartApiResponse.<UserResponse>builder()
+                        .success(true)
+                        .message("User updated successfully")
+                        .data(UserMapper.toResponse(userService.save(user)))
+                        .build())
+                .orElseGet(() -> DartApiResponse.<UserResponse>builder()
+                        .success(false)
+                        .message("User not found")
+                        .data(null)
+                        .build());
     }
 
     @Operation(summary = "Delete a user", description = "Deletes a user by its ID.")

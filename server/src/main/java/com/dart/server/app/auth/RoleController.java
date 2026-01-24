@@ -1,6 +1,6 @@
-// ...existing code...
 package com.dart.server.app.auth;
 
+import com.dart.server.common.utils.DartApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -54,8 +54,13 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "List of roles returned successfully")
     })
     @GetMapping
-    public List<RoleEntity> getAllRoles() {
-        return roleService.findAll();
+    public DartApiResponse<List<RoleEntity>> getAllRoles() {
+        List<RoleEntity> roles = roleService.findAll();
+        return DartApiResponse.<List<RoleEntity>>builder()
+                .success(true)
+                .message("Roles fetched successfully")
+                .data(roles)
+                .build();
     }
 
     @Operation(summary = "Get role by ID", description = "Returns a single role by its ID.")
@@ -64,10 +69,18 @@ public class RoleController {
             @ApiResponse(responseCode = "404", description = "Role not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<RoleEntity> getRoleById(@Parameter(description = "ID of the role") @PathVariable Long id) {
+    public DartApiResponse<RoleEntity> getRoleById(@Parameter(description = "ID of the role") @PathVariable Long id) {
         return roleService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(role -> DartApiResponse.<RoleEntity>builder()
+                        .success(true)
+                        .message("Role found")
+                        .data(role)
+                        .build())
+                .orElseGet(() -> DartApiResponse.<RoleEntity>builder()
+                        .success(false)
+                        .message("Role not found")
+                        .data(null)
+                        .build());
     }
 
     @Operation(summary = "Create a new role", description = "Creates a new role.")
@@ -75,8 +88,13 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "Role created successfully")
     })
     @PostMapping
-    public RoleEntity createRole(@Parameter(description = "Role request body") @RequestBody RoleEntity role) {
-        return roleService.save(role);
+    public DartApiResponse<RoleEntity> createRole(@Parameter(description = "Role request body") @RequestBody RoleEntity role) {
+        RoleEntity saved = roleService.save(role);
+        return DartApiResponse.<RoleEntity>builder()
+                .success(true)
+                .message("Role created successfully")
+                .data(saved)
+                .build();
     }
 
     @Operation(summary = "Update a role", description = "Updates an existing role.")
@@ -85,13 +103,21 @@ public class RoleController {
             @ApiResponse(responseCode = "404", description = "Role not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<RoleEntity> updateRole(
+    public DartApiResponse<RoleEntity> updateRole(
             @Parameter(description = "ID of the role") @PathVariable Long id,
             @Parameter(description = "Updated role request body") @RequestBody RoleEntity role) {
         role.setId(id);
         return roleService.findById(id)
-                .map(existing -> ResponseEntity.ok(roleService.save(role)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(existing -> DartApiResponse.<RoleEntity>builder()
+                        .success(true)
+                        .message("Role updated successfully")
+                        .data(roleService.save(role))
+                        .build())
+                .orElseGet(() -> DartApiResponse.<RoleEntity>builder()
+                        .success(false)
+                        .message("Role not found")
+                        .data(null)
+                        .build());
     }
 
     @Operation(summary = "Delete a role", description = "Deletes a role by its ID.")
@@ -100,11 +126,19 @@ public class RoleController {
             @ApiResponse(responseCode = "404", description = "Role not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRole(@Parameter(description = "ID of the role") @PathVariable Long id) {
+    public DartApiResponse<Void> deleteRole(@Parameter(description = "ID of the role") @PathVariable Long id) {
         if (!roleService.findById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
+            return DartApiResponse.<Void>builder()
+                    .success(false)
+                    .message("Role not found")
+                    .data(null)
+                    .build();
         }
         roleService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return DartApiResponse.<Void>builder()
+                .success(true)
+                .message("Role deleted successfully")
+                .data(null)
+                .build();
     }
 }
