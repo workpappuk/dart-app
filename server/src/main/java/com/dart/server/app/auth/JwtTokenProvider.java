@@ -1,5 +1,7 @@
 package com.dart.server.app.auth;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -11,8 +13,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
+
 @Component
 public class JwtTokenProvider {
 

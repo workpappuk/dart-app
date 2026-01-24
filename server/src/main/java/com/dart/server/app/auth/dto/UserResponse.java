@@ -1,11 +1,9 @@
 package com.dart.server.app.auth.dto;
 
-import java.util.Set;
-
-import com.dart.server.app.auth.RoleEntity;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.util.Set;
 
 @Data
 @Schema(description = "Response payload for User")
@@ -14,7 +12,9 @@ public class UserResponse {
     private String username;
     private Set<RoleResponse> roles;
 
-    public UserResponse() {}
+    public UserResponse() {
+    }
+
     public UserResponse(Long id, String username) {
         this.id = id;
         this.username = username;

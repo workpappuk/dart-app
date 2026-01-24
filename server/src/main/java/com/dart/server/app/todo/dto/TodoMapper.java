@@ -1,6 +1,5 @@
 package com.dart.server.app.todo.dto;
 
-import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.todo.TodoEntity;
 
 public class TodoMapper {

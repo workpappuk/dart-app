@@ -8,7 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.EnumMap;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -20,6 +23,27 @@ public class DBLoader {
     private final PermissionService permissionService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+
+    private static EnumMap<ERole, EPermission[]> getERoleEnumMap() {
+        EnumMap<ERole, EPermission[]> rolePermissions = new EnumMap<>(ERole.class);
+        rolePermissions.put(ERole.ADMIN, new EPermission[]{
+                EPermission.USER_CREATE,
+                EPermission.USER_READ,
+                EPermission.USER_UPDATE,
+                EPermission.USER_DELETE,
+                EPermission.ROLE_CREATE,
+                EPermission.ROLE_READ,
+                EPermission.ROLE_UPDATE,
+                EPermission.ROLE_DELETE
+        });
+        rolePermissions.put(ERole.USER, new EPermission[]{
+                EPermission.USER_CREATE,
+                EPermission.USER_READ,
+                EPermission.USER_UPDATE,
+                EPermission.USER_DELETE,
+        });
+        return rolePermissions;
+    }
 
     private String keyGenerator() {
         byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded();
@@ -87,27 +111,6 @@ public class DBLoader {
         });
 
 
-    }
-
-    private static EnumMap<ERole, EPermission[]> getERoleEnumMap() {
-        EnumMap<ERole, EPermission[]> rolePermissions = new EnumMap<>(ERole.class);
-        rolePermissions.put(ERole.ADMIN, new EPermission[]{
-                EPermission.USER_CREATE,
-                EPermission.USER_READ,
-                EPermission.USER_UPDATE,
-                EPermission.USER_DELETE,
-                EPermission.ROLE_CREATE,
-                EPermission.ROLE_READ,
-                EPermission.ROLE_UPDATE,
-                EPermission.ROLE_DELETE
-        });
-        rolePermissions.put(ERole.USER, new EPermission[]{
-                EPermission.USER_CREATE,
-                EPermission.USER_READ,
-                EPermission.USER_UPDATE,
-                EPermission.USER_DELETE,
-        });
-        return rolePermissions;
     }
 
 }

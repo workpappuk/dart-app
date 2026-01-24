@@ -2,7 +2,6 @@ package com.dart.server.app.auth.dto;
 
 import com.dart.server.app.auth.RoleEntity;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 

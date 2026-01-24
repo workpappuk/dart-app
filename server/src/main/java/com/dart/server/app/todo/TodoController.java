@@ -32,11 +32,11 @@ public class TodoController {
             @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size) {
         Page<TodoResponse> result = todoService.searchTodos(q, page, size);
         PageResponse<TodoResponse> pageResponse = new PageResponse<>(
-            result.getContent(),
-            result.getNumber(),
-            result.getSize(),
-            result.getTotalElements(),
-            result.getTotalPages()
+                result.getContent(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages()
         );
         return DartApiResponse.<PageResponse<TodoResponse>>builder()
                 .success(true)

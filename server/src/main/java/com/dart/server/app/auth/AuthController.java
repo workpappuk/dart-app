@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,7 +30,7 @@ public class AuthController {
 
     @Operation(summary = "Debug Authentication", description = "Prints the current user's authorities to the console.")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Authorities printed to console")
+            @ApiResponse(responseCode = "200", description = "Authorities printed to console")
     })
     @GetMapping("/debug-auth")
     public void debugAuth() {
@@ -41,8 +40,8 @@ public class AuthController {
 
     @Operation(summary = "Register a new user", description = "Registers a new user and assigns the default role.")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "User registered successfully"),
-        @ApiResponse(responseCode = "400", description = "Username already exists")
+            @ApiResponse(responseCode = "200", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Username already exists")
     })
     @PostMapping("/register")
     public DartApiResponse<UserResponse> register(@RequestBody UserRequest request) {
@@ -70,8 +69,8 @@ public class AuthController {
 
     @Operation(summary = "Login user", description = "Authenticates a user and returns a JWT token.")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Login successful, JWT token returned"),
-        @ApiResponse(responseCode = "401", description = "Invalid credentials")
+            @ApiResponse(responseCode = "200", description = "Login successful, JWT token returned"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
     @PostMapping("/login")
     public DartApiResponse<Map<String, Object>> login(@RequestBody UserRequest request) {

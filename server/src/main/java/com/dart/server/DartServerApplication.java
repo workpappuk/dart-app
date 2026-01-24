@@ -1,16 +1,10 @@
 package com.dart.server;
 
-import com.dart.server.app.auth.ERole;
 import com.dart.server.common.DBLoader;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.Arrays;
-import java.util.Base64;
 
 
 @RequiredArgsConstructor
