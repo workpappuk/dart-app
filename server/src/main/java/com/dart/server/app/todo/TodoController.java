@@ -3,6 +3,7 @@ package com.dart.server.app.todo;
 import com.dart.server.app.todo.dto.TodoRequest;
 import com.dart.server.app.todo.dto.TodoResponse;
 import com.dart.server.common.utils.DartApiResponse;
+import com.dart.server.common.utils.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,15 +28,22 @@ public class TodoController {
     })
     @GetMapping("/search")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public DartApiResponse<Page<TodoResponse>> searchTodos(
+    public DartApiResponse<PageResponse<TodoResponse>> searchTodos(
             @Parameter(description = "Search query") @RequestParam(defaultValue = "") String q,
             @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size) {
         Page<TodoResponse> result = todoService.searchTodos(q, page, size);
-        return DartApiResponse.<Page<TodoResponse>>builder()
+        PageResponse<TodoResponse> pageResponse = new PageResponse<>(
+            result.getContent(),
+            result.getNumber(),
+            result.getSize(),
+            result.getTotalElements(),
+            result.getTotalPages()
+        );
+        return DartApiResponse.<PageResponse<TodoResponse>>builder()
                 .success(true)
                 .message("Todos search result fetched successfully")
-                .data(result)
+                .data(pageResponse)
                 .build();
     }
 
