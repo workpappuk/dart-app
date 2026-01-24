@@ -1,6 +1,6 @@
 package com.dart.server.common.advices;
 
-import com.dart.server.common.utils.DartApiResponse;
+import com.dart.server.common.response.DartApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

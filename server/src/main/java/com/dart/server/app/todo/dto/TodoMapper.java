@@ -11,17 +11,16 @@ public class TodoMapper {
         response.setCompleted(todo.isCompleted());
         response.setCreatedAt(todo.getCreatedAt());
         response.setUpdatedAt(todo.getUpdatedAt());
-        response.setCreatedBy(todo.getCreatedBy() != null ? todo.getCreatedBy().getUsername() : null);
-        response.setUpdatedBy(todo.getUpdatedBy() != null ? todo.getUpdatedBy().getUsername() : null);
+        String userId = String.valueOf(todo.getCreatedBy() != null ? todo.getCreatedBy().getId() : null);
+        response.setCreatedBy(userId);
+        response.setUpdatedBy(userId);
         return response;
     }
 
-    public static TodoEntity toEntity(TodoRequest request, UserEntity creator, UserEntity updater) {
+    public static TodoEntity toEntity(TodoRequest request) {
         TodoEntity todo = new TodoEntity();
         todo.setDescription(request.getDescription());
         todo.setCompleted(request.isCompleted());
-        todo.setCreatedBy(creator);
-        todo.setUpdatedBy(updater);
         return todo;
     }
 }

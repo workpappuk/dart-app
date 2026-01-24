@@ -2,14 +2,13 @@ package com.dart.server.app.auth;
 
 import com.dart.server.app.auth.dto.UserRequest;
 import com.dart.server.app.auth.dto.UserResponse;
-import com.dart.server.common.utils.DartApiResponse;
+import com.dart.server.common.response.DartApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;

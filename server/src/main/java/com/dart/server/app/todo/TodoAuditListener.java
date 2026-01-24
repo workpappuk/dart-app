@@ -4,19 +4,13 @@ import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.auth.UserRepository;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import lombok.Setter;
 
-@Configurable
+import static com.dart.server.common.utils.AuthUtils.getCurrentUserId;
+
 public class TodoAuditListener {
+    @Setter
     private static UserRepository userRepository;
-
-    @Autowired
-    public static void setUserRepository(UserRepository repo) {
-        userRepository = repo;
-    }
 
     @PrePersist
     public void setCreatedBy(TodoEntity entity) {
@@ -36,21 +30,13 @@ public class TodoAuditListener {
     }
 
     private UserEntity getCurrentUserEntity() {
-        String username = getCurrentUsername();
-        if (username != null && userRepository != null) {
-            return userRepository.findById(Long.valueOf(username)).orElse(null);
-        }
-        return null;
-    }
-
-    private String getCurrentUsername() {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.isAuthenticated()) {
-                return auth.getName();
+        String userId = getCurrentUserId();
+        if (userId != null && userRepository != null) {
+            try {
+                return userRepository.findById(Long.valueOf(userId)).orElse(null);
+            } catch (NumberFormatException e) {
+                return null;
             }
-        } catch (Exception ignored) {
-
         }
         return null;
     }

@@ -2,8 +2,8 @@ package com.dart.server.app.todo;
 
 import com.dart.server.app.todo.dto.TodoRequest;
 import com.dart.server.app.todo.dto.TodoResponse;
-import com.dart.server.common.utils.DartApiResponse;
-import com.dart.server.common.utils.PageResponse;
+import com.dart.server.common.response.DartApiResponse;
+import com.dart.server.common.response.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,8 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/todos")

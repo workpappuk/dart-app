@@ -1,6 +1,6 @@
 package com.dart.server.app.auth;
 
-import com.dart.server.common.utils.DartApiResponse;
+import com.dart.server.common.response.DartApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

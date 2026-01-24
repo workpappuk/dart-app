@@ -1,5 +1,6 @@
 package com.dart.server.app.todo;
 
+import com.dart.server.app.auth.ERole;
 import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.auth.UserRepository;
 import com.dart.server.app.todo.dto.TodoMapper;
@@ -42,8 +43,7 @@ public class TodoService {
     }
 
     public TodoResponse createTodo(TodoRequest request, String username) {
-        UserEntity user = userRepository.findByUsername(username).orElse(null);
-        TodoEntity todo = TodoMapper.toEntity(request, user, user);
+        TodoEntity todo = TodoMapper.toEntity(request);
         return TodoMapper.toResponse(todoRepository.save(todo));
     }
 
@@ -57,7 +57,7 @@ public class TodoService {
         boolean isOwner = user != null && todo.getCreatedBy() != null && todo.getCreatedBy().getId().equals(user.getId());
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+                .anyMatch(role -> role.equals(ERole.ADMIN.name()));
         if (!isOwner && !isAdmin) {
             return Optional.empty();
         }
