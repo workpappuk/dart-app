@@ -4,6 +4,6 @@ CREATE TABLE todos (
     completed BOOLEAN NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by VARCHAR(100),
-    updated_by VARCHAR(100)
+    created_by BIGINT REFERENCES users(id),
+    updated_by BIGINT REFERENCES users(id)
 );
