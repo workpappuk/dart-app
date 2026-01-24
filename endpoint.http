@@ -1,5 +1,4 @@
-
-
+@token = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOiJVU0VSIiwiaWF0IjoxNzY5MjE3OTI1LCJleHAiOjE3NjkzMDQzMjV9.rxbUnNpDYvgawCURjGy0KieJZRMfjvUztAF3bKwOcyIBHLSLpXezlmCDxZKAw_YKtpAMdhDnmQ_9-ZVBG5h_Xg
 ### --- PERMISSIONS ---
 
 ### Create a new read permission
@@ -122,6 +121,8 @@ Content-Type: application/json
 ### Create a new todo
 POST http://localhost:8080/api/todos
 Content-Type: application/json
+Authorization: Bearer {{token}}
+
 
 {
   "description": "Sample todo",

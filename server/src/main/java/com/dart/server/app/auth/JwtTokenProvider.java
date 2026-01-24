@@ -1,3 +1,4 @@
+
 package com.dart.server.app.auth;
 
 import io.jsonwebtoken.Jwts;
@@ -11,6 +12,8 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 
 @Component
 public class JwtTokenProvider {
@@ -21,6 +24,7 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration:86400000}") // 1 day default
     private long jwtExpirationInMs;
 
+
     public String createToken(String username, Set<RoleEntity> roles) {
         String rolesString = roles.stream()
                 .map(RoleEntity::getName)
@@ -28,10 +32,24 @@ public class JwtTokenProvider {
         SecretKey key = Keys.hmacShaKeyFor(Base64.getEncoder().encodeToString(jwtSecret.getBytes()).getBytes());
         return Jwts.builder()
                 .setSubject(username)
-                .claim("roles", rolesString)
+                .claim("roles", rolesString.toUpperCase())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
+            }
+
+            public boolean validateToken(String token) {
+                try {
+                    SecretKey key = Keys.hmacShaKeyFor(Base64.getEncoder().encodeToString(jwtSecret.getBytes()).getBytes());
+                    Jwts.parserBuilder()
+                        .setSigningKey(key)
+                        .build()
+                        .parseClaimsJws(token);
+                    return true;
+                } catch (JwtException | IllegalArgumentException e) {
+                    return false;
+                }
+            }
     }
-}
+

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,17 +36,25 @@ public class TodoService {
         return todoRepository.findById(id).map(TodoMapper::toResponse);
     }
 
-    public TodoResponse createTodo(TodoRequest request) {
+    public TodoResponse createTodo(TodoRequest request, String username) {
         TodoEntity todo = TodoMapper.toEntity(request);
+        todo.setCreatedBy(username);
         return TodoMapper.toResponse(todoRepository.save(todo));
     }
 
-    public Optional<TodoResponse> updateTodo(Long id, TodoRequest request) {
+    public Optional<TodoResponse> updateTodo(Long id, TodoRequest request, String username) {
         Optional<TodoEntity> todoOptional = todoRepository.findById(id);
         if (todoOptional.isEmpty()) {
             return Optional.empty();
         }
         TodoEntity todo = todoOptional.get();
+        boolean isOwner = todo.getCreatedBy() != null && todo.getCreatedBy().equals(username);
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+        if (!isOwner && !isAdmin) {
+            return Optional.empty();
+        }
         todo.setDescription(request.getDescription());
         todo.setCompleted(request.isCompleted());
         return Optional.of(TodoMapper.toResponse(todoRepository.save(todo)));
