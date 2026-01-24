@@ -3,14 +3,21 @@ package com.dart.server.app.auth;
 import com.dart.server.app.auth.dto.UserRequest;
 import com.dart.server.app.auth.dto.UserResponse;
 import com.dart.server.common.utils.DartApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+@Tag(name = "Authentication", description = "Authentication and user registration APIs")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -27,6 +34,21 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Operation(summary = "Debug Authentication", description = "Prints the current user's authorities to the console.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Authorities printed to console")
+    })
+    @GetMapping("/debug-auth")
+    public void debugAuth() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        auth.getAuthorities().forEach(a -> System.out.println(a.getAuthority()));
+    }
+
+    @Operation(summary = "Register a new user", description = "Registers a new user and assigns the default role.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User registered successfully"),
+        @ApiResponse(responseCode = "400", description = "Username already exists")
+    })
     @PostMapping("/register")
     public DartApiResponse<UserResponse> register(@RequestBody UserRequest request) {
         if (userService.existsByUsername(request.getUsername())) {
@@ -51,6 +73,11 @@ public class AuthController {
                 .build();
     }
 
+    @Operation(summary = "Login user", description = "Authenticates a user and returns a JWT token.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Login successful, JWT token returned"),
+        @ApiResponse(responseCode = "401", description = "Invalid credentials")
+    })
     @PostMapping("/login")
     public DartApiResponse<Map<String, Object>> login(@RequestBody UserRequest request) {
         UserEntity user = userService.findByUsername(request.getUsername());
