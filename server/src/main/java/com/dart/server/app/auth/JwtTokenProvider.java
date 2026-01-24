@@ -1,4 +1,3 @@
-
 package com.dart.server.app.auth;
 
 import io.jsonwebtoken.Jwts;
@@ -14,7 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
-
 @Component
 public class JwtTokenProvider {
 
@@ -25,11 +23,20 @@ public class JwtTokenProvider {
     private long jwtExpirationInMs;
 
 
+    public Claims getClaims(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtSecret));
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     public String createToken(String username, Set<RoleEntity> roles) {
         String rolesString = roles.stream()
                 .map(RoleEntity::getName)
                 .collect(Collectors.joining(","));
-        SecretKey key = Keys.hmacShaKeyFor(Base64.getEncoder().encodeToString(jwtSecret.getBytes()).getBytes());
+        SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtSecret));
         return Jwts.builder()
                 .setSubject(username)
                 .claim("roles", rolesString.toUpperCase())
@@ -37,19 +44,21 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
-            }
 
-            public boolean validateToken(String token) {
-                try {
-                    SecretKey key = Keys.hmacShaKeyFor(Base64.getEncoder().encodeToString(jwtSecret.getBytes()).getBytes());
-                    Jwts.parserBuilder()
-                        .setSigningKey(key)
-                        .build()
-                        .parseClaimsJws(token);
-                    return true;
-                } catch (JwtException | IllegalArgumentException e) {
-                    return false;
-                }
-            }
     }
 
+    public boolean validateToken(String token) {
+        try {
+            SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtSecret));
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+}
