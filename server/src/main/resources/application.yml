@@ -1,0 +1,63 @@
+server:
+  port: 8080
+jwt:
+  secret: oNConES5ItWk8njkVHac4/gtkpQjVeBVlAuWYhot2EOkpZdCdiER5Jl8Fg9t3DAA8Ti1z4EG9NsPfPYHLdYTWw==
+  expiration: 3600000
+spring:
+  profiles:
+    active: local
+  application:
+    name: dart-server
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dart_db
+    username: dart_user
+    password: dart_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/devdb
+    username: devuser
+    password: devpass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: staging
+  datasource:
+    url: jdbc:postgresql://staging-host:5432/stagingdb
+    username: staginguser
+    password: stagingpass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://prod-host:5432/proddb
+    username: produser
+    password: prodpass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: false
+
