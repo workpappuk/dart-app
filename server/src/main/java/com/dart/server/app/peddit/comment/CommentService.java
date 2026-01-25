@@ -46,5 +46,12 @@ public class CommentService {
             return true;
         }).orElse(false);
     }
-}
 
+    public CommentEntity getByIdEntity(Long id) {
+        return commentRepository.findById(id).orElse(null);
+    }
+
+    public CommentEntity save(CommentEntity entity) {
+        return commentRepository.save(entity);
+    }
+}

@@ -3,8 +3,8 @@ package com.dart.server.app.peddit.community;
 import com.dart.server.app.peddit.community.dto.CommunityMapper;
 import com.dart.server.app.peddit.community.dto.CommunityRequest;
 import com.dart.server.app.peddit.community.dto.CommunityResponse;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,5 +47,12 @@ public class CommunityService {
             return true;
         }).orElse(false);
     }
-}
 
+    public CommunityEntity getByIdEntity(Long id) {
+        return communityRepository.findById(id).orElse(null);
+    }
+
+    public CommunityEntity save(CommunityEntity entity) {
+        return communityRepository.save(entity);
+    }
+}

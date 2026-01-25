@@ -53,5 +53,12 @@ public class PostService {
             return true;
         }).orElse(false);
     }
-}
 
+    public PostEntity getByIdEntity(Long id) {
+        return postRepository.findById(id).orElse(null);
+    }
+
+    public PostEntity save(PostEntity entity) {
+        return postRepository.save(entity);
+    }
+}

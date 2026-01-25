@@ -2,6 +2,8 @@ package com.dart.server.app.peddit.community;
 
 import com.dart.server.app.peddit.community.dto.CommunityRequest;
 import com.dart.server.app.peddit.community.dto.CommunityResponse;
+import com.dart.server.common.response.DartApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,29 +17,55 @@ public class CommunityController {
     @Autowired
     private CommunityService communityService;
 
+    @Operation(summary = "Get all communities", description = "Returns a list of all communities.")
     @GetMapping
-    public List<CommunityResponse> getAll() {
-        return communityService.getAll();
+    public DartApiResponse<List<CommunityResponse>> getAll() {
+        return DartApiResponse.<List<CommunityResponse>>builder()
+                .success(true)
+                .message("OK")
+                .data(communityService.getAll())
+                .build();
     }
 
+    @Operation(summary = "Get community by ID", description = "Returns a single community by its ID.")
     @GetMapping("/{id}")
-    public CommunityResponse getById(@PathVariable Long id) {
-        return communityService.getById(id);
+    public DartApiResponse<CommunityResponse> getById(@PathVariable Long id) {
+        CommunityResponse response = communityService.getById(id);
+        if (response == null)
+            return DartApiResponse.<CommunityResponse>builder().success(false).message("Community not found").build();
+        return DartApiResponse.<CommunityResponse>builder().success(true).message("OK").data(response).build();
     }
 
+    @Operation(summary = "Create a new community", description = "Creates a new community.")
     @PostMapping
-    public CommunityResponse create(@RequestBody CommunityRequest request) {
-        return communityService.create(request);
+    public DartApiResponse<CommunityResponse> create(@RequestBody CommunityRequest request) {
+        return DartApiResponse.<CommunityResponse>builder()
+                .success(true)
+                .message("Created")
+                .data(communityService.create(request))
+                .build();
     }
 
+    @Operation(summary = "Update a community", description = "Updates an existing community by ID.")
     @PutMapping("/{id}")
-    public CommunityResponse update(@PathVariable Long id, @RequestBody CommunityRequest request) {
-        return communityService.update(id, request);
+    public DartApiResponse<CommunityResponse> update(@PathVariable Long id, @RequestBody CommunityRequest request) {
+        CommunityResponse response = communityService.update(id, request);
+        if (response == null)
+            return DartApiResponse.<CommunityResponse>builder().success(false).message("Community not found").build();
+        return DartApiResponse.<CommunityResponse>builder().success(true).message("OK").data(response).build();
     }
 
+    @Operation(summary = "Delete a community", description = "Marks a community as deleted by ID.")
     @DeleteMapping("/{id}")
-    public boolean delete(@PathVariable Long id) {
-        return communityService.delete(id);
+    public DartApiResponse<Boolean> delete(@PathVariable Long id) {
+        var entity = communityService.getByIdEntity(id);
+        if (entity == null)
+            return DartApiResponse.<Boolean>builder().success(false).message("Community not found").build();
+        if (entity.isMarkedForDeletion()) {
+            return DartApiResponse.<Boolean>builder().success(false).message("Community already marked for deletion").build();
+        }
+        entity.setMarkedForDeletion(true);
+        communityService.save(entity);
+        return DartApiResponse.<Boolean>builder().success(true).message("Marked for deletion").data(true).build();
     }
 }
-

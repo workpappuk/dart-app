@@ -22,12 +22,9 @@ public class VoteService {
         return voteRepository.save(vote);
     }
 
-    public boolean delete(Long id) {
-        if (voteRepository.existsById(id)) {
-            voteRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public VoteEntity save(VoteEntity entity) {
+        return voteRepository.save(entity);
     }
-}
 
+
+}

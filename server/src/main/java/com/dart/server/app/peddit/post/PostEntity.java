@@ -1,16 +1,12 @@
 package com.dart.server.app.peddit.post;
 
 import com.dart.server.app.auth.UserEntity;
-import com.dart.server.app.peddit.comment.CommentEntity;
 import com.dart.server.app.peddit.community.CommunityEntity;
-import com.dart.server.app.peddit.vote.VoteEntity;
 import com.dart.server.config.db.DartDBAuditListener;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @Entity
