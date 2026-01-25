@@ -1,0 +1,34 @@
+package com.dart.server.common.utils;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class AuthUtilsTest {
+    @Test
+    void getCurrentUserId_returnsUsername() {
+        try (MockedStatic<SecurityContextHolder> mocked = mockStatic(SecurityContextHolder.class)) {
+            SecurityContext context = mock(SecurityContext.class);
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getName()).thenReturn("user");
+            when(context.getAuthentication()).thenReturn(auth);
+            mocked.when(SecurityContextHolder::getContext).thenReturn(context);
+            assertEquals("user", AuthUtils.getCurrentUserId());
+        }
+    }
+
+    @Test
+    void getCurrentUserId_returnsNullOnException() {
+        try (MockedStatic<SecurityContextHolder> mocked = mockStatic(SecurityContextHolder.class)) {
+            mocked.when(SecurityContextHolder::getContext).thenThrow(new RuntimeException());
+            assertNull(AuthUtils.getCurrentUserId());
+        }
+    }
+}
+
