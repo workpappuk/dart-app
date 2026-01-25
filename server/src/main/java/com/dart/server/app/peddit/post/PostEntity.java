@@ -33,12 +33,6 @@ public class PostEntity {
     @JoinColumn(name = "author_id", nullable = false)
     private UserEntity author;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CommentEntity> comments = new HashSet<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VoteEntity> votes = new HashSet<>();
-
     private boolean markedForDeletion = false;
 
     @Column(nullable = false, updatable = false)
