@@ -10,15 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class PermissionControllerTest {
     @Mock
     PermissionService permissionService;
-
     @InjectMocks
     PermissionController permissionController;
-
     @Test
-    void contextLoads() throws Exception {
-        try (var mocks = MockitoAnnotations.openMocks(this)) {
-            assertNotNull(permissionService);
-            assertNotNull(permissionController);
-        }
+    void contextLoads() {
+        MockitoAnnotations.openMocks(this);
+        assertNotNull(permissionService);
+        assertNotNull(permissionController);
     }
 }

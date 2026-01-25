@@ -12,12 +12,10 @@ class RoleControllerTest {
     RoleService roleService;
     @InjectMocks
     RoleController roleController;
-
     @Test
     void contextLoads() throws Exception {
-        try (var mocks = MockitoAnnotations.openMocks(this)) {
-            assertNotNull(roleService);
-            assertNotNull(roleController);
-        }
+        MockitoAnnotations.openMocks(this);
+        assertNotNull(roleService);
+        assertNotNull(roleController);
     }
 }
