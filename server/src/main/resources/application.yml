@@ -1,16 +1,20 @@
 server:
   port: 8080
-jwt:
-  secret: oNConES5ItWk8njkVHac4/gtkpQjVeBVlAuWYhot2EOkpZdCdiER5Jl8Fg9t3DAA8Ti1z4EG9NsPfPYHLdYTWw==
-  expiration: 3600000
+
 spring:
   profiles:
     active: local
-  application:
-    name: dart-server
 
 ---
 spring:
+  dart:
+    swagger:
+      enabled: true
+    jwt:
+      secret: oNConES5ItWk8njkVHac4/gtkpQjVeBVlAuWYhot2EOkpZdCdiER5Jl8Fg9t3DAA8Ti1z4EG9NsPfPYHLdYTWw==
+      expiration: 3600000
+  application:
+    name: dart-server-local
   config:
     activate:
       on-profile: local
@@ -24,6 +28,14 @@ spring:
 
 ---
 spring:
+  dart:
+    swagger:
+      enabled: true
+    jwt:
+      secret: oNConES5ItWk8njkVHac4/gtkpQjVeBVlAuWYhot2EOkpZdCdiER5Jl8Fg9t3DAA8Ti1z4EG9NsPfPYHLdYTWw==
+      expiration: 3600000
+  application:
+    name: dart-server-dev
   config:
     activate:
       on-profile: dev
@@ -37,6 +49,14 @@ spring:
 
 ---
 spring:
+  dart:
+    swagger:
+      enabled: true
+    jwt:
+      secret: oNConES5ItWk8njkVHac4/gtkpQjVeBVlAuWYhot2EOkpZdCdiER5Jl8Fg9t3DAA8Ti1z4EG9NsPfPYHLdYTWw==
+      expiration: 3600000
+  application:
+    name: dart-server-staging
   config:
     activate:
       on-profile: staging
@@ -50,6 +70,14 @@ spring:
 
 ---
 spring:
+  dart:
+    swagger:
+      enabled: true
+    jwt:
+      secret: oNConES5ItWk8njkVHac4/gtkpQjVeBVlAuWYhot2EOkpZdCdiER5Jl8Fg9t3DAA8Ti1z4EG9NsPfPYHLdYTWw==
+      expiration: 3600000
+  application:
+    name: dart-server-prod
   config:
     activate:
       on-profile: prod

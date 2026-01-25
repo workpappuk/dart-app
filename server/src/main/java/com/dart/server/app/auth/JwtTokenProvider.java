@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret:secret-key}")
+    @Value("${spring.dart.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration:86400000}") // 1 day default
+    @Value("${spring.dart.jwt.expiration}") // 1 day default
     private long jwtExpirationInMs;
 
 

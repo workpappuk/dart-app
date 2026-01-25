@@ -2,6 +2,7 @@ package com.dart.server.config;
 
 import com.dart.server.app.auth.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
+
+    @Value("${spring.dart.swagger.enabled}")
+    private boolean swaggerEnabled;
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -32,18 +36,22 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/register",
-                                "/api/auth/login",
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(
+                            "/api/auth/register",
+                            "/api/auth/login"
+                    ).permitAll();
+                    if (swaggerEnabled) {
+                        auth.requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
+                        ).permitAll();
+                    }
+                    auth.anyRequest().authenticated();
+                })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
