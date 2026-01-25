@@ -6,6 +6,8 @@ import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import 'react-native-reanimated';
 import { Provider, useSelector } from 'react-redux';
 import { RootState, store } from './redux/store';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
 
 function InnerRootLayout() {
   const dark = useSelector((state: RootState) => state.theme.dark);
@@ -32,6 +34,9 @@ function InnerRootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+          <Stack.Screen name="pages/admin/dashboard" options={{ title: 'Admin Dashboard' }} />
+          <Stack.Screen name="pages/auth/login" options={{ title: 'Login' }} />
+        
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
@@ -39,10 +44,14 @@ function InnerRootLayout() {
   );
 }
 
+
 export default function RootLayout() {
+  const queryClient = React.useRef(new QueryClient()).current;
   return (
     <Provider store={store}>
-      <InnerRootLayout />
+      <QueryClientProvider client={queryClient}>
+        <InnerRootLayout />
+      </QueryClientProvider>
     </Provider>
   );
 }
