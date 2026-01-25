@@ -6,7 +6,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Setter;
 
-import static com.dart.server.common.utils.AuthUtils.getCurrentUserId;
+import static com.dart.server.common.utils.AuthUtils.getCurrentUsername;
 
 public class TodoAuditListener {
     @Setter
@@ -30,7 +30,7 @@ public class TodoAuditListener {
     }
 
     private UserEntity getCurrentUserEntity() {
-        String userId = getCurrentUserId();
+        String userId = getCurrentUsername();
         if (userId != null && userRepository != null) {
             try {
                 return userRepository.findById(Long.valueOf(userId)).orElse(null);

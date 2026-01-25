@@ -29,8 +29,10 @@ public class TodoController {
     public DartApiResponse<PageResponse<TodoResponse>> searchTodos(
             @Parameter(description = "Search query") @RequestParam(defaultValue = "") String q,
             @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size) {
-        Page<TodoResponse> result = todoService.searchTodos(q, page, size);
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        String username = authentication.getName();
+        Page<TodoResponse> result = todoService.searchTodos(q, page, size, username);
         PageResponse<TodoResponse> pageResponse = new PageResponse<>(
                 result.getContent(),
                 result.getNumber(),
@@ -51,8 +53,9 @@ public class TodoController {
             @ApiResponse(responseCode = "404", description = "Todo not found")
     })
     @GetMapping("/{id}")
-    public DartApiResponse<TodoResponse> getTodoById(@Parameter(description = "ID of the todo") @PathVariable Long id) {
-        return todoService.getTodoById(id)
+    public DartApiResponse<TodoResponse> getTodoById(@Parameter(description = "ID of the todo") @PathVariable Long id, Authentication authentication) {
+        String username = authentication.getName();
+        return todoService.getTodoById(id, username)
                 .map(todo -> DartApiResponse.<TodoResponse>builder()
                         .success(true)
                         .message("Todo found")
@@ -60,7 +63,7 @@ public class TodoController {
                         .build())
                 .orElseGet(() -> DartApiResponse.<TodoResponse>builder()
                         .success(false)
-                        .message("Todo not found")
+                        .message("Todo not found or access denied")
                         .data(null)
                         .build());
     }
@@ -101,7 +104,7 @@ public class TodoController {
                         .build())
                 .orElseGet(() -> DartApiResponse.<TodoResponse>builder()
                         .success(false)
-                        .message("Todo not found")
+                        .message("Todo not found or access denied")
                         .data(null)
                         .build());
     }
@@ -112,13 +115,14 @@ public class TodoController {
             @ApiResponse(responseCode = "404", description = "Todo not found")
     })
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public DartApiResponse<Void> deleteTodo(@Parameter(description = "ID of the todo") @PathVariable Long id) {
-        boolean deleted = todoService.deleteTodo(id);
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public DartApiResponse<Void> deleteTodo(@Parameter(description = "ID of the todo") @PathVariable Long id, Authentication authentication) {
+        String username = authentication.getName();
+        boolean deleted = todoService.deleteTodo(id, username);
         if (!deleted) {
             return DartApiResponse.<Void>builder()
                     .success(false)
-                    .message("Todo not found")
+                    .message("Todo not found or access denied")
                     .data(null)
                     .build();
         }

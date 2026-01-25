@@ -84,7 +84,7 @@ public class AuthController {
                     .data(null)
                     .build();
         }
-        String token = jwtTokenProvider.createToken(user.getId(), user.getRoles());
+        String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
         return DartApiResponse.<Map<String, Object>>builder()

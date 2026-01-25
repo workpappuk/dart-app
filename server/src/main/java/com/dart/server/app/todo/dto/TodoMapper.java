@@ -13,6 +13,7 @@ public class TodoMapper {
         String userId = String.valueOf(todo.getCreatedBy() != null ? todo.getCreatedBy().getId() : null);
         response.setCreatedBy(userId);
         response.setUpdatedBy(userId);
+        response.setMarkedForDeletion(todo.isMarkedForDeletion());
         return response;
     }
 

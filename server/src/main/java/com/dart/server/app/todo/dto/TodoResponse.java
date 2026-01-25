@@ -27,7 +27,7 @@ public class TodoResponse {
     @Schema(description = "User who last updated the todo", example = "john_doe")
     private String updatedBy;
 
-    // createdAt and updatedAt should be set at the entity level (in TodoEntity) using @PrePersist and @PreUpdate methods.
-    // createdBy and updatedBy should be set at the entity level using an EntityListener (e.g., TodoAuditListener) that pulls the username from the security context.
-    // This DTO is correct for mapping these values from the entity for API responses.
+    @Schema(description = "Soft deletion flag", example = "false")
+    private boolean markedForDeletion;
+
 }

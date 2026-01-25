@@ -6,6 +6,7 @@ import com.dart.server.app.auth.UserRepository;
 import com.dart.server.app.todo.dto.TodoMapper;
 import com.dart.server.app.todo.dto.TodoRequest;
 import com.dart.server.app.todo.dto.TodoResponse;
+import com.dart.server.common.utils.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,18 +33,37 @@ public class TodoService {
                 .collect(Collectors.toList());
     }
 
-    public Page<TodoResponse> searchTodos(String q, int page, int size) {
+    public Page<TodoResponse> searchTodos(String q, int page, int size, String username) {
         Pageable pageable = PageRequest.of(page, size);
-        return todoRepository.findByDescriptionContainingIgnoreCase(q, pageable)
-                .map(TodoMapper::toResponse);
+        if (AuthUtils.isAdmin()) {
+            return todoRepository.findByDescriptionContainingIgnoreCaseAndMarkedForDeletionFalse(q, pageable)
+                    .map(TodoMapper::toResponse);
+        } else {
+            return todoRepository.findByDescriptionContainingIgnoreCaseAndCreatedBy_UsernameAndMarkedForDeletionFalse(q, username, pageable)
+                    .map(TodoMapper::toResponse);
+        }
     }
 
-    public Optional<TodoResponse> getTodoById(Long id) {
-        return todoRepository.findById(id).map(TodoMapper::toResponse);
+    public Optional<TodoResponse> getTodoById(Long id, String username) {
+        Optional<TodoEntity> todoOptional = todoRepository.findByIdAndMarkedForDeletionFalse(id);
+        if (todoOptional.isEmpty()) {
+            return Optional.empty();
+        }
+        TodoEntity todo = todoOptional.get();
+        UserEntity user = AuthUtils.getUser(username, userRepository);
+        if (!AuthUtils.isOwner(todo, user) && !AuthUtils.isAdmin()) {
+            return Optional.empty();
+        }
+        return Optional.of(TodoMapper.toResponse(todo));
     }
 
     public TodoResponse createTodo(TodoRequest request, String username) {
         TodoEntity todo = TodoMapper.toEntity(request);
+        UserEntity user = AuthUtils.getUser(username, userRepository);
+        if (user != null) {
+            todo.setCreatedBy(user);
+            todo.setUpdatedBy(user);
+        }
         return TodoMapper.toResponse(todoRepository.save(todo));
     }
 
@@ -53,12 +73,8 @@ public class TodoService {
             return Optional.empty();
         }
         TodoEntity todo = todoOptional.get();
-        UserEntity user = userRepository.findByUsername(username).orElse(null);
-        boolean isOwner = user != null && todo.getCreatedBy() != null && todo.getCreatedBy().getId().equals(user.getId());
-        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(role -> role.equals(ERole.ADMIN.name()));
-        if (!isOwner && !isAdmin) {
+        UserEntity user = AuthUtils.getUser(username, userRepository);
+        if (!AuthUtils.isOwner(todo, user) && !AuthUtils.isAdmin()) {
             return Optional.empty();
         }
         todo.setDescription(request.getDescription());
@@ -69,11 +85,18 @@ public class TodoService {
         return Optional.of(TodoMapper.toResponse(todoRepository.save(todo)));
     }
 
-    public boolean deleteTodo(Long id) {
-        if (!todoRepository.existsById(id)) {
+    public boolean deleteTodo(Long id, String username) {
+        Optional<TodoEntity> todoOptional = todoRepository.findByIdAndMarkedForDeletionFalse(id);
+        if (todoOptional.isEmpty()) {
             return false;
         }
-        todoRepository.deleteById(id);
+        TodoEntity todo = todoOptional.get();
+        UserEntity user = AuthUtils.getUser(username, userRepository);
+        if (!AuthUtils.isOwner(todo, user) && !AuthUtils.isAdmin()) {
+            return false;
+        }
+        todo.setMarkedForDeletion(true);
+        todoRepository.save(todo);
         return true;
     }
 }

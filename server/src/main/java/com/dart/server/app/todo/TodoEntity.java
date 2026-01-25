@@ -19,6 +19,8 @@ public class TodoEntity {
 
     private boolean completed;
 
+    private boolean markedForDeletion = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

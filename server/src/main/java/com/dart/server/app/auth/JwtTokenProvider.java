@@ -33,13 +33,13 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
-    public String createToken(Long userId, Set<RoleEntity> roles) {
+    public String createToken(String username, Set<RoleEntity> roles) {
         String rolesString = roles.stream()
                 .map(RoleEntity::getName)
                 .collect(Collectors.joining(","));
         SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(jwtSecret));
         return Jwts.builder()
-                .setSubject(String.valueOf(userId))
+                .setSubject(username)
                 .claim("roles", rolesString.toUpperCase())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
