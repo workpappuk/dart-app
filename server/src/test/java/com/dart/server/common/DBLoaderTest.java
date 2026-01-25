@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DBLoaderTest {
     @Mock
@@ -67,5 +68,13 @@ class DBLoaderTest {
         verify(permissionService, atLeastOnce()).save(any());
         verify(roleService, atLeastOnce()).save(any());
         verify(userService, atLeastOnce()).save(any());
+    }
+
+    @Test
+    void testKeyGenerator() {
+        DBLoader loader = new DBLoader(roleService, permissionService, userService, passwordEncoder);
+        String key = loader.keyGenerator();
+        assertNotNull(key);
+        assertTrue(key.length() > 0);
     }
 }

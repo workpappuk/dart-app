@@ -45,7 +45,7 @@ public class DBLoader {
         return rolePermissions;
     }
 
-    private String keyGenerator() {
+    public String keyGenerator() {
         byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded();
         String base64Key = Base64.getEncoder().encodeToString(keyBytes);
         return base64Key;
