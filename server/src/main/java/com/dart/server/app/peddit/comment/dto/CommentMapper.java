@@ -1,7 +1,6 @@
-package com.dart.server.app.peddit.comment;
+package com.dart.server.app.peddit.comment.dto;
 
-import com.dart.server.app.peddit.comment.dto.CommentRequest;
-import com.dart.server.app.peddit.comment.dto.CommentResponse;
+import com.dart.server.app.peddit.comment.CommentEntity;
 
 public class CommentMapper {
     public static CommentEntity toEntity(CommentRequest request) {

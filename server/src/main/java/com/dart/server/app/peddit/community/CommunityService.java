@@ -1,5 +1,6 @@
 package com.dart.server.app.peddit.community;
 
+import com.dart.server.app.peddit.community.dto.CommunityMapper;
 import com.dart.server.app.peddit.community.dto.CommunityRequest;
 import com.dart.server.app.peddit.community.dto.CommunityResponse;
 import org.springframework.stereotype.Service;

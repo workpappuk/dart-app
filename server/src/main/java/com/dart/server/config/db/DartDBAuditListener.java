@@ -1,14 +1,15 @@
-package com.dart.server.app.todo;
+package com.dart.server.config.db;
 
 import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.auth.UserRepository;
+import com.dart.server.app.todo.TodoEntity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Setter;
 
 import static com.dart.server.common.utils.AuthUtils.getCurrentUsername;
 
-public class TodoAuditListener {
+public class DartDBAuditListener {
     @Setter
     private static UserRepository userRepository;
 

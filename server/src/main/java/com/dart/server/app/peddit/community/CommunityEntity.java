@@ -2,6 +2,7 @@ package com.dart.server.app.peddit.community;
 
 import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.peddit.post.PostEntity;
+import com.dart.server.config.db.DartDBAuditListener;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "communities")
+@EntityListeners(DartDBAuditListener.class)
 public class CommunityEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

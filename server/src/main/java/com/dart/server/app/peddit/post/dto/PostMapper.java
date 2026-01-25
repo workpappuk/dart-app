@@ -1,8 +1,7 @@
-package com.dart.server.app.peddit.post;
+package com.dart.server.app.peddit.post.dto;
 
 import com.dart.server.app.peddit.community.CommunityEntity;
-import com.dart.server.app.peddit.post.dto.PostRequest;
-import com.dart.server.app.peddit.post.dto.PostResponse;
+import com.dart.server.app.peddit.post.PostEntity;
 
 public class PostMapper {
     public static PostEntity toEntity(PostRequest request, CommunityEntity community) {

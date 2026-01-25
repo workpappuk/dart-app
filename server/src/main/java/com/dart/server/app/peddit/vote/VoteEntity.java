@@ -1,10 +1,16 @@
 package com.dart.server.app.peddit.vote;
 
 import com.dart.server.app.auth.UserEntity;
+import com.dart.server.config.db.DartDBAuditListener;
 import jakarta.persistence.*;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+
+@Data
 @Entity
 @Table(name = "votes")
+@EntityListeners(DartDBAuditListener.class)
 public class VoteEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +28,29 @@ public class VoteEntity {
 
     @Column(nullable = false)
     private boolean upvote;
+    private boolean markedForDeletion = false;
 
-    // getters and setters
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", updatable = false)
+    private UserEntity createdBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by")
+    private UserEntity updatedBy;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
-

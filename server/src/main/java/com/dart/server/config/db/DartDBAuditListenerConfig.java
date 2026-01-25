@@ -1,14 +1,14 @@
-package com.dart.server.app.todo;
+package com.dart.server.config.db;
 
 import com.dart.server.app.auth.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class TodoAuditListenerConfig {
+public class DartDBAuditListenerConfig {
     @Autowired
     public void configure(UserRepository userRepository) {
-        TodoAuditListener.setUserRepository(userRepository);
+        DartDBAuditListener.setUserRepository(userRepository);
     }
 }
 

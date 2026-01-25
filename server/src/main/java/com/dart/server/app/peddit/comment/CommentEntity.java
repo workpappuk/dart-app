@@ -2,6 +2,7 @@ package com.dart.server.app.peddit.comment;
 
 import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.peddit.EEntityTargetType;
+import com.dart.server.config.db.DartDBAuditListener;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "comments")
+@EntityListeners(DartDBAuditListener.class)
 public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

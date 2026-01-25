@@ -1,6 +1,7 @@
 package com.dart.server.app.todo;
 
 import com.dart.server.app.auth.UserEntity;
+import com.dart.server.config.db.DartDBAuditListener;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "todos")
-@EntityListeners(TodoAuditListener.class)
+@EntityListeners(DartDBAuditListener.class)
 public class TodoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

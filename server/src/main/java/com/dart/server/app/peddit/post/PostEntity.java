@@ -4,6 +4,7 @@ import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.peddit.comment.CommentEntity;
 import com.dart.server.app.peddit.community.CommunityEntity;
 import com.dart.server.app.peddit.vote.VoteEntity;
+import com.dart.server.config.db.DartDBAuditListener;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "posts")
+@EntityListeners(DartDBAuditListener.class)
 public class PostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

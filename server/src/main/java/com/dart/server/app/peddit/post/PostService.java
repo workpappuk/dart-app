@@ -2,6 +2,7 @@ package com.dart.server.app.peddit.post;
 
 import com.dart.server.app.peddit.community.CommunityEntity;
 import com.dart.server.app.peddit.community.CommunityRepository;
+import com.dart.server.app.peddit.post.dto.PostMapper;
 import com.dart.server.app.peddit.post.dto.PostRequest;
 import com.dart.server.app.peddit.post.dto.PostResponse;
 import org.springframework.beans.factory.annotation.Autowired;

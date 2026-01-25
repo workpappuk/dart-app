@@ -1,5 +1,6 @@
 package com.dart.server.app.peddit.comment;
 
+import com.dart.server.app.peddit.comment.dto.CommentMapper;
 import com.dart.server.app.peddit.comment.dto.CommentRequest;
 import com.dart.server.app.peddit.comment.dto.CommentResponse;
 import org.springframework.beans.factory.annotation.Autowired;

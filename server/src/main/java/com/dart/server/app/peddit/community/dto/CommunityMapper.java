@@ -1,7 +1,6 @@
-package com.dart.server.app.peddit.community;
+package com.dart.server.app.peddit.community.dto;
 
-import com.dart.server.app.peddit.community.dto.CommunityRequest;
-import com.dart.server.app.peddit.community.dto.CommunityResponse;
+import com.dart.server.app.peddit.community.CommunityEntity;
 
 public class CommunityMapper {
     public static CommunityEntity toEntity(CommunityRequest request) {
