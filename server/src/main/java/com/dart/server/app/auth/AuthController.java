@@ -35,7 +35,9 @@ public class AuthController {
     @GetMapping("/debug-auth")
     public void debugAuth() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        auth.getAuthorities().forEach(a -> System.out.println(a.getAuthority()));
+        if (auth != null && auth.getAuthorities() != null) {
+            auth.getAuthorities().forEach(a -> System.out.println(a.getAuthority()));
+        }
     }
 
     @Operation(summary = "Register a new user", description = "Registers a new user and assigns the default role.")

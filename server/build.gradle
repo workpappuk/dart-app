@@ -3,7 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.10'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.hibernate.orm' version '6.6.41.Final'
-    id 'org.graalvm.buildtools.native' version '0.10.6'
+    id 'jacoco'
 }
 
 group = 'com.dart'
@@ -43,6 +43,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -54,4 +55,13 @@ hibernate {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }

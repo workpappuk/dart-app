@@ -1,5 +1,6 @@
 package com.dart.server.app.todo;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -15,13 +16,16 @@ class TodoServiceTest {
     @InjectMocks
     TodoService todoService;
 
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
     @Test
     void contextLoads() throws Exception {
-        try (var mocks = MockitoAnnotations.openMocks(this)) {
-            // Use the fields to avoid warnings
-            assertNotNull(todoRepository);
-            assertNotNull(userRepository);
-            assertNotNull(todoService);
-        }
+        // Use the fields to avoid warnings
+        assertNotNull(todoRepository);
+        assertNotNull(userRepository);
+        assertNotNull(todoService);
     }
 }
