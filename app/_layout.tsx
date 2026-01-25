@@ -4,13 +4,25 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import 'react-native-reanimated';
-import { Provider, useSelector } from 'react-redux';
-import { RootState, store } from './redux/store';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { RootState, setToken, store } from './redux/store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
+import React, { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function InnerRootLayout() {
   const dark = useSelector((state: RootState) => state.theme.dark);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const loadSession = async () => {
+      const token = await AsyncStorage.getItem('session_token');
+      if (token) {
+        dispatch(setToken(token));
+      }
+    };
+    loadSession();
+  }, []);
+
   // Merge MD3 themes with React Navigation theme requirements
   const navigationTheme = dark
     ? {

@@ -1,3 +1,4 @@
+
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 
@@ -33,6 +34,8 @@ const themeSlice = createSlice({
   },
 });
 
+
+
 const sessionSlice = createSlice({
   name: 'session',
   initialState: initialSessionState,
@@ -41,11 +44,12 @@ const sessionSlice = createSlice({
       state.token = action.payload;
       state.isSessionValid = action.payload !== null;
     },
-
   },
 });
 
+
 export const { setToken } = sessionSlice.actions;
+export const { toggleTheme, setDark } = themeSlice.actions;
 
 export const store = configureStore({
   reducer: {

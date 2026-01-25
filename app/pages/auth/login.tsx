@@ -5,9 +5,10 @@ import { View } from 'react-native';
 import { TextInput, Button, Text, Surface } from 'react-native-paper';
 import { useMutation } from '@tanstack/react-query';
 import { loginUser } from '@/app/utils/services';
-import { setToken } from '@/app/redux/store';
+import {  setToken } from '@/app/redux/store';
 import { useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login() {
     const [state, setState] = useState({
@@ -35,7 +36,14 @@ export default function Login() {
         onError: (error: any) => {
             setState((prev) => ({ ...prev, error: error.message || 'Login failed.' }));
         },
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
+            const { token } = data;
+            if (token) {
+                await AsyncStorage.setItem('session_token', token);
+            } else {
+                await AsyncStorage.removeItem('session_token');
+            }
+
             dispatch(setToken(data.token)); // Set token here
             setState((prev) => ({ ...prev, error: '' }));
             router.back();
