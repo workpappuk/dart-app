@@ -26,6 +26,10 @@ public class CommentEntity {
     private EEntityTargetType targetType;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private CommentEntity parentComment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private UserEntity author;
 

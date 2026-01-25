@@ -37,6 +37,7 @@ CREATE TABLE comments (
     target_id BIGINT NOT NULL,
     target_type VARCHAR(32) NOT NULL,
     author_id BIGINT NOT NULL REFERENCES users(id),
+    parent_comment BIGINT NOT NULL REFERENCES comments(id),
     marked_for_deletion BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
