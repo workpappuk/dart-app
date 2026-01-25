@@ -40,7 +40,7 @@ class TodoAuditListenerTest {
         user.setId(1L);
         // Mock AuthUtils.getCurrentUserId() via static mocking
         try (var mocked = Mockito.mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
-            mocked.when(com.dart.server.common.utils.AuthUtils::getCurrentUserId).thenReturn("1");
+            mocked.when(com.dart.server.common.utils.AuthUtils::getCurrentUsername).thenReturn("1");
             when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
             listener.setCreatedBy(entity);
             assertEquals(user, entity.getCreatedBy());
@@ -55,7 +55,7 @@ class TodoAuditListenerTest {
         UserEntity user = new UserEntity();
         user.setId(2L);
         try (var mocked = Mockito.mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
-            mocked.when(com.dart.server.common.utils.AuthUtils::getCurrentUserId).thenReturn("2");
+            mocked.when(com.dart.server.common.utils.AuthUtils::getCurrentUsername).thenReturn("2");
             when(userRepository.findById(2L)).thenReturn(java.util.Optional.of(user));
             listener.setUpdatedBy(entity);
             assertEquals(user, entity.getUpdatedBy());
@@ -67,7 +67,7 @@ class TodoAuditListenerTest {
         TodoAuditListener listener = new TodoAuditListener();
         TodoEntity entity = new TodoEntity();
         try (var mocked = Mockito.mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
-            mocked.when(com.dart.server.common.utils.AuthUtils::getCurrentUserId).thenReturn(null);
+            mocked.when(com.dart.server.common.utils.AuthUtils::getCurrentUsername).thenReturn(null);
             listener.setCreatedBy(entity);
             assertNull(entity.getCreatedBy());
             assertNull(entity.getUpdatedBy());
@@ -79,7 +79,7 @@ class TodoAuditListenerTest {
         TodoAuditListener listener = new TodoAuditListener();
         TodoEntity entity = new TodoEntity();
         try (var mocked = Mockito.mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
-            mocked.when(com.dart.server.common.utils.AuthUtils::getCurrentUserId).thenReturn(null);
+            mocked.when(com.dart.server.common.utils.AuthUtils::getCurrentUsername).thenReturn(null);
             listener.setUpdatedBy(entity);
             assertNull(entity.getUpdatedBy());
         }
@@ -90,7 +90,7 @@ class TodoAuditListenerTest {
         TodoAuditListener listener = new TodoAuditListener();
         TodoEntity entity = new TodoEntity();
         try (var mocked = Mockito.mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
-            mocked.when(com.dart.server.common.utils.AuthUtils::getCurrentUserId).thenReturn("notANumber");
+            mocked.when(com.dart.server.common.utils.AuthUtils::getCurrentUsername).thenReturn("notANumber");
             // Should not throw
             listener.setCreatedBy(entity);
             assertNull(entity.getCreatedBy());

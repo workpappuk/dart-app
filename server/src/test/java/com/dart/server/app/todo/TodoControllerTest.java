@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -34,8 +35,9 @@ class TodoControllerTest {
     @Test
     void searchTodos_shouldReturnPage() throws Exception {
         var page = new org.springframework.data.domain.PageImpl<TodoResponse>(Collections.emptyList());
-        when(todoService.searchTodos(any(), any(Integer.class), any(Integer.class))).thenReturn(page);
-        mockMvc.perform(get("/api/todos/search"))
+        when(todoService.searchTodos(any(), any(Integer.class), any(Integer.class), any())).thenReturn(page);
+        org.springframework.security.core.Authentication auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", null);
+        mockMvc.perform(get("/api/todos/search").principal(auth))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
@@ -44,8 +46,9 @@ class TodoControllerTest {
     void getTodoById_shouldReturnTodo() throws Exception {
         TodoResponse todo = new TodoResponse();
         todo.setId(1L);
-        when(todoService.getTodoById(1L)).thenReturn(Optional.of(todo));
-        mockMvc.perform(get("/api/todos/1"))
+        when(todoService.getTodoById(anyLong(), any())).thenReturn(Optional.of(todo));
+        org.springframework.security.core.Authentication auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", null);
+        mockMvc.perform(get("/api/todos/1").principal(auth))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value(1L));
@@ -53,8 +56,9 @@ class TodoControllerTest {
 
     @Test
     void getTodoById_shouldReturnNotFound() throws Exception {
-        when(todoService.getTodoById(1L)).thenReturn(Optional.empty());
-        mockMvc.perform(get("/api/todos/1"))
+        when(todoService.getTodoById(anyLong(), any())).thenReturn(Optional.empty());
+        org.springframework.security.core.Authentication auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", null);
+        mockMvc.perform(get("/api/todos/1").principal(auth))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(false));
     }
@@ -109,17 +113,20 @@ class TodoControllerTest {
 
     @Test
     void deleteTodo_shouldReturnDeleted() throws Exception {
-        when(todoService.deleteTodo(1L)).thenReturn(true);
-        mockMvc.perform(delete("/api/todos/1"))
+        when(todoService.deleteTodo(anyLong(), any())).thenReturn(true);
+        org.springframework.security.core.Authentication auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", null);
+        mockMvc.perform(delete("/api/todos/1").principal(auth))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
 
     @Test
     void deleteTodo_shouldReturnNotFound() throws Exception {
-        when(todoService.deleteTodo(1L)).thenReturn(false);
-        mockMvc.perform(delete("/api/todos/1"))
+        when(todoService.deleteTodo(anyLong(), any())).thenReturn(false);
+        org.springframework.security.core.Authentication auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("user", null);
+        mockMvc.perform(delete("/api/todos/1").principal(auth))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(false));
     }
+
 }

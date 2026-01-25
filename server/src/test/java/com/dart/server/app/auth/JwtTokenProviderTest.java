@@ -32,7 +32,7 @@ class JwtTokenProviderTest {
     void createToken_and_getClaims_success() {
         RoleEntity role = new RoleEntity();
         role.setName("ROLE_USER");
-        String token = provider.createToken(123L, Collections.singleton(role));
+        String token = provider.createToken("123", Collections.singleton(role));
         Claims claims = provider.getClaims(token);
         assertEquals("123", claims.getSubject());
         assertEquals("ROLE_USER", claims.get("roles"));
@@ -42,7 +42,7 @@ class JwtTokenProviderTest {
     void validateToken_validToken_returnsTrue() {
         RoleEntity role = new RoleEntity();
         role.setName("ROLE_USER");
-        String token = provider.createToken(123L, Collections.singleton(role));
+        String token = provider.createToken("123", Collections.singleton(role));
         assertTrue(provider.validateToken(token));
     }
 
@@ -61,9 +61,9 @@ class JwtTokenProviderTest {
         ReflectionTestUtils.setField(provider, "jwtExpirationInMs", 1L);
         RoleEntity role = new RoleEntity();
         role.setName("ROLE_USER");
-        String token = provider.createToken(123L, Collections.singleton(role));
+        String token = provider.createToken("123", Collections.singleton(role));
         Thread.sleep(10); // ensure token is expired
-        boolean valid = false;
+        boolean valid;
         try {
             valid = provider.validateToken(token);
         } catch (Exception e) {

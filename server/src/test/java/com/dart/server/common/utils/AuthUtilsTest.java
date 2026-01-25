@@ -11,7 +11,7 @@ import static org.mockito.Mockito.*;
 
 class AuthUtilsTest {
     @Test
-    void getCurrentUserId_returnsUsername() {
+    void getCurrentUsername_returnsUsername() {
         try (MockedStatic<SecurityContextHolder> mocked = mockStatic(SecurityContextHolder.class)) {
             SecurityContext context = mock(SecurityContext.class);
             Authentication auth = mock(Authentication.class);
@@ -19,42 +19,42 @@ class AuthUtilsTest {
             when(auth.getName()).thenReturn("user");
             when(context.getAuthentication()).thenReturn(auth);
             mocked.when(SecurityContextHolder::getContext).thenReturn(context);
-            assertEquals("user", AuthUtils.getCurrentUserId());
+            assertEquals("user", AuthUtils.getCurrentUsername());
         }
     }
 
     @Test
-    void getCurrentUserId_returnsNullOnException() {
+    void getCurrentUsername_returnsNullOnException() {
         try (MockedStatic<SecurityContextHolder> mocked = mockStatic(SecurityContextHolder.class)) {
             mocked.when(SecurityContextHolder::getContext).thenThrow(new RuntimeException());
-            assertNull(AuthUtils.getCurrentUserId());
+            assertNull(AuthUtils.getCurrentUsername());
         }
     }
 
     @Test
-    void getCurrentUserId_returnsNullWhenAuthIsNull() {
+    void getCurrentUsername_returnsNullWhenAuthIsNull() {
         try (MockedStatic<SecurityContextHolder> mocked = mockStatic(SecurityContextHolder.class)) {
             SecurityContext context = mock(SecurityContext.class);
             when(context.getAuthentication()).thenReturn(null);
             mocked.when(SecurityContextHolder::getContext).thenReturn(context);
-            assertNull(AuthUtils.getCurrentUserId());
+            assertNull(AuthUtils.getCurrentUsername());
         }
     }
 
     @Test
-    void getCurrentUserId_returnsNullWhenNotAuthenticated() {
+    void getCurrentUsername_returnsNullWhenNotAuthenticated() {
         try (MockedStatic<SecurityContextHolder> mocked = mockStatic(SecurityContextHolder.class)) {
             SecurityContext context = mock(SecurityContext.class);
             Authentication auth = mock(Authentication.class);
             when(auth.isAuthenticated()).thenReturn(false);
             when(context.getAuthentication()).thenReturn(auth);
             mocked.when(SecurityContextHolder::getContext).thenReturn(context);
-            assertNull(AuthUtils.getCurrentUserId());
+            assertNull(AuthUtils.getCurrentUsername());
         }
     }
 
     @Test
-    void getCurrentUserId_returnsNullWhenNameIsNull() {
+    void getCurrentUsername_returnsNullWhenNameIsNull() {
         try (MockedStatic<SecurityContextHolder> mocked = mockStatic(SecurityContextHolder.class)) {
             SecurityContext context = mock(SecurityContext.class);
             Authentication auth = mock(Authentication.class);
@@ -62,7 +62,7 @@ class AuthUtilsTest {
             when(auth.getName()).thenReturn(null);
             when(context.getAuthentication()).thenReturn(auth);
             mocked.when(SecurityContextHolder::getContext).thenReturn(context);
-            assertNull(AuthUtils.getCurrentUserId());
+            assertNull(AuthUtils.getCurrentUsername());
         }
     }
 }
