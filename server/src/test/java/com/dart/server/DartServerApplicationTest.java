@@ -8,4 +8,9 @@ class DartServerApplicationTest {
     @Test
     void contextLoads() {
     }
+
+    @Test
+    void mainRunsWithoutException() {
+        DartServerApplication.main(new String[]{});
+    }
 }
