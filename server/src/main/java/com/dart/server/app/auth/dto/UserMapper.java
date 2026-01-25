@@ -7,11 +7,12 @@ import java.util.stream.Collectors;
 
 public class UserMapper {
     public static UserResponse toResponse(UserEntity entity) {
+        if (entity == null) return null;
         UserResponse response = new UserResponse();
         response.setId(entity.getId());
         response.setUsername(entity.getUsername());
 
-        Set<RoleResponse> roleResponses = entity.getRoles()
+        Set<RoleResponse> roleResponses = entity.getRoles() == null ? null : entity.getRoles()
                 .stream().map(RoleMapper::toResponse)
                 .collect(Collectors.toSet());
 

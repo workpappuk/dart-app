@@ -8,8 +8,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Set;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -26,6 +24,7 @@ class DBLoaderTest {
     DBLoader dbLoader;
 
     @BeforeEach
+    @SuppressWarnings("resource")
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
@@ -36,12 +35,22 @@ class DBLoaderTest {
         when(permissionService.findByName(any())).thenReturn(null);
         when(permissionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         // Mock roleService
-        when(roleService.findByName(any())).thenAnswer(invocation -> {
-            String name = invocation.getArgument(0);
-            RoleEntity role = new RoleEntity();
-            role.setId(1L);
-            role.setName(name);
-            return role;
+        // Return null for first call (role creation), then a RoleEntity for subsequent calls (user assignment)
+        when(roleService.findByName(any())).thenAnswer(new org.mockito.stubbing.Answer<RoleEntity>() {
+            private boolean firstCall = true;
+
+            @Override
+            public RoleEntity answer(org.mockito.invocation.InvocationOnMock invocation) {
+                if (firstCall) {
+                    firstCall = false;
+                    return null;
+                } else {
+                    RoleEntity role = new RoleEntity();
+                    role.setId(1L);
+                    role.setName(invocation.getArgument(0));
+                    return role;
+                }
+            }
         });
         when(roleService.save(any())).thenAnswer(invocation -> {
             RoleEntity role = invocation.getArgument(0);
