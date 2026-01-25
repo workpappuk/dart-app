@@ -72,4 +72,50 @@ class PermissionControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value(1L));
     }
+
+    @Test
+    void updatePermission_shouldReturnUpdated() throws Exception {
+        PermissionEntity entity = new PermissionEntity();
+        entity.setId(1L);
+        entity.setName("PERM");
+        when(permissionService.findById(1L)).thenReturn(Optional.of(entity));
+        when(permissionService.save(any())).thenReturn(entity);
+        mockMvc.perform(put("/api/permissions/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(entity)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1L));
+    }
+
+    @Test
+    void updatePermission_shouldReturnNotFound() throws Exception {
+        PermissionEntity entity = new PermissionEntity();
+        entity.setId(1L);
+        entity.setName("PERM");
+        when(permissionService.findById(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(put("/api/permissions/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(entity)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    void deletePermission_shouldReturnDeleted() throws Exception {
+        PermissionEntity entity = new PermissionEntity();
+        entity.setId(1L);
+        when(permissionService.findById(1L)).thenReturn(Optional.of(entity));
+        mockMvc.perform(delete("/api/permissions/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    void deletePermission_shouldReturnNotFound() throws Exception {
+        when(permissionService.findById(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(delete("/api/permissions/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false));
+    }
 }

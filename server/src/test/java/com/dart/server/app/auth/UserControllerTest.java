@@ -72,4 +72,82 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
+
+    @Test
+    void getUserById_shouldReturnUser() throws Exception {
+        UserEntity entity = new UserEntity();
+        entity.setId(1L);
+        entity.setUsername("user");
+        when(userService.findById(1L)).thenReturn(Optional.of(entity));
+        mockMvc.perform(get("/api/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1L));
+    }
+
+    @Test
+    void getUserById_shouldReturnNotFound() throws Exception {
+        when(userService.findById(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(get("/api/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    void createUser_shouldReturnCreated() throws Exception {
+        UserEntity entity = new UserEntity();
+        entity.setId(1L);
+        entity.setUsername("user");
+        when(userService.save(any())).thenReturn(entity);
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(entity)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1L));
+    }
+
+    @Test
+    void updateUser_shouldReturnUpdated() throws Exception {
+        UserEntity entity = new UserEntity();
+        entity.setId(1L);
+        entity.setUsername("user");
+        when(userService.findById(1L)).thenReturn(Optional.of(entity));
+        when(userService.save(any())).thenReturn(entity);
+        mockMvc.perform(put("/api/users/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(entity)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1L));
+    }
+
+    @Test
+    void updateUser_shouldReturnNotFound() throws Exception {
+        UserEntity entity = new UserEntity();
+        entity.setId(1L);
+        entity.setUsername("user");
+        when(userService.findById(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(put("/api/users/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(entity)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    void deleteUser_shouldReturnNoContent() throws Exception {
+        UserEntity entity = new UserEntity();
+        entity.setId(1L);
+        when(userService.findById(1L)).thenReturn(Optional.of(entity));
+        mockMvc.perform(delete("/api/users/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteUser_shouldReturnNotFound() throws Exception {
+        when(userService.findById(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(delete("/api/users/1"))
+                .andExpect(status().isNotFound());
+    }
 }

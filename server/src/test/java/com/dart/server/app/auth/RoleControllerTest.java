@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Collections;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -69,5 +70,85 @@ class RoleControllerTest {
         mockMvc.perform(get("/api/roles"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    void getRoleById_shouldReturnRole() throws Exception {
+        RoleEntity entity = new RoleEntity();
+        entity.setId(1L);
+        entity.setName("ROLE");
+        when(roleService.findById(1L)).thenReturn(Optional.of(entity));
+        mockMvc.perform(get("/api/roles/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1L));
+    }
+
+    @Test
+    void getRoleById_shouldReturnNotFound() throws Exception {
+        when(roleService.findById(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(get("/api/roles/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    void createRole_shouldReturnCreated() throws Exception {
+        RoleEntity entity = new RoleEntity();
+        entity.setId(1L);
+        entity.setName("ROLE");
+        when(roleService.save(any())).thenReturn(entity);
+        mockMvc.perform(post("/api/roles")
+                        .contentType("application/json")
+                        .content(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(entity)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1L));
+    }
+
+    @Test
+    void updateRole_shouldReturnUpdated() throws Exception {
+        RoleEntity entity = new RoleEntity();
+        entity.setId(1L);
+        entity.setName("ROLE");
+        when(roleService.findById(1L)).thenReturn(Optional.of(entity));
+        when(roleService.save(any())).thenReturn(entity);
+        mockMvc.perform(put("/api/roles/1")
+                        .contentType("application/json")
+                        .content(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(entity)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1L));
+    }
+
+    @Test
+    void updateRole_shouldReturnNotFound() throws Exception {
+        RoleEntity entity = new RoleEntity();
+        entity.setId(1L);
+        entity.setName("ROLE");
+        when(roleService.findById(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(put("/api/roles/1")
+                        .contentType("application/json")
+                        .content(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(entity)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    void deleteRole_shouldReturnDeleted() throws Exception {
+        RoleEntity entity = new RoleEntity();
+        entity.setId(1L);
+        when(roleService.findById(1L)).thenReturn(Optional.of(entity));
+        mockMvc.perform(delete("/api/roles/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    void deleteRole_shouldReturnNotFound() throws Exception {
+        when(roleService.findById(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(delete("/api/roles/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false));
     }
 }

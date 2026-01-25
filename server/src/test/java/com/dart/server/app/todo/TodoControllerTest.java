@@ -58,4 +58,68 @@ class TodoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(false));
     }
+
+    @Test
+    void createTodo_shouldReturnCreated() throws Exception {
+        TodoResponse todo = new TodoResponse();
+        todo.setId(1L);
+        com.dart.server.app.todo.dto.TodoRequest req = new com.dart.server.app.todo.dto.TodoRequest();
+        org.springframework.security.core.Authentication auth = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
+        org.mockito.Mockito.when(auth.getName()).thenReturn("user");
+        when(todoService.createTodo(any(), any())).thenReturn(todo);
+        mockMvc.perform(post("/api/todos")
+                        .principal(auth)
+                        .contentType("application/json")
+                        .content(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1L));
+    }
+
+    @Test
+    void updateTodo_shouldReturnUpdated() throws Exception {
+        TodoResponse todo = new TodoResponse();
+        todo.setId(1L);
+        com.dart.server.app.todo.dto.TodoRequest req = new com.dart.server.app.todo.dto.TodoRequest();
+        org.springframework.security.core.Authentication auth = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
+        org.mockito.Mockito.when(auth.getName()).thenReturn("user");
+        when(todoService.updateTodo(any(Long.class), any(), any())).thenReturn(java.util.Optional.of(todo));
+        mockMvc.perform(put("/api/todos/1")
+                        .principal(auth)
+                        .contentType("application/json")
+                        .content(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1L));
+    }
+
+    @Test
+    void updateTodo_shouldReturnNotFound() throws Exception {
+        com.dart.server.app.todo.dto.TodoRequest req = new com.dart.server.app.todo.dto.TodoRequest();
+        org.springframework.security.core.Authentication auth = org.mockito.Mockito.mock(org.springframework.security.core.Authentication.class);
+        org.mockito.Mockito.when(auth.getName()).thenReturn("user");
+        when(todoService.updateTodo(any(Long.class), any(), any())).thenReturn(java.util.Optional.empty());
+        mockMvc.perform(put("/api/todos/1")
+                        .principal(auth)
+                        .contentType("application/json")
+                        .content(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    void deleteTodo_shouldReturnDeleted() throws Exception {
+        when(todoService.deleteTodo(1L)).thenReturn(true);
+        mockMvc.perform(delete("/api/todos/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    void deleteTodo_shouldReturnNotFound() throws Exception {
+        when(todoService.deleteTodo(1L)).thenReturn(false);
+        mockMvc.perform(delete("/api/todos/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false));
+    }
 }

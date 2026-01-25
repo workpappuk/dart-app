@@ -26,6 +26,8 @@ class AuthControllerTest {
     RoleService roleService;
     @Mock
     org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    @Mock
+    JwtTokenProvider jwtTokenProvider;
     @InjectMocks
     AuthController authController;
 
@@ -40,6 +42,21 @@ class AuthControllerTest {
     void debugAuth_shouldReturn200() throws Exception {
         Authentication mockAuth = org.mockito.Mockito.mock(Authentication.class);
         org.mockito.Mockito.when(mockAuth.getAuthorities()).thenReturn(java.util.Collections.emptyList());
+        mockMvc.perform(get("/api/auth/debug-auth").with(SecurityMockMvcRequestPostProcessors.authentication(mockAuth)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void debugAuth_shouldHandleNullAuthentication() throws Exception {
+        // No authentication set in context
+        mockMvc.perform(get("/api/auth/debug-auth"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void debugAuth_shouldHandleNullAuthorities() throws Exception {
+        Authentication mockAuth = org.mockito.Mockito.mock(Authentication.class);
+        org.mockito.Mockito.when(mockAuth.getAuthorities()).thenReturn(null);
         mockMvc.perform(get("/api/auth/debug-auth").with(SecurityMockMvcRequestPostProcessors.authentication(mockAuth)))
                 .andExpect(status().isOk());
     }
@@ -72,5 +89,58 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("Username already exists"));
+    }
+
+    @Test
+    void login_shouldReturnSuccess() throws Exception {
+        UserRequest req = new UserRequest();
+        req.setUsername("user");
+        req.setPassword("pass");
+        UserEntity user = new UserEntity();
+        user.setId(1L);
+        user.setUsername("user");
+        user.setPassword("encoded");
+        when(userService.findByUsername("user")).thenReturn(user);
+        when(passwordEncoder.matches("pass", "encoded")).thenReturn(true);
+        when(jwtTokenProvider.createToken(any(), any())).thenReturn("token123");
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.token").value("token123"));
+    }
+
+    @Test
+    void login_shouldReturnInvalidCredentials() throws Exception {
+        UserRequest req = new UserRequest();
+        req.setUsername("user");
+        req.setPassword("wrong");
+        when(userService.findByUsername("user")).thenReturn(null);
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Invalid credentials"));
+    }
+
+    @Test
+    void login_shouldReturnInvalidCredentialsWhenPasswordDoesNotMatch() throws Exception {
+        UserRequest req = new UserRequest();
+        req.setUsername("user");
+        req.setPassword("wrong");
+        UserEntity user = new UserEntity();
+        user.setId(1L);
+        user.setUsername("user");
+        user.setPassword("encoded");
+        when(userService.findByUsername("user")).thenReturn(user);
+        when(passwordEncoder.matches("wrong", "encoded")).thenReturn(false);
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Invalid credentials"));
     }
 }
