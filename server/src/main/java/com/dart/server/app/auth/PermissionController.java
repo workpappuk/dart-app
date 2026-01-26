@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/permissions")
@@ -38,7 +39,7 @@ public class PermissionController {
             @ApiResponse(responseCode = "404", description = "Permission not found")
     })
     @GetMapping("/{id}")
-    public DartApiResponse<PermissionEntity> getPermissionById(@Parameter(description = "ID of the permission") @PathVariable Long id) {
+    public DartApiResponse<PermissionEntity> getPermissionById(@Parameter(description = "ID of the permission") @PathVariable UUID id) {
         return permissionService.findById(id)
                 .map(permission -> DartApiResponse.<PermissionEntity>builder()
                         .success(true)
@@ -73,7 +74,7 @@ public class PermissionController {
     })
     @PutMapping("/{id}")
     public DartApiResponse<PermissionEntity> updatePermission(
-            @Parameter(description = "ID of the permission") @PathVariable Long id,
+            @Parameter(description = "ID of the permission") @PathVariable UUID id,
             @Parameter(description = "Updated permission request body") @RequestBody PermissionEntity permission) {
         permission.setId(id);
         return permissionService.findById(id)
@@ -95,7 +96,7 @@ public class PermissionController {
             @ApiResponse(responseCode = "404", description = "Permission not found")
     })
     @DeleteMapping("/{id}")
-    public DartApiResponse<Void> deletePermission(@Parameter(description = "ID of the permission") @PathVariable Long id) {
+    public DartApiResponse<Void> deletePermission(@Parameter(description = "ID of the permission") @PathVariable UUID id) {
         if (!permissionService.findById(id).isPresent()) {
             return DartApiResponse.<Void>builder()
                     .success(false)

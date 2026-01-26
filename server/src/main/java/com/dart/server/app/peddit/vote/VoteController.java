@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 import java.util.List;
 
 @RestController
@@ -30,7 +32,7 @@ public class VoteController {
 
     @Operation(summary = "Get vote by ID", description = "Returns a single vote by its ID.")
     @GetMapping("/{id}")
-    public DartApiResponse<VoteResponse> getById(@PathVariable Long id) {
+    public DartApiResponse<VoteResponse> getById(@PathVariable UUID id) {
         var entity = voteService.getById(id);
         if (entity == null)
             return DartApiResponse.<VoteResponse>builder().success(false).message("Vote not found").build();
@@ -46,7 +48,7 @@ public class VoteController {
 
     @Operation(summary = "Delete a vote", description = "Marks a vote as deleted by ID.")
     @DeleteMapping("/{id}")
-    public DartApiResponse<Boolean> delete(@PathVariable Long id) {
+    public DartApiResponse<Boolean> delete(@PathVariable UUID id) {
         var entity = voteService.getById(id);
         if (entity == null) return DartApiResponse.<Boolean>builder().success(false).message("Vote not found").build();
         if (entity.isMarkedForDeletion()) {

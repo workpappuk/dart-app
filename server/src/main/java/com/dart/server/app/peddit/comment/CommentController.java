@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 import java.util.List;
 
 @RestController
@@ -29,7 +31,7 @@ public class CommentController {
 
     @Operation(summary = "Get comment by ID", description = "Returns a single comment by its ID.")
     @GetMapping("/{id}")
-    public DartApiResponse<CommentResponse> getById(@PathVariable Long id) {
+    public DartApiResponse<CommentResponse> getById(@PathVariable UUID id) {
         CommentResponse response = commentService.getById(id);
         if (response == null)
             return DartApiResponse.<CommentResponse>builder().success(false).message("Comment not found").build();
@@ -48,7 +50,7 @@ public class CommentController {
 
     @Operation(summary = "Update a comment", description = "Updates an existing comment by ID.")
     @PutMapping("/{id}")
-    public DartApiResponse<CommentResponse> update(@PathVariable Long id, @RequestBody CommentRequest request) {
+    public DartApiResponse<CommentResponse> update(@PathVariable UUID id, @RequestBody CommentRequest request) {
         CommentResponse response = commentService.update(id, request);
         if (response == null)
             return DartApiResponse.<CommentResponse>builder().success(false).message("Comment not found").build();
@@ -57,7 +59,7 @@ public class CommentController {
 
     @Operation(summary = "Delete a comment", description = "Marks a comment as deleted by ID.")
     @DeleteMapping("/{id}")
-    public DartApiResponse<Boolean> delete(@PathVariable Long id) {
+    public DartApiResponse<Boolean> delete(@PathVariable UUID id) {
         var entity = commentService.getByIdEntity(id);
         if (entity == null)
             return DartApiResponse.<Boolean>builder().success(false).message("Comment not found").build();

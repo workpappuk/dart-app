@@ -2,22 +2,17 @@ package com.dart.server.app.peddit.community;
 
 import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.peddit.post.PostEntity;
-import com.dart.server.config.db.DartDBAuditListener;
+import com.dart.server.common.db.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @Entity
 @Table(name = "communities")
-@EntityListeners(DartDBAuditListener.class)
-public class CommunityEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class CommunityEntity extends Auditable {
 
     @Column(nullable = false, unique = true)
     private String name;
@@ -36,29 +31,4 @@ public class CommunityEntity {
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostEntity> posts = new HashSet<>();
 
-    private boolean markedForDeletion = false;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", updatable = false)
-    private UserEntity createdBy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by")
-    private UserEntity updatedBy;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

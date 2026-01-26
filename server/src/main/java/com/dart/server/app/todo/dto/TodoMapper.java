@@ -10,9 +10,8 @@ public class TodoMapper {
         response.setCompleted(todo.isCompleted());
         response.setCreatedAt(todo.getCreatedAt());
         response.setUpdatedAt(todo.getUpdatedAt());
-        String userId = String.valueOf(todo.getCreatedBy() != null ? todo.getCreatedBy().getId() : null);
-        response.setCreatedBy(userId);
-        response.setUpdatedBy(userId);
+        response.setCreatedBy(todo.getCreatedBy());
+        response.setUpdatedBy(todo.getUpdatedBy());
         response.setMarkedForDeletion(todo.isMarkedForDeletion());
         return response;
     }

@@ -5,6 +5,7 @@ import { Surface, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
+import { Communities } from "@/app/components/peddit/community/Communities";
 export default function AdminDashboard() {
 
   const { session } = useSelector((state: RootState) => state);
@@ -57,6 +58,7 @@ function CommunitiesSection() {
   return (
     <Surface style={{ padding: 16, margin: 16, borderRadius: 8 }}>
       <Text>Communities Section</Text>
+      <Communities />
     </Surface>
   );
 }

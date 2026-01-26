@@ -2,20 +2,14 @@ package com.dart.server.app.peddit.post;
 
 import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.peddit.community.CommunityEntity;
-import com.dart.server.config.db.DartDBAuditListener;
+import com.dart.server.common.db.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "posts")
-@EntityListeners(DartDBAuditListener.class)
-public class PostEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class PostEntity extends Auditable {
 
     @Column(nullable = false)
     private String title;
@@ -31,29 +25,4 @@ public class PostEntity {
     @JoinColumn(name = "author_id", nullable = false)
     private UserEntity author;
 
-    private boolean markedForDeletion = false;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", updatable = false)
-    private UserEntity createdBy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by")
-    private UserEntity updatedBy;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

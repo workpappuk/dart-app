@@ -1,5 +1,6 @@
 package com.dart.server.app.auth;
 
+import com.dart.server.common.db.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,10 +12,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Data
-public class UserEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UserEntity extends Auditable {
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -30,21 +28,4 @@ public class UserEntity {
     )
     private Set<RoleEntity> roles;
 
-    @Column(nullable = false, updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

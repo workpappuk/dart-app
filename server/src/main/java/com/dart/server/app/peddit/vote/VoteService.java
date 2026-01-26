@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class VoteService {
@@ -14,7 +15,7 @@ public class VoteService {
         return voteRepository.findAll();
     }
 
-    public VoteEntity getById(Long id) {
+    public VoteEntity getById(UUID id) {
         return voteRepository.findById(id).orElse(null);
     }
 

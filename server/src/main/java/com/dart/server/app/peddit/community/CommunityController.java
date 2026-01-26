@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 import java.util.List;
 
 @RestController
@@ -29,7 +31,7 @@ public class CommunityController {
 
     @Operation(summary = "Get community by ID", description = "Returns a single community by its ID.")
     @GetMapping("/{id}")
-    public DartApiResponse<CommunityResponse> getById(@PathVariable Long id) {
+    public DartApiResponse<CommunityResponse> getById(@PathVariable UUID id) {
         CommunityResponse response = communityService.getById(id);
         if (response == null)
             return DartApiResponse.<CommunityResponse>builder().success(false).message("Community not found").build();
@@ -48,7 +50,7 @@ public class CommunityController {
 
     @Operation(summary = "Update a community", description = "Updates an existing community by ID.")
     @PutMapping("/{id}")
-    public DartApiResponse<CommunityResponse> update(@PathVariable Long id, @RequestBody CommunityRequest request) {
+    public DartApiResponse<CommunityResponse> update(@PathVariable UUID id, @RequestBody CommunityRequest request) {
         CommunityResponse response = communityService.update(id, request);
         if (response == null)
             return DartApiResponse.<CommunityResponse>builder().success(false).message("Community not found").build();
@@ -57,7 +59,7 @@ public class CommunityController {
 
     @Operation(summary = "Delete a community", description = "Marks a community as deleted by ID.")
     @DeleteMapping("/{id}")
-    public DartApiResponse<Boolean> delete(@PathVariable Long id) {
+    public DartApiResponse<Boolean> delete(@PathVariable UUID id) {
         var entity = communityService.getByIdEntity(id);
         if (entity == null)
             return DartApiResponse.<Boolean>builder().success(false).message("Community not found").build();

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PermissionService {
@@ -15,7 +16,7 @@ public class PermissionService {
         return permissionRepository.findAll();
     }
 
-    public Optional<PermissionEntity> findById(Long id) {
+    public Optional<PermissionEntity> findById(UUID id) {
         return permissionRepository.findById(id);
     }
 
@@ -23,7 +24,7 @@ public class PermissionService {
         return permissionRepository.save(permission);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(UUID id) {
         permissionRepository.deleteById(id);
     }
 

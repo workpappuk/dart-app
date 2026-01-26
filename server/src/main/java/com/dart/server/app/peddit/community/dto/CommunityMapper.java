@@ -15,7 +15,7 @@ public class CommunityMapper {
         response.setId(entity.getId());
         response.setName(entity.getName());
         response.setDescription(entity.getDescription());
-        response.setCreatedBy(entity.getCreatedBy() != null ? entity.getCreatedBy().getUsername() : null);
+        response.setCreatedBy(entity.getCreatedBy());
         response.setMarkedForDeletion(entity.isMarkedForDeletion());
         return response;
     }

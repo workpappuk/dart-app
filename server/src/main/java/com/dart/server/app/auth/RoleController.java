@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -27,7 +28,7 @@ public class RoleController {
             @ApiResponse(responseCode = "404", description = "Role or permission not found")
     })
     @PostMapping("/{roleId}/permissions/{permissionId}")
-    public ResponseEntity<Void> assignPermissionToRole(@PathVariable Long roleId, @PathVariable Long permissionId) {
+    public ResponseEntity<Void> assignPermissionToRole(@PathVariable UUID roleId, @PathVariable UUID permissionId) {
         if (!roleService.findById(roleId).isPresent() || !permissionService.findById(permissionId).isPresent()) {
             return ResponseEntity.notFound().build();
         }
@@ -41,7 +42,7 @@ public class RoleController {
             @ApiResponse(responseCode = "404", description = "Role or permission not found")
     })
     @DeleteMapping("/{roleId}/permissions/{permissionId}")
-    public ResponseEntity<Void> removePermissionFromRole(@PathVariable Long roleId, @PathVariable Long permissionId) {
+    public ResponseEntity<Void> removePermissionFromRole(@PathVariable UUID roleId, @PathVariable UUID permissionId) {
         if (!roleService.findById(roleId).isPresent() || !permissionService.findById(permissionId).isPresent()) {
             return ResponseEntity.notFound().build();
         }
@@ -69,7 +70,7 @@ public class RoleController {
             @ApiResponse(responseCode = "404", description = "Role not found")
     })
     @GetMapping("/{id}")
-    public DartApiResponse<RoleEntity> getRoleById(@Parameter(description = "ID of the role") @PathVariable Long id) {
+    public DartApiResponse<RoleEntity> getRoleById(@Parameter(description = "ID of the role") @PathVariable UUID id) {
         return roleService.findById(id)
                 .map(role -> DartApiResponse.<RoleEntity>builder()
                         .success(true)
@@ -104,7 +105,7 @@ public class RoleController {
     })
     @PutMapping("/{id}")
     public DartApiResponse<RoleEntity> updateRole(
-            @Parameter(description = "ID of the role") @PathVariable Long id,
+            @Parameter(description = "ID of the role") @PathVariable UUID id,
             @Parameter(description = "Updated role request body") @RequestBody RoleEntity role) {
         role.setId(id);
         return roleService.findById(id)
@@ -126,7 +127,7 @@ public class RoleController {
             @ApiResponse(responseCode = "404", description = "Role not found")
     })
     @DeleteMapping("/{id}")
-    public DartApiResponse<Void> deleteRole(@Parameter(description = "ID of the role") @PathVariable Long id) {
+    public DartApiResponse<Void> deleteRole(@Parameter(description = "ID of the role") @PathVariable UUID id) {
         if (!roleService.findById(id).isPresent()) {
             return DartApiResponse.<Void>builder()
                     .success(false)

@@ -34,6 +34,6 @@ public class AuthUtils {
     }
 
     public static boolean isOwner(TodoEntity todo, UserEntity user) {
-        return user != null && todo.getCreatedBy() != null && todo.getCreatedBy().getId().equals(user.getId());
+        return user != null && todo.getCreatedBy() != null && todo.getCreatedBy().equals(user.getId());
     }
 }

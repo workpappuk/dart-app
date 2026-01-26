@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -21,14 +22,14 @@ public class UserService {
         return userRepository.findByUsername(username).orElse(null);
     }
 
-    public void assignRole(Long userId, Long roleId) {
+    public void assignRole(UUID userId, UUID roleId) {
         UserEntity user = userRepository.findById(userId).orElseThrow();
         RoleEntity role = roleService.findById(roleId).orElseThrow();
         user.getRoles().add(role);
         userRepository.save(user);
     }
 
-    public void removeRole(Long userId, Long roleId) {
+    public void removeRole(UUID userId, UUID roleId) {
         UserEntity user = userRepository.findById(userId).orElseThrow();
         RoleEntity role = roleService.findById(roleId).orElseThrow();
         user.getRoles().remove(role);
@@ -39,7 +40,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<UserEntity> findById(Long id) {
+    public Optional<UserEntity> findById(UUID id) {
         return userRepository.findById(id);
     }
 
@@ -47,7 +48,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(UUID id) {
         userRepository.deleteById(id);
     }
 }

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +28,7 @@ public class AuthController {
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Operation(summary = "Debug Authentication", description = "Prints the current user's authorities to the console.")
     @ApiResponses({
@@ -84,13 +86,33 @@ public class AuthController {
                     .data(null)
                     .build();
         }
-        String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
+        String token = jwtTokenProvider.createToken(user.getId().toString(), user.getRoles());
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
         return DartApiResponse.<Map<String, Object>>builder()
                 .success(true)
                 .message("Login successful")
                 .data(response)
+                .build();
+    }
+
+    @Operation(summary = "Logout user", description = "Logs out the user by instructing the client to remove the JWT token.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Logout successful")
+    })
+    @PostMapping("/logout")
+    public DartApiResponse<Void> logout(HttpServletRequest request) {
+        // For stateless JWT, instruct client to delete token
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7);
+            jwtBlacklistService.blacklistToken(token);
+        }
+        SecurityContextHolder.clearContext();
+        return DartApiResponse.<Void>builder()
+                .success(true)
+                .message("Logout successful. Please remove the token on the client side.")
+                .data(null)
                 .build();
     }
 }

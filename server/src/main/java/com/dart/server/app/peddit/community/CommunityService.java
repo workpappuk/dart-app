@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 public class CommunityService {
@@ -20,7 +21,7 @@ public class CommunityService {
                 .collect(Collectors.toList());
     }
 
-    public CommunityResponse getById(Long id) {
+    public CommunityResponse getById(UUID id) {
         return communityRepository.findById(id)
                 .map(CommunityMapper::toResponse)
                 .orElse(null);
@@ -31,7 +32,7 @@ public class CommunityService {
         return CommunityMapper.toResponse(communityRepository.save(entity));
     }
 
-    public CommunityResponse update(Long id, CommunityRequest request) {
+    public CommunityResponse update(UUID id, CommunityRequest request) {
         return communityRepository.findById(id)
                 .map(entity -> {
                     entity.setName(request.getName());
@@ -40,7 +41,7 @@ public class CommunityService {
                 }).orElse(null);
     }
 
-    public boolean delete(Long id) {
+    public boolean delete(UUID id) {
         return communityRepository.findById(id).map(entity -> {
             entity.setMarkedForDeletion(true);
             communityRepository.save(entity);
@@ -48,7 +49,7 @@ public class CommunityService {
         }).orElse(false);
     }
 
-    public CommunityEntity getByIdEntity(Long id) {
+    public CommunityEntity getByIdEntity(UUID id) {
         return communityRepository.findById(id).orElse(null);
     }
 

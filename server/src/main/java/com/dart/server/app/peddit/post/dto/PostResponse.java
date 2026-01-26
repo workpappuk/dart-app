@@ -2,13 +2,15 @@ package com.dart.server.app.peddit.post.dto;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class PostResponse {
-    private Long id;
+    private UUID id;
     private String title;
     private String content;
-    private Long communityId;
-    private Long authorId;
+    private UUID communityId;
+    private UUID authorId;
     private boolean markedForDeletion;
 }
 

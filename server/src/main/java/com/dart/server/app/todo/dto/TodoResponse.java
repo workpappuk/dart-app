@@ -3,11 +3,14 @@ package com.dart.server.app.todo.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.Instant;
+import java.util.UUID;
+
 @Data
 @Schema(description = "Response body for a todo item")
 public class TodoResponse {
     @Schema(description = "Todo ID", example = "1")
-    private Long id;
+    private UUID id;
 
     @Schema(description = "Todo description", example = "Buy groceries")
     private String description;
@@ -16,10 +19,10 @@ public class TodoResponse {
     private boolean completed;
 
     @Schema(description = "Creation timestamp", example = "2023-10-10T10:00:00")
-    private java.time.LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Schema(description = "Last update timestamp", example = "2023-10-10T10:00:00")
-    private java.time.LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Schema(description = "User who created the todo", example = "john_doe")
     private String createdBy;

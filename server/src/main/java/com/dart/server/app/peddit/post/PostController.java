@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 import java.util.List;
 
 @RestController
@@ -29,7 +31,7 @@ public class PostController {
 
     @Operation(summary = "Get post by ID", description = "Returns a single post by its ID.")
     @GetMapping("/{id}")
-    public DartApiResponse<PostResponse> getById(@PathVariable Long id) {
+    public DartApiResponse<PostResponse> getById(@PathVariable UUID id) {
         PostResponse response = postService.getById(id);
         if (response == null)
             return DartApiResponse.<PostResponse>builder().success(false).message("Post not found").build();
@@ -48,7 +50,7 @@ public class PostController {
 
     @Operation(summary = "Update a post", description = "Updates an existing post by ID.")
     @PutMapping("/{id}")
-    public DartApiResponse<PostResponse> update(@PathVariable Long id, @RequestBody PostRequest request) {
+    public DartApiResponse<PostResponse> update(@PathVariable UUID id, @RequestBody PostRequest request) {
         PostResponse response = postService.update(id, request);
         if (response == null)
             return DartApiResponse.<PostResponse>builder().success(false).message("Post not found").build();
@@ -57,7 +59,7 @@ public class PostController {
 
     @Operation(summary = "Delete a post", description = "Marks a post as deleted by ID.")
     @DeleteMapping("/{id}")
-    public DartApiResponse<Boolean> delete(@PathVariable Long id) {
+    public DartApiResponse<Boolean> delete(@PathVariable UUID id) {
         var entity = postService.getByIdEntity(id);
         if (entity == null) return DartApiResponse.<Boolean>builder().success(false).message("Post not found").build();
         if (entity.isMarkedForDeletion()) {

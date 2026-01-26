@@ -15,6 +15,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @Tag(name = "Todos", description = "Endpoints for managing todos")
 @RestController
 @RequestMapping("/api/todos")
@@ -33,8 +35,7 @@ public class TodoController {
             @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
             Authentication authentication) {
-        String username = authentication.getName();
-        Page<TodoResponse> result = todoService.searchTodos(q, page, size, username);
+        Page<TodoResponse> result = todoService.searchTodos(q, page, size);
         PageResponse<TodoResponse> pageResponse = new PageResponse<>(
                 result.getContent(),
                 result.getNumber(),
@@ -55,7 +56,7 @@ public class TodoController {
             @ApiResponse(responseCode = "404", description = "Todo not found")
     })
     @GetMapping("/{id}")
-    public DartApiResponse<TodoResponse> getTodoById(@Parameter(description = "ID of the todo") @PathVariable Long id, Authentication authentication) {
+    public DartApiResponse<TodoResponse> getTodoById(@Parameter(description = "ID of the todo") @PathVariable UUID id, Authentication authentication) {
         String username = authentication.getName();
         return todoService.getTodoById(id, username)
                 .map(todo -> DartApiResponse.<TodoResponse>builder()
@@ -76,9 +77,8 @@ public class TodoController {
     })
     @PostMapping
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public DartApiResponse<TodoResponse> createTodo(@Parameter(description = "Todo request body") @RequestBody TodoRequest request, Authentication authentication) {
-        String username = authentication.getName();
-        TodoResponse todo = todoService.createTodo(request, username);
+    public DartApiResponse<TodoResponse> createTodo(@Parameter(description = "Todo request body") @RequestBody TodoRequest request) {
+        TodoResponse todo = todoService.createTodo(request);
         return DartApiResponse.<TodoResponse>builder()
                 .success(true)
                 .message("Todo created successfully")
@@ -94,7 +94,7 @@ public class TodoController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public DartApiResponse<TodoResponse> updateTodo(
-            @Parameter(description = "ID of the todo") @PathVariable Long id,
+            @Parameter(description = "ID of the todo") @PathVariable UUID id,
             @Parameter(description = "Updated todo request body") @RequestBody TodoRequest request,
             Authentication authentication) {
         String username = authentication.getName();
@@ -118,7 +118,7 @@ public class TodoController {
     })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    public DartApiResponse<Void> deleteTodo(@Parameter(description = "ID of the todo") @PathVariable Long id, Authentication authentication) {
+    public DartApiResponse<Void> deleteTodo(@Parameter(description = "ID of the todo") @PathVariable UUID id, Authentication authentication) {
         String username = authentication.getName();
         boolean deleted = todoService.deleteTodo(id, username);
         if (!deleted) {

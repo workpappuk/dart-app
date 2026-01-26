@@ -2,10 +2,12 @@ package com.dart.server.app.peddit.vote.dto;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class VoteRequest {
-    private Long targetId;
+    private UUID targetId;
     private String targetType;
-    private Long userId;
+    private UUID userId;
     private boolean upvote;
 }

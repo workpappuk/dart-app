@@ -10,6 +10,8 @@ import { useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SESSION_TOKEN_KEY } from '@/app/utils/constants';
+import { set } from 'lodash';
+import { clearUserSessionToken, setUserSessionToken } from '@/app/utils/axios';
 
 export default function Login() {
     const [state, setState] = useState({
@@ -40,14 +42,16 @@ export default function Login() {
         onSuccess: async (data) => {
             const { token } = data;
             if (token) {
+            dispatch(setToken(token)); // Set token here
                 await AsyncStorage.setItem(SESSION_TOKEN_KEY, token);
+                setUserSessionToken(token);
             } else {
                 await AsyncStorage.removeItem(SESSION_TOKEN_KEY);
+                clearUserSessionToken();
             }
 
-            dispatch(setToken(data.token)); // Set token here
             setState((prev) => ({ ...prev, error: '' }));
-            router.back();
+           router.push('/'); // Navigate to home on success
         },
     });
 

@@ -2,10 +2,13 @@
 import { Button, Divider, Surface, Text } from "react-native-paper";
 import { AppHeader } from "../components/core/AppHeader";
 import { ThemeSwitch } from "../components/ThemeSwitch";
-import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, setToken } from '../redux/store';
 import { View } from "react-native";
 import { useRouter } from "expo-router";
+import { logoutUser } from "../utils/services";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { clearUserSessionToken } from "../utils/axios";
 
 
 export default function SettingsScreen() {
@@ -13,6 +16,7 @@ export default function SettingsScreen() {
   
   const session = useSelector((state: RootState) => state.session);
   const router = useRouter();
+  const dispatch = useDispatch();
   return (
     <>
       <AppHeader title="Settings" showBack={false} />
@@ -23,11 +27,25 @@ export default function SettingsScreen() {
         </View>
         <Divider style={{ marginVertical: 16 }} />
         {session.token ? (
+          <>
           <View style={{ marginTop: 16 }}>
             <Button mode="contained" onPress={() => { router.push('/pages/admin/dashboard'); }}>
               Admin Dashoard
             </Button>
           </View>
+           <View style={{ marginTop: 16 }}>
+            <Button mode="contained" onPress={async () => {
+              await logoutUser();
+              await AsyncStorage.removeItem('session_token');
+              clearUserSessionToken();
+              dispatch(setToken(null));
+               
+              router.replace('/pages/auth/login');
+             }}>
+              Logout
+            </Button>
+          </View>
+          </>
         ) : (
            <View style={{ marginTop: 16 }}>
             <Button mode="contained" onPress={() => { router.push('/pages/auth/login'); }}>

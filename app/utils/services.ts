@@ -1,6 +1,6 @@
 
 import api from './axios';
-import { DartApiResponse, LoginResponse, UserRequest } from './types';
+import { CommunityRequest, DartApiResponse, LoginResponse, UserRequest } from './types';
 
 export const getUsers = async () => {
 	const response = await api.get('/users');
@@ -11,3 +11,14 @@ export const loginUser = async (userRequest: UserRequest): Promise<DartApiRespon
 	const response = await api.post('/api/auth/login', { username: userRequest.username, password: userRequest.password });
 	return response.data;
 }
+
+export const logoutUser = async () => {
+	const response = await api.post('/api/auth/logout');
+	return response.data;
+}
+
+export const createCommunity = async (data: CommunityRequest) => {
+	const response = await api.post('/api/communities', data);
+	return response.data;
+}
+

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class RoleService {
@@ -13,7 +14,7 @@ public class RoleService {
     @Autowired
     private RoleRepository roleRepository;
 
-    public void assignPermission(Long roleId, Long permissionId) {
+    public void assignPermission(UUID roleId, UUID permissionId) {
         RoleEntity role = roleRepository.findById(roleId).orElseThrow();
         PermissionEntity permission = permissionService.findById(permissionId).orElseThrow();
         if (role.getPermissions() == null) {
@@ -23,7 +24,7 @@ public class RoleService {
         roleRepository.save(role);
     }
 
-    public void removePermission(Long roleId, Long permissionId) {
+    public void removePermission(UUID roleId, UUID permissionId) {
         RoleEntity role = roleRepository.findById(roleId).orElseThrow();
         PermissionEntity permission = permissionService.findById(permissionId).orElseThrow();
         if (role.getPermissions() != null) {
@@ -40,7 +41,7 @@ public class RoleService {
         return roleRepository.findAll();
     }
 
-    public Optional<RoleEntity> findById(Long id) {
+    public Optional<RoleEntity> findById(UUID id) {
         return roleRepository.findById(id);
     }
 
@@ -48,7 +49,7 @@ public class RoleService {
         return roleRepository.save(role);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(UUID id) {
         roleRepository.deleteById(id);
     }
 

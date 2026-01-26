@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SESSION_TOKEN_KEY } from './utils/constants';
+import { setUserSessionToken } from './utils/axios';
 
 function InnerRootLayout() {
   const dark = useSelector((state: RootState) => state.theme.dark);
@@ -18,6 +19,7 @@ function InnerRootLayout() {
     const loadSession = async () => {
       const token = await AsyncStorage.getItem(SESSION_TOKEN_KEY);
       if (token) {
+        setUserSessionToken(token);
         dispatch(setToken(token));
       }
     };

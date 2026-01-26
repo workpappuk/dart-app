@@ -1,5 +1,7 @@
 package com.dart.server.app.todo;
 
+import java.util.UUID;
+
 import com.dart.server.app.auth.ERole;
 import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.auth.UserRepository;
@@ -33,18 +35,18 @@ public class TodoService {
                 .collect(Collectors.toList());
     }
 
-    public Page<TodoResponse> searchTodos(String q, int page, int size, String username) {
+    public Page<TodoResponse> searchTodos(String q, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         if (AuthUtils.isAdmin()) {
             return todoRepository.findByDescriptionContainingIgnoreCaseAndMarkedForDeletionFalse(q, pageable)
                     .map(TodoMapper::toResponse);
         } else {
-            return todoRepository.findByDescriptionContainingIgnoreCaseAndCreatedBy_UsernameAndMarkedForDeletionFalse(q, username, pageable)
+            return todoRepository.findByDescriptionContainingIgnoreCase(q, pageable)
                     .map(TodoMapper::toResponse);
         }
     }
 
-    public Optional<TodoResponse> getTodoById(Long id, String username) {
+    public Optional<TodoResponse> getTodoById(UUID id, String username) {
         Optional<TodoEntity> todoOptional = todoRepository.findByIdAndMarkedForDeletionFalse(id);
         if (todoOptional.isEmpty()) {
             return Optional.empty();
@@ -57,17 +59,12 @@ public class TodoService {
         return Optional.of(TodoMapper.toResponse(todo));
     }
 
-    public TodoResponse createTodo(TodoRequest request, String username) {
+    public TodoResponse createTodo(TodoRequest request) {
         TodoEntity todo = TodoMapper.toEntity(request);
-        UserEntity user = AuthUtils.getUser(username, userRepository);
-        if (user != null) {
-            todo.setCreatedBy(user);
-            todo.setUpdatedBy(user);
-        }
         return TodoMapper.toResponse(todoRepository.save(todo));
     }
 
-    public Optional<TodoResponse> updateTodo(Long id, TodoRequest request, String username) {
+    public Optional<TodoResponse> updateTodo(UUID id, TodoRequest request, String username) {
         Optional<TodoEntity> todoOptional = todoRepository.findById(id);
         if (todoOptional.isEmpty()) {
             return Optional.empty();
@@ -79,13 +76,10 @@ public class TodoService {
         }
         todo.setDescription(request.getDescription());
         todo.setCompleted(request.isCompleted());
-        if (user != null) {
-            todo.setUpdatedBy(user);
-        }
         return Optional.of(TodoMapper.toResponse(todoRepository.save(todo)));
     }
 
-    public boolean deleteTodo(Long id, String username) {
+    public boolean deleteTodo(UUID id, String username) {
         Optional<TodoEntity> todoOptional = todoRepository.findByIdAndMarkedForDeletionFalse(id);
         if (todoOptional.isEmpty()) {
             return false;

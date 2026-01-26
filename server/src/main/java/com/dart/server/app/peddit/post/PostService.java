@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 public class PostService {
@@ -24,7 +25,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public PostResponse getById(Long id) {
+    public PostResponse getById(UUID id) {
         return postRepository.findById(id)
                 .map(PostMapper::toResponse)
                 .orElse(null);
@@ -37,7 +38,7 @@ public class PostService {
         return PostMapper.toResponse(postRepository.save(entity));
     }
 
-    public PostResponse update(Long id, PostRequest request) {
+    public PostResponse update(UUID id, PostRequest request) {
         return postRepository.findById(id)
                 .map(entity -> {
                     entity.setTitle(request.getTitle());
@@ -46,7 +47,7 @@ public class PostService {
                 }).orElse(null);
     }
 
-    public boolean delete(Long id) {
+    public boolean delete(UUID id) {
         return postRepository.findById(id).map(entity -> {
             entity.setMarkedForDeletion(true);
             postRepository.save(entity);
@@ -54,7 +55,7 @@ public class PostService {
         }).orElse(false);
     }
 
-    public PostEntity getByIdEntity(Long id) {
+    public PostEntity getByIdEntity(UUID id) {
         return postRepository.findById(id).orElse(null);
     }
 

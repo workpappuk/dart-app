@@ -2,7 +2,6 @@ package com.dart.server.app.todo;
 
 import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.auth.UserRepository;
-import com.dart.server.config.db.DartDBAuditListener;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,7 +32,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User or role not found")
     })
     @PostMapping("/{userId}/roles/{roleId}")
-    public ResponseEntity<Void> assignRoleToUser(@PathVariable Long userId, @PathVariable Long roleId) {
+    public ResponseEntity<Void> assignRoleToUser(@PathVariable UUID userId, @PathVariable UUID roleId) {
         if (!userService.findById(userId).isPresent() || !roleService.findById(roleId).isPresent()) {
             return ResponseEntity.notFound().build();
         }
@@ -45,7 +46,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User or role not found")
     })
     @DeleteMapping("/{userId}/roles/{roleId}")
-    public ResponseEntity<Void> removeRoleFromUser(@PathVariable Long userId, @PathVariable Long roleId) {
+    public ResponseEntity<Void> removeRoleFromUser(@PathVariable UUID userId, @PathVariable UUID roleId) {
         if (!userService.findById(userId).isPresent() || !roleService.findById(roleId).isPresent()) {
             return ResponseEntity.notFound().build();
         }
@@ -75,7 +76,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("/{id}")
-    public DartApiResponse<UserResponse> getUserById(@Parameter(description = "ID of the user") @PathVariable Long id) {
+    public DartApiResponse<UserResponse> getUserById(@Parameter(description = "ID of the user") @PathVariable UUID id) {
         return userService.findById(id)
                 .map(UserMapper::toResponse)
                 .map(user -> DartApiResponse.<UserResponse>builder()
@@ -112,7 +113,7 @@ public class UserController {
     })
     @PutMapping("/{id}")
     public DartApiResponse<UserResponse> updateUser(
-            @Parameter(description = "ID of the user") @PathVariable Long id,
+            @Parameter(description = "ID of the user") @PathVariable UUID id,
             @Parameter(description = "Updated user request body") @RequestBody UserRequest userRequest) {
         UserEntity user = UserMapper.toEntity(userRequest);
         user.setId(id);
@@ -135,7 +136,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@Parameter(description = "ID of the user") @PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@Parameter(description = "ID of the user") @PathVariable UUID id) {
         if (!userService.findById(id).isPresent()) {
             return ResponseEntity.notFound().build();
         }

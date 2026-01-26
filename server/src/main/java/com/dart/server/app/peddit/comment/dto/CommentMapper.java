@@ -17,7 +17,6 @@ public class CommentMapper {
         response.setContent(entity.getContent());
         response.setTargetId(entity.getTargetId());
         response.setTargetType(entity.getTargetType());
-        response.setAuthorId(entity.getAuthor() != null ? entity.getAuthor().getId() : null);
         response.setMarkedForDeletion(entity.isMarkedForDeletion());
         return response;
     }

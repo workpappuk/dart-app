@@ -1,7 +1,11 @@
 package com.dart.server.app.peddit.vote;
 
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface VoteRepository extends JpaRepository<VoteEntity, Long> {
+import java.util.UUID;
+
+public interface VoteRepository extends JpaRepository<VoteEntity, UUID> {
 }
 
