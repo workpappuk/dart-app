@@ -1,6 +1,8 @@
 ### --- PERMISSIONS ---
 
-@token = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmNWMzMjRlMS0zMDYzLTRjMTgtOTVmYy01YzA1MmE5ZTMzNzYiLCJyb2xlcyI6IlVTRVIiLCJpYXQiOjE3Njk0MDY4ODAsImV4cCI6MTc2OTQxMDQ4MH0.4iQVWzT8F4iQrsCkXEcb5WBEocxxrJvONoN2ENAaHAvWdM5ib3kcRnTC57ZHxgZRrREzIs9-tZmSuKVxieg1hA
+@token = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0OGIwMjg4NS03OTkyLTQ3YjUtYTYxZS1hYTQ5YzE5MmE3ZGEiLCJyb2xlcyI6IlVTRVIiLCJpYXQiOjE3Njk0MTU3MzcsImV4cCI6MTc2OTQxOTMzN30.air0t6MzkjdJhfsyKLhIz-1QDOyNnEUeS4MtfhTtR5C20jiBhzRXQ3r7idJVcBUw948jWSBa80B2W-lKsRfj5A
+
+
 ### Create a new read permission
 POST http://localhost:8080/api/permissions
 Content-Type: application/json

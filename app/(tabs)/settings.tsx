@@ -12,8 +12,8 @@ import { clearUserSessionToken } from "../utils/axios";
 
 
 export default function SettingsScreen() {
-    const dark = useSelector((state: RootState) => state.theme.dark);
-  
+  const dark = useSelector((state: RootState) => state.theme.dark);
+
   const session = useSelector((state: RootState) => state.session);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -28,26 +28,32 @@ export default function SettingsScreen() {
         <Divider style={{ marginVertical: 16 }} />
         {session.token ? (
           <>
-          <View style={{ marginTop: 16 }}>
-            <Button mode="contained" onPress={() => { router.push('/pages/admin/dashboard'); }}>
-              Admin Dashoard
-            </Button>
-          </View>
-           <View style={{ marginTop: 16 }}>
-            <Button mode="contained" onPress={async () => {
-              await logoutUser();
-              await AsyncStorage.removeItem('session_token');
-              clearUserSessionToken();
-              dispatch(setToken(null));
-               
-              router.replace('/pages/auth/login');
-             }}>
-              Logout
-            </Button>
-          </View>
+            <View style={{ marginTop: 16 }}>
+              <Button mode="contained" onPress={() => { router.push('/pages/admin/dashboard'); }}>
+                Admin Dashoard
+              </Button>
+            </View>
+            <View style={{ marginTop: 16 }}>
+              <Button mode="contained" onPress={async () => {
+                logoutUser()
+                .catch((err) => {
+                  console.error('Logout error:', err);
+                })
+                .finally(async () => {
+                  await AsyncStorage.removeItem('session_token');
+                  clearUserSessionToken();
+                  dispatch(setToken(null));
+
+                  router.replace('/pages/auth/login');
+
+                });
+              }}>
+                Logout
+              </Button>
+            </View>
           </>
         ) : (
-           <View style={{ marginTop: 16 }}>
+          <View style={{ marginTop: 16 }}>
             <Button mode="contained" onPress={() => { router.push('/pages/auth/login'); }}>
               Login
             </Button>

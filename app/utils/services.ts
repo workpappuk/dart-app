@@ -1,6 +1,6 @@
 
 import api from './axios';
-import { CommunityRequest, DartApiResponse, LoginResponse, UserRequest } from './types';
+import { CommunityRequest, CommunityResponse, DartApiResponse, LoginResponse, PageResponse, UserRequest } from './types';
 
 export const getUsers = async () => {
 	const response = await api.get('/users');
@@ -22,3 +22,17 @@ export const createCommunity = async (data: CommunityRequest) => {
 	return response.data;
 }
 
+export const getCommunities = async () : Promise<DartApiResponse<CommunityResponse[]>> => {
+	const response = await api.get('/api/communities');
+	return response.data;
+}
+
+export const fetchCommunityDetails = async (communityId: string) : Promise<DartApiResponse<CommunityResponse>> => {
+	const response = await api.get(`/api/communities/${communityId}`);
+	return response.data;
+}
+
+export const updateCommunity = async (communityId: string | null, data: CommunityRequest) => {
+	const response = await api.put(`/api/communities/${communityId}`, data);
+	return response.data;
+}

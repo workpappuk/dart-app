@@ -23,7 +23,7 @@ export interface LoginResponse {
 
 // User DTOs
 export interface UserResponse {
-  id: number;
+  id: string;
   username: string;
   roles: RoleResponse[];
 }
@@ -35,7 +35,7 @@ export interface UserRequest {
 
 // Role DTOs
 export interface RoleResponse {
-  id: number;
+  id: string;
   name: string;
   permissions: PermissionResponse[];
 }
@@ -46,7 +46,7 @@ export interface RoleRequest {
 
 // Permission DTOs
 export interface PermissionResponse {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -56,7 +56,7 @@ export interface PermissionRequest {
 
 // Todo DTOs
 export interface TodoResponse {
-  id: number;
+  id: string;
   description: string;
   completed: boolean;
   createdAt: string; // ISO string
@@ -73,23 +73,23 @@ export interface TodoRequest {
 
 // Comment DTOs
 export interface CommentResponse {
-  id: number;
+  id: string;
   content: string;
-  targetId: number;
+  targetId: string;
   targetType: string; // EEntityTargetType
-  authorId: number;
+  authorId: string;
   markedForDeletion: boolean;
 }
 
 export interface CommentRequest {
   content: string;
-  targetId: number;
+  targetId: string;
   targetType: string; // EEntityTargetType
 }
 
 // Community DTOs
 export interface CommunityResponse {
-  id: number;
+  id: string;
   name: string;
   description: string;
   createdBy: string;
@@ -103,32 +103,32 @@ export interface CommunityRequest {
 
 // Post DTOs
 export interface PostResponse {
-  id: number;
+  id: string;
   title: string;
   content: string;
-  communityId: number;
-  authorId: number;
+  communityId: string;
+  authorId: string;
   markedForDeletion: boolean;
 }
 
 export interface PostRequest {
   title: string;
   content: string;
-  communityId: number;
+  communityId: string;
 }
 
 // Vote DTOs
 export interface VoteResponse {
-  id: number;
-  targetId: number;
+  id: string;
+  targetId: string;
   targetType: string;
-  userId: number;
+  userId: string;
   upvote: boolean;
 }
 
 export interface VoteRequest {
-  targetId: number;
+  targetId: string;
   targetType: string;
-  userId: number;
+  userId: string;
   upvote: boolean;
 }

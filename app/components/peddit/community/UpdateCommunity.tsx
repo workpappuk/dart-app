@@ -1,19 +1,22 @@
 
 
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { TextInput, Button, Text, useTheme } from 'react-native-paper';
 import { useMutation } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { CommunityRequest } from '@/app/utils/types';
-import { createCommunity } from '@/app/utils/services';
+import { updateCommunity, fetchCommunityDetails } from '@/app/utils/services';
 import AppAlert from '../../core/AppAlert';
 import { ViewType } from './Communities';
 
 
-export function AddCommunity(
-    { callback }: { callback: (view: ViewType) => void }
+export function UpdateCommunity(
+    { communityId, callback }: {
+        communityId: string | null;
+        callback: (view: ViewType) => void
+    }
 ) {
     const theme = useTheme();
 
@@ -25,15 +28,15 @@ export function AddCommunity(
 
     const mutation = useMutation({
         mutationFn: async (data: CommunityRequest) => {
-            return await createCommunity(data);
+            return await updateCommunity(communityId, data);
         },
         onError: (err: any) => {
-            setError(err.message || 'Failed to add community');
-            setAlert({ visible: true, message: err.message || 'Failed to add community', title: 'Error', isError: true });
+            setError(err.message || 'Failed to update community');
+            setAlert({ visible: true, message: err.message || 'Failed to update community', title: 'Error', isError: true });
         },
         onSuccess: () => {
 
-            setAlert({ visible: true, title: 'Community created successfully!', isError: false });
+            setAlert({ visible: true, title: 'Community updated successfully!', isError: false });
         },
     });
 
@@ -42,6 +45,21 @@ export function AddCommunity(
         mutation.mutate(data);
     };
 
+
+    useEffect(() => {
+        // Fetch community details by ID and populate the form
+        if (communityId) {
+
+            fetchCommunityDetails(communityId).then((data) => {
+                console.log('Fetched community data:', data);
+                const { name, description } = data.data;
+                reset({
+                    name: name || '',
+                    description: description || '',
+                });
+            });
+        }
+    }, [communityId]);
     return (
         <View>
             <AppAlert
@@ -49,15 +67,17 @@ export function AddCommunity(
                 title={alert.title}
                 message={alert.message!}
                 onDismiss={() => {
+                    setAlert((a) => ({ ...a, visible: false }))
                     reset();
                     setError('');
                     callback('list');
-                    setAlert((a) => ({ ...a, visible: false }))
+
                 }}
                 confirmText="OK"
+            // Optionally, you can style based on alert.isError
             />
             <Text variant="headlineMedium" style={{ marginBottom: 20, textAlign: 'center' }}>
-                Create Community
+                Update Community
             </Text>
             <Controller
                 control={control}
@@ -103,7 +123,7 @@ export function AddCommunity(
                 disabled={mutation.isPending}
                 style={{ borderRadius: 8 }}
             >
-                Add Community
+                Update Community
             </Button>
 
             <Button

@@ -1,9 +1,9 @@
 import { RootState } from "@/app/redux/store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Surface, Text } from "react-native-paper";
+import { Divider, Surface, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { Communities } from "@/app/components/peddit/community/Communities";
 export default function AdminDashboard() {
@@ -21,19 +21,21 @@ export default function AdminDashboard() {
   ];
   return (
     <>
-      <Surface style={{ padding: 16, margin: 16, borderRadius: 8 }}>
-
+      <View style={styles.container}>
         <SegmentedButtons
           value={value}
           onValueChange={setValue}
           buttons={options}
         />
 
-        {value === 'communities' && <CommunitiesSection />}
-        {value === 'posts' && <PostsSection />}
-        {value === 'users' && <UsersSection />}
-        
-      </Surface>
+        <ScrollView style={{ marginVertical: 16 }} >
+
+          {value === 'communities' && <CommunitiesSection />}
+          {value === 'posts' && <PostsSection />}
+          {value === 'users' && <UsersSection />}
+        </ScrollView>
+
+      </View>
     </>
   );
 }
@@ -56,16 +58,12 @@ function PostsSection() {
 
 function CommunitiesSection() {
   return (
-    <Surface style={{ padding: 16, margin: 16, borderRadius: 8 }}>
-      <Text>Communities Section</Text>
-      <Communities />
-    </Surface>
+    <Communities />
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
+    padding: 16,
   },
 });
