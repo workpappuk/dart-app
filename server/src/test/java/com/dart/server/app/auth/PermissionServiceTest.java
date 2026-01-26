@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -37,16 +38,18 @@ class PermissionServiceTest {
 
     @Test
     void findById_shouldReturnOptional() {
+        UUID id = UUID.randomUUID();
         PermissionEntity entity = new PermissionEntity();
-        entity.setId(1L);
-        when(permissionRepository.findById(1L)).thenReturn(Optional.of(entity));
-        assertTrue(permissionService.findById(1L).isPresent());
+        entity.setId(id);
+        when(permissionRepository.findById(id)).thenReturn(Optional.of(entity));
+        assertTrue(permissionService.findById(id).isPresent());
     }
 
     @Test
     void findById_shouldReturnEmpty() {
-        when(permissionRepository.findById(1L)).thenReturn(Optional.empty());
-        assertTrue(permissionService.findById(1L).isEmpty());
+        UUID id = UUID.randomUUID();
+        when(permissionRepository.findById(id)).thenReturn(Optional.empty());
+        assertTrue(permissionService.findById(id).isEmpty());
     }
 
     @Test
@@ -58,9 +61,10 @@ class PermissionServiceTest {
 
     @Test
     void deleteById_shouldCallRepository() {
-        doNothing().when(permissionRepository).deleteById(1L);
-        permissionService.deleteById(1L);
-        verify(permissionRepository).deleteById(1L);
+        UUID id = UUID.randomUUID();
+        doNothing().when(permissionRepository).deleteById(id);
+        permissionService.deleteById(id);
+        verify(permissionRepository).deleteById(id);
     }
 
     @Test

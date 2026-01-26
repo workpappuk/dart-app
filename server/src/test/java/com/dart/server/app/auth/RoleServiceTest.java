@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -30,27 +31,31 @@ class RoleServiceTest {
     @Test
     void assignPermission_shouldAssign() {
         RoleEntity role = new RoleEntity();
-        role.setId(1L);
+        UUID roleId = UUID.randomUUID();
+        role.setId(roleId);
         PermissionEntity perm = new PermissionEntity();
-        perm.setId(2L);
-        when(roleRepository.findById(1L)).thenReturn(Optional.of(role));
-        when(permissionService.findById(2L)).thenReturn(Optional.of(perm));
+        UUID permId = UUID.randomUUID();
+        perm.setId(permId);
+        when(roleRepository.findById(roleId)).thenReturn(Optional.of(role));
+        when(permissionService.findById(permId)).thenReturn(Optional.of(perm));
         when(roleRepository.save(any())).thenReturn(role);
-        roleService.assignPermission(1L, 2L);
+        roleService.assignPermission(roleId, permId);
         verify(roleRepository).save(role);
     }
 
     @Test
     void removePermission_shouldRemove() {
         RoleEntity role = new RoleEntity();
-        role.setId(1L);
+        UUID roleId = UUID.randomUUID();
+        role.setId(roleId);
         PermissionEntity perm = new PermissionEntity();
-        perm.setId(2L);
+        UUID permId = UUID.randomUUID();
+        perm.setId(permId);
         role.setPermissions(new java.util.HashSet<>(Collections.singletonList(perm)));
-        when(roleRepository.findById(1L)).thenReturn(Optional.of(role));
-        when(permissionService.findById(2L)).thenReturn(Optional.of(perm));
+        when(roleRepository.findById(roleId)).thenReturn(Optional.of(role));
+        when(permissionService.findById(permId)).thenReturn(Optional.of(perm));
         when(roleRepository.save(any())).thenReturn(role);
-        roleService.removePermission(1L, 2L);
+        roleService.removePermission(roleId, permId);
         verify(roleRepository).save(role);
     }
 
@@ -70,15 +75,17 @@ class RoleServiceTest {
     @Test
     void findById_shouldReturnOptional() {
         RoleEntity entity = new RoleEntity();
-        entity.setId(1L);
-        when(roleRepository.findById(1L)).thenReturn(Optional.of(entity));
-        assertTrue(roleService.findById(1L).isPresent());
+        UUID roleId = UUID.randomUUID();
+        entity.setId(roleId);
+        when(roleRepository.findById(roleId)).thenReturn(Optional.of(entity));
+        assertTrue(roleService.findById(roleId).isPresent());
     }
 
     @Test
     void findById_shouldReturnEmpty() {
-        when(roleRepository.findById(1L)).thenReturn(Optional.empty());
-        assertTrue(roleService.findById(1L).isEmpty());
+        UUID roleId = UUID.randomUUID();
+        when(roleRepository.findById(roleId)).thenReturn(Optional.empty());
+        assertTrue(roleService.findById(roleId).isEmpty());
     }
 
     @Test
@@ -90,8 +97,9 @@ class RoleServiceTest {
 
     @Test
     void deleteById_shouldCallRepository() {
-        doNothing().when(roleRepository).deleteById(1L);
-        roleService.deleteById(1L);
-        verify(roleRepository).deleteById(1L);
+        UUID roleId = UUID.randomUUID();
+        doNothing().when(roleRepository).deleteById(roleId);
+        roleService.deleteById(roleId);
+        verify(roleRepository).deleteById(roleId);
     }
 }

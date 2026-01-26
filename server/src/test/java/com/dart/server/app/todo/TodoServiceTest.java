@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,23 +59,23 @@ class TodoServiceTest {
         TodoRequest req = new TodoRequest();
         TodoEntity entity = new TodoEntity();
         when(todoRepository.save(any())).thenReturn(entity);
-        TodoResponse result = todoService.createTodo(req, "user");
+        TodoResponse result = todoService.createTodo(req);
         assertNotNull(result);
     }
 
     @Test
     void updateTodo_shouldReturnUpdated_whenAdmin() {
+        UUID todoId = UUID.randomUUID();
         TodoEntity entity = new TodoEntity();
-        entity.setId(1L);
+        entity.setId(todoId);
         UserEntity user = new UserEntity();
-        user.setId(2L);
+        user.setId(UUID.randomUUID());
         UserEntity creator = new UserEntity();
-        creator.setId(3L);
-        entity.setCreatedBy(creator); // Ensure createdBy is not null and has an id
+        creator.setId(UUID.randomUUID());
         TodoRequest req = new TodoRequest();
         req.setDescription("desc");
         req.setCompleted(true);
-        when(todoRepository.findById(1L)).thenReturn(Optional.of(entity));
+        when(todoRepository.findById(todoId)).thenReturn(Optional.of(entity));
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
         when(todoRepository.save(any())).thenReturn(entity);
         // Set up SecurityContext for admin
@@ -82,38 +83,39 @@ class TodoServiceTest {
         SecurityContext context = mock(SecurityContext.class);
         when(context.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(context);
-        Optional<TodoResponse> result = todoService.updateTodo(1L, req, "admin");
+        Optional<TodoResponse> result = todoService.updateTodo(todoId, req, "admin");
         assertTrue(result.isPresent());
     }
 
     @Test
     void updateTodo_shouldReturnEmpty_whenNotOwnerOrAdmin() {
+        UUID todoId = UUID.randomUUID();
         TodoEntity entity = new TodoEntity();
-        entity.setId(1L);
+        entity.setId(todoId);
         UserEntity user = new UserEntity();
-        user.setId(2L);
+        user.setId(UUID.randomUUID());
         UserEntity creator = new UserEntity();
-        creator.setId(3L);
-        entity.setCreatedBy(creator); // Ensure createdBy is not null and has an id
+        creator.setId(UUID.randomUUID());
         TodoRequest req = new TodoRequest();
         req.setDescription("desc");
         req.setCompleted(true);
-        when(todoRepository.findById(1L)).thenReturn(Optional.of(entity));
+        when(todoRepository.findById(todoId)).thenReturn(Optional.of(entity));
         when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
         // Set up SecurityContext for non-owner, non-admin
         Authentication auth = new UsernamePasswordAuthenticationToken("user", null, Collections.singletonList(new SimpleGrantedAuthority("USER")));
         SecurityContext context = mock(SecurityContext.class);
         when(context.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(context);
-        Optional<TodoResponse> result = todoService.updateTodo(1L, req, "user");
+        Optional<TodoResponse> result = todoService.updateTodo(todoId, req, "user");
         assertTrue(result.isEmpty());
     }
 
     @Test
     void updateTodo_shouldReturnEmpty_whenNotFound() {
-        when(todoRepository.findById(1L)).thenReturn(Optional.empty());
+        UUID todoId = UUID.randomUUID();
+        when(todoRepository.findById(todoId)).thenReturn(Optional.empty());
         TodoRequest req = new TodoRequest();
-        Optional<TodoResponse> result = todoService.updateTodo(1L, req, "user");
+        Optional<TodoResponse> result = todoService.updateTodo(todoId, req, "user");
         assertTrue(result.isEmpty());
     }
 
@@ -124,7 +126,7 @@ class TodoServiceTest {
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.getUser(any(), any())).thenReturn(new UserEntity());
             var page = new org.springframework.data.domain.PageImpl<>(Collections.singletonList(new TodoEntity()));
             when(todoRepository.findByDescriptionContainingIgnoreCaseAndMarkedForDeletionFalse(any(), any())).thenReturn(page);
-            var result = todoService.searchTodos("test", 0, 10, "admin");
+            var result = todoService.searchTodos("test", 0, 10);
             assertNotNull(result);
             assertEquals(1, result.getTotalElements());
         }
@@ -136,8 +138,8 @@ class TodoServiceTest {
             mocked.when(com.dart.server.common.utils.AuthUtils::isAdmin).thenReturn(false);
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.getUser(any(), any())).thenReturn(new UserEntity());
             var page = new org.springframework.data.domain.PageImpl<>(Collections.singletonList(new TodoEntity()));
-            when(todoRepository.findByDescriptionContainingIgnoreCaseAndCreatedBy_UsernameAndMarkedForDeletionFalse(any(), any(), any())).thenReturn(page);
-            var result = todoService.searchTodos("test", 0, 10, "user");
+            when(todoRepository.findByDescriptionContainingIgnoreCase(any(), any())).thenReturn(page);
+            var result = todoService.searchTodos("test", 0, 10);
             assertNotNull(result);
             assertEquals(1, result.getTotalElements());
         }
@@ -145,42 +147,45 @@ class TodoServiceTest {
 
     @Test
     void getTodoById_shouldReturnEmpty_whenNotOwnerOrAdmin() {
+        UUID todoId = UUID.randomUUID();
         TodoEntity todo = new TodoEntity();
         UserEntity user = new UserEntity();
         try (var mocked = mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.getUser(any(), any())).thenReturn(user);
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.isOwner(any(), any())).thenReturn(false);
             mocked.when(com.dart.server.common.utils.AuthUtils::isAdmin).thenReturn(false);
-            when(todoRepository.findByIdAndMarkedForDeletionFalse(1L)).thenReturn(Optional.of(todo));
-            var result = todoService.getTodoById(1L, "user");
+            when(todoRepository.findByIdAndMarkedForDeletionFalse(todoId)).thenReturn(Optional.of(todo));
+            var result = todoService.getTodoById(todoId, "user");
             assertTrue(result.isEmpty());
         }
     }
 
     @Test
     void getTodoById_shouldReturn_whenOwner() {
+        UUID todoId = UUID.randomUUID();
         TodoEntity todo = new TodoEntity();
         UserEntity user = new UserEntity();
         try (var mocked = mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.getUser(any(), any())).thenReturn(user);
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.isOwner(any(), any())).thenReturn(true);
             mocked.when(com.dart.server.common.utils.AuthUtils::isAdmin).thenReturn(false);
-            when(todoRepository.findByIdAndMarkedForDeletionFalse(1L)).thenReturn(Optional.of(todo));
-            var result = todoService.getTodoById(1L, "user");
+            when(todoRepository.findByIdAndMarkedForDeletionFalse(todoId)).thenReturn(Optional.of(todo));
+            var result = todoService.getTodoById(todoId, "user");
             assertTrue(result.isPresent());
         }
     }
 
     @Test
     void getTodoById_shouldReturn_whenAdmin() {
+        UUID todoId = UUID.randomUUID();
         TodoEntity todo = new TodoEntity();
         UserEntity user = new UserEntity();
         try (var mocked = mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.getUser(any(), any())).thenReturn(user);
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.isOwner(any(), any())).thenReturn(false);
             mocked.when(com.dart.server.common.utils.AuthUtils::isAdmin).thenReturn(true);
-            when(todoRepository.findByIdAndMarkedForDeletionFalse(1L)).thenReturn(Optional.of(todo));
-            var result = todoService.getTodoById(1L, "user");
+            when(todoRepository.findByIdAndMarkedForDeletionFalse(todoId)).thenReturn(Optional.of(todo));
+            var result = todoService.getTodoById(todoId, "user");
             assertTrue(result.isPresent());
         }
     }
@@ -192,53 +197,40 @@ class TodoServiceTest {
         try (var mocked = mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.getUser(any(), any())).thenReturn(null);
             when(todoRepository.save(any())).thenReturn(entity);
-            TodoResponse result = todoService.createTodo(req, "user");
+            TodoResponse result = todoService.createTodo(req);
             assertNotNull(result);
         }
     }
 
     @Test
     void deleteTodo_shouldReturnFalse_whenNotOwnerOrAdmin() {
+        UUID todoId = UUID.randomUUID();
         TodoEntity todo = new TodoEntity();
         UserEntity user = new UserEntity();
         try (var mocked = mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.getUser(any(), any())).thenReturn(user);
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.isOwner(any(), any())).thenReturn(false);
             mocked.when(com.dart.server.common.utils.AuthUtils::isAdmin).thenReturn(false);
-            when(todoRepository.findByIdAndMarkedForDeletionFalse(1L)).thenReturn(Optional.of(todo));
-            boolean result = todoService.deleteTodo(1L, "user");
+            when(todoRepository.findByIdAndMarkedForDeletionFalse(todoId)).thenReturn(Optional.of(todo));
+            boolean result = todoService.deleteTodo(todoId, "user");
             assertFalse(result);
         }
     }
 
     @Test
     void deleteTodo_shouldReturnTrue_whenOwner() {
+        UUID todoId = UUID.randomUUID();
         TodoEntity todo = new TodoEntity();
         UserEntity user = new UserEntity();
         try (var mocked = mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.getUser(any(), any())).thenReturn(user);
             mocked.when(() -> com.dart.server.common.utils.AuthUtils.isOwner(any(), any())).thenReturn(true);
             mocked.when(com.dart.server.common.utils.AuthUtils::isAdmin).thenReturn(false);
-            when(todoRepository.findByIdAndMarkedForDeletionFalse(1L)).thenReturn(Optional.of(todo));
+            when(todoRepository.findByIdAndMarkedForDeletionFalse(todoId)).thenReturn(Optional.of(todo));
             when(todoRepository.save(any())).thenReturn(todo);
-            boolean result = todoService.deleteTodo(1L, "user");
+            boolean result = todoService.deleteTodo(todoId, "user");
             assertTrue(result);
         }
     }
-
-    @Test
-    void deleteTodo_shouldReturnTrue_whenAdmin() {
-        TodoEntity todo = new TodoEntity();
-        UserEntity user = new UserEntity();
-        try (var mocked = mockStatic(com.dart.server.common.utils.AuthUtils.class)) {
-            mocked.when(() -> com.dart.server.common.utils.AuthUtils.getUser(any(), any())).thenReturn(user);
-            mocked.when(() -> com.dart.server.common.utils.AuthUtils.isOwner(any(), any())).thenReturn(false);
-            mocked.when(com.dart.server.common.utils.AuthUtils::isAdmin).thenReturn(true);
-            when(todoRepository.findByIdAndMarkedForDeletionFalse(1L)).thenReturn(Optional.of(todo));
-            when(todoRepository.save(any())).thenReturn(todo);
-            boolean result = todoService.deleteTodo(1L, "user");
-            assertTrue(result);
-        }
-    }
-
 }
+

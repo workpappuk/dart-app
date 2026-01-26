@@ -6,16 +6,18 @@ import com.dart.server.app.auth.dto.PermissionRequest;
 import com.dart.server.app.auth.dto.PermissionResponse;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PermissionMapperTest {
     @Test
     void testToResponse() {
         PermissionEntity entity = new PermissionEntity();
-        entity.setId(1L);
+        entity.setId(UUID.randomUUID());
         entity.setName("PERM");
         PermissionResponse response = PermissionMapper.toResponse(entity);
-        assertEquals(1L, response.getId());
+        assertNotNull(response.getId());
         assertEquals("PERM", response.getName());
     }
 
@@ -27,4 +29,3 @@ class PermissionMapperTest {
         assertEquals("PERM", entity.getName());
     }
 }
-

@@ -9,8 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,29 +49,33 @@ class UserServiceTest {
 
     @Test
     void assignRole_shouldAssign() {
+        UUID userId = UUID.randomUUID();
+        UUID roleId = UUID.randomUUID();
         UserEntity user = new UserEntity();
-        user.setId(1L);
+        user.setId(userId);
         user.setRoles(new java.util.HashSet<>());
         RoleEntity role = new RoleEntity();
-        role.setId(2L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(roleService.findById(2L)).thenReturn(Optional.of(role));
+        role.setId(roleId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(roleService.findById(roleId)).thenReturn(Optional.of(role));
         when(userRepository.save(any())).thenReturn(user);
-        userService.assignRole(1L, 2L);
+        userService.assignRole(userId, roleId);
         verify(userRepository).save(user);
     }
 
     @Test
     void removeRole_shouldRemove() {
+        UUID userId = UUID.randomUUID();
+        UUID roleId = UUID.randomUUID();
         UserEntity user = new UserEntity();
-        user.setId(1L);
+        user.setId(userId);
         RoleEntity role = new RoleEntity();
-        role.setId(2L);
+        role.setId(roleId);
         user.setRoles(new java.util.HashSet<>(Collections.singletonList(role)));
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(roleService.findById(2L)).thenReturn(Optional.of(role));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(roleService.findById(roleId)).thenReturn(Optional.of(role));
         when(userRepository.save(any())).thenReturn(user);
-        userService.removeRole(1L, 2L);
+        userService.removeRole(userId, roleId);
         verify(userRepository).save(user);
     }
 
@@ -81,16 +87,18 @@ class UserServiceTest {
 
     @Test
     void findById_shouldReturnOptional() {
+        UUID userId = UUID.randomUUID();
         UserEntity entity = new UserEntity();
-        entity.setId(1L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(entity));
-        assertTrue(userService.findById(1L).isPresent());
+        entity.setId(userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(entity));
+        assertTrue(userService.findById(userId).isPresent());
     }
 
     @Test
     void findById_shouldReturnEmpty() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertTrue(userService.findById(1L).isEmpty());
+        UUID userId = UUID.randomUUID();
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        assertTrue(userService.findById(userId).isEmpty());
     }
 
     @Test
@@ -102,8 +110,9 @@ class UserServiceTest {
 
     @Test
     void deleteById_shouldCallRepository() {
-        doNothing().when(userRepository).deleteById(1L);
-        userService.deleteById(1L);
-        verify(userRepository).deleteById(1L);
+        UUID userId = UUID.randomUUID();
+        doNothing().when(userRepository).deleteById(userId);
+        userService.deleteById(userId);
+        verify(userRepository).deleteById(userId);
     }
 }

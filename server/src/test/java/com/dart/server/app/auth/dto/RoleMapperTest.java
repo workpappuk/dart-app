@@ -8,6 +8,7 @@ import com.dart.server.app.auth.PermissionEntity;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,14 +16,16 @@ class RoleMapperTest {
     @Test
     void testToResponse() {
         RoleEntity entity = new RoleEntity();
-        entity.setId(1L);
+        UUID roleId = UUID.randomUUID();
+        entity.setId(roleId);
         entity.setName("ADMIN");
         PermissionEntity perm = new PermissionEntity();
-        perm.setId(2L);
+        UUID permId = UUID.randomUUID();
+        perm.setId(permId);
         perm.setName("PERM");
         entity.setPermissions(Set.of(perm));
         RoleResponse response = RoleMapper.toResponse(entity);
-        assertEquals(1L, response.getId());
+        assertEquals(roleId, response.getId());
         assertEquals("ADMIN", response.getName());
         assertEquals(1, response.getPermissions().size());
     }
@@ -35,4 +38,3 @@ class RoleMapperTest {
         assertEquals("USER", entity.getName());
     }
 }
-

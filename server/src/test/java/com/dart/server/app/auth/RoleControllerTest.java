@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -34,33 +35,45 @@ class RoleControllerTest {
 
     @Test
     void assignPermissionToRole_shouldReturnOk() throws Exception {
-        when(roleService.findById(1L)).thenReturn(Optional.of(new RoleEntity()));
-        when(permissionService.findById(2L)).thenReturn(Optional.of(new PermissionEntity()));
-        mockMvc.perform(post("/api/roles/1/permissions/2"))
+        UUID roleId = UUID.randomUUID();
+        UUID permId = UUID.randomUUID();
+        RoleEntity role = new RoleEntity();
+        role.setId(roleId);
+        PermissionEntity perm = new PermissionEntity();
+        perm.setId(permId);
+        when(roleService.findById(roleId)).thenReturn(Optional.of(role));
+        when(permissionService.findById(permId)).thenReturn(Optional.of(perm));
+        mockMvc.perform(post("/api/roles/" + roleId + "/permissions/" + permId))
                 .andExpect(status().isOk());
     }
 
     @Test
     void assignPermissionToRole_shouldReturnNotFound() throws Exception {
-        when(roleService.findById(1L)).thenReturn(Optional.empty());
-        when(permissionService.findById(2L)).thenReturn(Optional.of(new PermissionEntity()));
-        mockMvc.perform(post("/api/roles/1/permissions/2"))
+        UUID roleId = UUID.randomUUID();
+        UUID permId = UUID.randomUUID();
+        when(roleService.findById(roleId)).thenReturn(Optional.empty());
+        when(permissionService.findById(permId)).thenReturn(Optional.of(new PermissionEntity()));
+        mockMvc.perform(post("/api/roles/" + roleId + "/permissions/" + permId))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void removePermissionFromRole_shouldReturnOk() throws Exception {
-        when(roleService.findById(1L)).thenReturn(Optional.of(new RoleEntity()));
-        when(permissionService.findById(2L)).thenReturn(Optional.of(new PermissionEntity()));
-        mockMvc.perform(delete("/api/roles/1/permissions/2"))
+        UUID roleId = UUID.randomUUID();
+        UUID permId = UUID.randomUUID();
+        when(roleService.findById(roleId)).thenReturn(Optional.of(new RoleEntity()));
+        when(permissionService.findById(permId)).thenReturn(Optional.of(new PermissionEntity()));
+        mockMvc.perform(delete("/api/roles/" + roleId + "/permissions/" + permId))
                 .andExpect(status().isOk());
     }
 
     @Test
     void removePermissionFromRole_shouldReturnNotFound() throws Exception {
-        when(roleService.findById(1L)).thenReturn(Optional.of(new RoleEntity()));
-        when(permissionService.findById(2L)).thenReturn(Optional.empty());
-        mockMvc.perform(delete("/api/roles/1/permissions/2"))
+        UUID roleId = UUID.randomUUID();
+        UUID permId = UUID.randomUUID();
+        when(roleService.findById(roleId)).thenReturn(Optional.of(new RoleEntity()));
+        when(permissionService.findById(permId)).thenReturn(Optional.empty());
+        mockMvc.perform(delete("/api/roles/" + roleId + "/permissions/" + permId))
                 .andExpect(status().isNotFound());
     }
 
@@ -74,28 +87,31 @@ class RoleControllerTest {
 
     @Test
     void getRoleById_shouldReturnRole() throws Exception {
+        UUID roleId = UUID.randomUUID();
         RoleEntity entity = new RoleEntity();
-        entity.setId(1L);
+        entity.setId(roleId);
         entity.setName("ROLE");
-        when(roleService.findById(1L)).thenReturn(Optional.of(entity));
-        mockMvc.perform(get("/api/roles/1"))
+        when(roleService.findById(roleId)).thenReturn(Optional.of(entity));
+        mockMvc.perform(get("/api/roles/" + roleId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.id").value(1L));
+                .andExpect(jsonPath("$.data.id").value(roleId.toString()));
     }
 
     @Test
     void getRoleById_shouldReturnNotFound() throws Exception {
-        when(roleService.findById(1L)).thenReturn(Optional.empty());
-        mockMvc.perform(get("/api/roles/1"))
+        UUID roleId = UUID.randomUUID();
+        when(roleService.findById(roleId)).thenReturn(Optional.empty());
+        mockMvc.perform(get("/api/roles/" + roleId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
     void createRole_shouldReturnCreated() throws Exception {
+        UUID roleId = UUID.randomUUID();
         RoleEntity entity = new RoleEntity();
-        entity.setId(1L);
+        entity.setId(roleId);
         entity.setName("ROLE");
         when(roleService.save(any())).thenReturn(entity);
         mockMvc.perform(post("/api/roles")
@@ -103,31 +119,33 @@ class RoleControllerTest {
                         .content(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(entity)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.id").value(1L));
+                .andExpect(jsonPath("$.data.id").value(roleId.toString()));
     }
 
     @Test
     void updateRole_shouldReturnUpdated() throws Exception {
+        UUID roleId = UUID.randomUUID();
         RoleEntity entity = new RoleEntity();
-        entity.setId(1L);
+        entity.setId(roleId);
         entity.setName("ROLE");
-        when(roleService.findById(1L)).thenReturn(Optional.of(entity));
+        when(roleService.findById(roleId)).thenReturn(Optional.of(entity));
         when(roleService.save(any())).thenReturn(entity);
-        mockMvc.perform(put("/api/roles/1")
+        mockMvc.perform(put("/api/roles/" + roleId)
                         .contentType("application/json")
                         .content(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(entity)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.id").value(1L));
+                .andExpect(jsonPath("$.data.id").value(roleId.toString()));
     }
 
     @Test
     void updateRole_shouldReturnNotFound() throws Exception {
+        UUID roleId = UUID.randomUUID();
         RoleEntity entity = new RoleEntity();
-        entity.setId(1L);
+        entity.setId(roleId);
         entity.setName("ROLE");
-        when(roleService.findById(1L)).thenReturn(Optional.empty());
-        mockMvc.perform(put("/api/roles/1")
+        when(roleService.findById(roleId)).thenReturn(Optional.empty());
+        mockMvc.perform(put("/api/roles/" + roleId)
                         .contentType("application/json")
                         .content(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(entity)))
                 .andExpect(status().isOk())
@@ -136,18 +154,20 @@ class RoleControllerTest {
 
     @Test
     void deleteRole_shouldReturnDeleted() throws Exception {
+        UUID roleId = UUID.randomUUID();
         RoleEntity entity = new RoleEntity();
-        entity.setId(1L);
-        when(roleService.findById(1L)).thenReturn(Optional.of(entity));
-        mockMvc.perform(delete("/api/roles/1"))
+        entity.setId(roleId);
+        when(roleService.findById(roleId)).thenReturn(Optional.of(entity));
+        mockMvc.perform(delete("/api/roles/" + roleId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
 
     @Test
     void deleteRole_shouldReturnNotFound() throws Exception {
-        when(roleService.findById(1L)).thenReturn(Optional.empty());
-        mockMvc.perform(delete("/api/roles/1"))
+        UUID roleId = UUID.randomUUID();
+        when(roleService.findById(roleId)).thenReturn(Optional.empty());
+        mockMvc.perform(delete("/api/roles/" + roleId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(false));
     }

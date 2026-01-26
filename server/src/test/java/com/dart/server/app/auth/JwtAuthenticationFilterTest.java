@@ -32,10 +32,21 @@ class JwtAuthenticationFilterTest {
     @InjectMocks
     JwtAuthenticationFilter filter;
 
+    JwtBlacklistService jwtBlacklistService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         SecurityContextHolder.clearContext();
+        jwtBlacklistService = new JwtBlacklistService();
+        // Use reflection to inject the mock/service for testing
+        try {
+            java.lang.reflect.Field field = JwtAuthenticationFilter.class.getDeclaredField("jwtBlacklistService");
+            field.setAccessible(true);
+            field.set(filter, jwtBlacklistService);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -99,4 +110,3 @@ class JwtAuthenticationFilterTest {
         verify(filterChain).doFilter(request, response);
     }
 }
-

@@ -13,6 +13,8 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.UUID;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -97,7 +99,7 @@ class AuthControllerTest {
         req.setUsername("user");
         req.setPassword("pass");
         UserEntity user = new UserEntity();
-        user.setId(1L);
+        user.setId(UUID.randomUUID());
         user.setUsername("user");
         user.setPassword("encoded");
         when(userService.findByUsername("user")).thenReturn(user);
@@ -131,7 +133,7 @@ class AuthControllerTest {
         req.setUsername("user");
         req.setPassword("wrong");
         UserEntity user = new UserEntity();
-        user.setId(1L);
+        user.setId(UUID.randomUUID());
         user.setUsername("user");
         user.setPassword("encoded");
         when(userService.findByUsername("user")).thenReturn(user);

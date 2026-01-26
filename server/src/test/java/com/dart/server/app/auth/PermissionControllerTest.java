@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -27,8 +28,11 @@ class PermissionControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(permissionController).build();
+        try (AutoCloseable mocks = MockitoAnnotations.openMocks(this)) {
+            mockMvc = MockMvcBuilders.standaloneSetup(permissionController).build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -41,28 +45,31 @@ class PermissionControllerTest {
 
     @Test
     void getPermissionById_shouldReturnPermission() throws Exception {
+        UUID id = UUID.randomUUID();
         PermissionEntity entity = new PermissionEntity();
-        entity.setId(1L);
+        entity.setId(id);
         entity.setName("PERM");
-        when(permissionService.findById(1L)).thenReturn(Optional.of(entity));
-        mockMvc.perform(get("/api/permissions/1"))
+        when(permissionService.findById(id)).thenReturn(Optional.of(entity));
+        mockMvc.perform(get("/api/permissions/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.id").value(1L));
+                .andExpect(jsonPath("$.data.id").value(id.toString()));
     }
 
     @Test
     void getPermissionById_shouldReturnNotFound() throws Exception {
-        when(permissionService.findById(1L)).thenReturn(Optional.empty());
-        mockMvc.perform(get("/api/permissions/1"))
+        UUID id = UUID.randomUUID();
+        when(permissionService.findById(id)).thenReturn(Optional.empty());
+        mockMvc.perform(get("/api/permissions/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
     void createPermission_shouldReturnCreated() throws Exception {
+        UUID id = UUID.randomUUID();
         PermissionEntity entity = new PermissionEntity();
-        entity.setId(1L);
+        entity.setId(id);
         entity.setName("PERM");
         when(permissionService.save(any())).thenReturn(entity);
         mockMvc.perform(post("/api/permissions")
@@ -70,31 +77,33 @@ class PermissionControllerTest {
                         .content(new ObjectMapper().writeValueAsString(entity)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.id").value(1L));
+                .andExpect(jsonPath("$.data.id").value(id.toString()));
     }
 
     @Test
     void updatePermission_shouldReturnUpdated() throws Exception {
+        UUID id = UUID.randomUUID();
         PermissionEntity entity = new PermissionEntity();
-        entity.setId(1L);
+        entity.setId(id);
         entity.setName("PERM");
-        when(permissionService.findById(1L)).thenReturn(Optional.of(entity));
+        when(permissionService.findById(id)).thenReturn(Optional.of(entity));
         when(permissionService.save(any())).thenReturn(entity);
-        mockMvc.perform(put("/api/permissions/1")
+        mockMvc.perform(put("/api/permissions/" + id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(entity)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.id").value(1L));
+                .andExpect(jsonPath("$.data.id").value(id.toString()));
     }
 
     @Test
     void updatePermission_shouldReturnNotFound() throws Exception {
+        UUID id = UUID.randomUUID();
         PermissionEntity entity = new PermissionEntity();
-        entity.setId(1L);
+        entity.setId(id);
         entity.setName("PERM");
-        when(permissionService.findById(1L)).thenReturn(Optional.empty());
-        mockMvc.perform(put("/api/permissions/1")
+        when(permissionService.findById(id)).thenReturn(Optional.empty());
+        mockMvc.perform(put("/api/permissions/" + id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(entity)))
                 .andExpect(status().isOk())
@@ -103,18 +112,20 @@ class PermissionControllerTest {
 
     @Test
     void deletePermission_shouldReturnDeleted() throws Exception {
+        UUID id = UUID.randomUUID();
         PermissionEntity entity = new PermissionEntity();
-        entity.setId(1L);
-        when(permissionService.findById(1L)).thenReturn(Optional.of(entity));
-        mockMvc.perform(delete("/api/permissions/1"))
+        entity.setId(id);
+        when(permissionService.findById(id)).thenReturn(Optional.of(entity));
+        mockMvc.perform(delete("/api/permissions/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
     }
 
     @Test
     void deletePermission_shouldReturnNotFound() throws Exception {
-        when(permissionService.findById(1L)).thenReturn(Optional.empty());
-        mockMvc.perform(delete("/api/permissions/1"))
+        UUID id = UUID.randomUUID();
+        when(permissionService.findById(id)).thenReturn(Optional.empty());
+        mockMvc.perform(delete("/api/permissions/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(false));
     }

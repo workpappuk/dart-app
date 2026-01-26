@@ -8,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.UUID;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,7 +49,7 @@ class DBLoaderTest {
                     return null;
                 } else {
                     RoleEntity role = new RoleEntity();
-                    role.setId(1L);
+                    role.setId(UUID.randomUUID());
                     role.setName(invocation.getArgument(0));
                     return role;
                 }
@@ -55,7 +57,7 @@ class DBLoaderTest {
         });
         when(roleService.save(any())).thenAnswer(invocation -> {
             RoleEntity role = invocation.getArgument(0);
-            role.setId(1L);
+            role.setId(UUID.randomUUID());
             return role;
         });
         // Mock userService

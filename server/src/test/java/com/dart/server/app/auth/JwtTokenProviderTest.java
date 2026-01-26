@@ -63,12 +63,6 @@ class JwtTokenProviderTest {
         role.setName("ROLE_USER");
         String token = provider.createToken("123", Collections.singleton(role));
         Thread.sleep(10); // ensure token is expired
-        boolean valid;
-        try {
-            valid = provider.validateToken(token);
-        } catch (Exception e) {
-            valid = false;
-        }
-        assertFalse(valid);
+        assertFalse(provider.validateToken(token));
     }
 }

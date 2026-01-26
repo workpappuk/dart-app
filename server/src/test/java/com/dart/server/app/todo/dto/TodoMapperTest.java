@@ -1,44 +1,63 @@
 package com.dart.server.app.todo.dto;
 
+import com.dart.server.app.todo.TodoEntity;
 import org.junit.jupiter.api.Test;
+import java.time.Instant;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TodoMapperTest {
     @Test
-    void testToResponseWithValidEntity() {
-        // Assuming TodoMapper.toResponse returns non-null for valid input
-        var entity = new com.dart.server.app.todo.TodoEntity();
-        entity.setId(1L);
-        entity.setDescription("desc");
-        assertNotNull(TodoMapper.toResponse(entity));
+    void testToResponse() {
+        TodoEntity todo = new TodoEntity();
+        UUID id = UUID.randomUUID();
+        todo.setId(id);
+        todo.setDescription("desc");
+        todo.setCompleted(true);
+        Instant now = Instant.now();
+        todo.setCreatedAt(now);
+        todo.setUpdatedAt(now);
+        todo.setCreatedBy("user");
+        todo.setUpdatedBy("user2");
+        todo.setMarkedForDeletion(true);
+        TodoResponse resp = TodoMapper.toResponse(todo);
+        assertEquals(id, resp.getId());
+        assertEquals("desc", resp.getDescription());
+        assertTrue(resp.isCompleted());
+        assertEquals(now, resp.getCreatedAt());
+        assertEquals(now, resp.getUpdatedAt());
+        assertEquals("user", resp.getCreatedBy());
+        assertEquals("user2", resp.getUpdatedBy());
+        assertTrue(resp.isMarkedForDeletion());
     }
-
-    @Test
-    void testToResponseNullInput() {
-        assertThrows(NullPointerException.class, () -> TodoMapper.toResponse(null));
-    }
-
-    @Test
-    void testToResponseWithNullCreatedBy() {
-        var entity = new com.dart.server.app.todo.TodoEntity();
-        entity.setId(2L);
-        entity.setDescription("desc2");
-        entity.setCompleted(true);
-        // createdBy is null
-        var response = TodoMapper.toResponse(entity);
-        assertEquals("null", response.getCreatedBy());
-        assertEquals("null", response.getUpdatedBy());
-    }
-
     @Test
     void testToEntity() {
         TodoRequest req = new TodoRequest();
         req.setDescription("desc");
         req.setCompleted(true);
-        var entity = TodoMapper.toEntity(req);
-        assertEquals("desc", entity.getDescription());
-        assertTrue(entity.isCompleted());
+        TodoEntity todo = TodoMapper.toEntity(req);
+        assertEquals("desc", todo.getDescription());
+        assertTrue(todo.isCompleted());
     }
-    // Add more tests for mapping logic as needed
+
+    @Test
+    void testToResponseWithNullEntity() {
+        TodoResponse resp = TodoMapper.toResponse(new TodoEntity());
+        assertNull(resp.getId());
+        assertNull(resp.getDescription());
+        assertFalse(resp.isCompleted());
+        assertNull(resp.getCreatedAt());
+        assertNull(resp.getUpdatedAt());
+        assertNull(resp.getCreatedBy());
+        assertNull(resp.getUpdatedBy());
+        assertFalse(resp.isMarkedForDeletion());
+    }
+
+    @Test
+    void testToEntityWithNullRequest() {
+        TodoEntity todo = TodoMapper.toEntity(null);
+        assertNull(todo.getDescription());
+        assertFalse(todo.isCompleted());
+    }
 }

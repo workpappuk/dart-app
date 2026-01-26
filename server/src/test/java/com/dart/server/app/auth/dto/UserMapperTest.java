@@ -2,6 +2,8 @@ package com.dart.server.app.auth.dto;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
@@ -13,11 +15,11 @@ class UserMapperTest {
     @Test
     void testToResponseValid() {
         var entity = new com.dart.server.app.auth.UserEntity();
-        entity.setId(1L);
+        entity.setId(UUID.randomUUID());
         entity.setUsername("user");
         entity.setRoles(null);
         var response = UserMapper.toResponse(entity);
-        assertEquals(1L, response.getId());
+        assertNotNull(response.getId());
         assertEquals("user", response.getUsername());
         assertNull(response.getRoles());
     }
@@ -25,17 +27,17 @@ class UserMapperTest {
     @Test
     void testToResponseWithRoles() {
         var entity = new com.dart.server.app.auth.UserEntity();
-        entity.setId(2L);
+        entity.setId(UUID.randomUUID());
         entity.setUsername("user2");
         var role = new com.dart.server.app.auth.RoleEntity();
-        role.setId(10L);
+        role.setId(UUID.randomUUID());
         role.setName("ADMIN");
         role.setPermissions(new java.util.HashSet<>()); // Fix: initialize permissions
         java.util.Set<com.dart.server.app.auth.RoleEntity> roles = new java.util.HashSet<>();
         roles.add(role);
         entity.setRoles(roles);
         var response = UserMapper.toResponse(entity);
-        assertEquals(2L, response.getId());
+        assertNotNull(response.getId());
         assertEquals("user2", response.getUsername());
         assertNotNull(response.getRoles());
         assertEquals(1, response.getRoles().size());

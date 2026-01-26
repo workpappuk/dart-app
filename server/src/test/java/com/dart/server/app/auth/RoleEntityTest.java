@@ -2,16 +2,18 @@ package com.dart.server.app.auth;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoleEntityTest {
     @Test
     void testSettersAndGetters() {
         RoleEntity role = new RoleEntity();
-        role.setId(1L);
+        UUID roleId = UUID.randomUUID();
+        role.setId(roleId);
         role.setName("ADMIN");
-        assertEquals(1L, role.getId());
+        assertEquals(roleId, role.getId());
         assertEquals("ADMIN", role.getName());
     }
 }
-
