@@ -9,13 +9,14 @@ import { RootState, setToken, store } from './redux/store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SESSION_TOKEN_KEY } from './utils/constants';
 
 function InnerRootLayout() {
   const dark = useSelector((state: RootState) => state.theme.dark);
   const dispatch = useDispatch();
   useEffect(() => {
     const loadSession = async () => {
-      const token = await AsyncStorage.getItem('session_token');
+      const token = await AsyncStorage.getItem(SESSION_TOKEN_KEY);
       if (token) {
         dispatch(setToken(token));
       }

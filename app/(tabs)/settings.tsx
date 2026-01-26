@@ -9,14 +9,16 @@ import { useRouter } from "expo-router";
 
 
 export default function SettingsScreen() {
-  const { theme, session } = useSelector((state: RootState) => state);
+    const dark = useSelector((state: RootState) => state.theme.dark);
+  
+  const session = useSelector((state: RootState) => state.session);
   const router = useRouter();
   return (
     <>
       <AppHeader title="Settings" showBack={false} />
       <Surface style={{ padding: 16, margin: 16, borderRadius: 8 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text>Switch to {theme.dark ? 'Light' : 'Dark'}</Text>
+          <Text>Switch to {dark ? 'Light' : 'Dark'}</Text>
           <ThemeSwitch />
         </View>
         <Divider style={{ marginVertical: 16 }} />

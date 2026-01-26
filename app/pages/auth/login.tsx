@@ -9,6 +9,7 @@ import {  setToken } from '@/app/redux/store';
 import { useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SESSION_TOKEN_KEY } from '@/app/utils/constants';
 
 export default function Login() {
     const [state, setState] = useState({
@@ -39,9 +40,9 @@ export default function Login() {
         onSuccess: async (data) => {
             const { token } = data;
             if (token) {
-                await AsyncStorage.setItem('session_token', token);
+                await AsyncStorage.setItem(SESSION_TOKEN_KEY, token);
             } else {
-                await AsyncStorage.removeItem('session_token');
+                await AsyncStorage.removeItem(SESSION_TOKEN_KEY);
             }
 
             dispatch(setToken(data.token)); // Set token here
