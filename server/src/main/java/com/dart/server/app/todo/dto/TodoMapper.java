@@ -18,6 +18,7 @@ public class TodoMapper {
 
     public static TodoEntity toEntity(TodoRequest request) {
         TodoEntity todo = new TodoEntity();
+        if (request == null) return todo;
         todo.setDescription(request.getDescription());
         todo.setCompleted(request.isCompleted());
         return todo;

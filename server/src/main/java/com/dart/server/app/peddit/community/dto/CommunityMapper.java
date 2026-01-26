@@ -5,6 +5,7 @@ import com.dart.server.app.peddit.community.CommunityEntity;
 public class CommunityMapper {
     public static CommunityEntity toEntity(CommunityRequest request) {
         CommunityEntity entity = new CommunityEntity();
+        if (request == null) return entity;
         entity.setName(request.getName());
         entity.setDescription(request.getDescription());
         return entity;
@@ -20,4 +21,3 @@ public class CommunityMapper {
         return response;
     }
 }
-

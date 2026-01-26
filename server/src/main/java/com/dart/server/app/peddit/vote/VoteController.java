@@ -43,6 +43,13 @@ public class VoteController {
     @PostMapping
     public DartApiResponse<VoteResponse> create(@RequestBody VoteRequest request) {
         var entity = voteService.create(VoteMapper.toEntity(request));
+        if (entity == null) {
+            return DartApiResponse.<VoteResponse>builder()
+                    .success(false)
+                    .message("Vote creation failed")
+                    .data(null)
+                    .build();
+        }
         return DartApiResponse.<VoteResponse>builder().success(true).message("Created").data(VoteMapper.toResponse(entity)).build();
     }
 

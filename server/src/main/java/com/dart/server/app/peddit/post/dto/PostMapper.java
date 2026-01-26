@@ -6,6 +6,10 @@ import com.dart.server.app.peddit.post.PostEntity;
 public class PostMapper {
     public static PostEntity toEntity(PostRequest request, CommunityEntity community) {
         PostEntity entity = new PostEntity();
+        if (request == null) {
+            entity.setCommunity(community);
+            return entity;
+        }
         entity.setTitle(request.getTitle());
         entity.setContent(request.getContent());
         entity.setCommunity(community);
@@ -17,10 +21,9 @@ public class PostMapper {
         response.setId(entity.getId());
         response.setTitle(entity.getTitle());
         response.setContent(entity.getContent());
-        response.setCommunityId(entity.getCommunity().getId());
+        response.setCommunityId(entity.getCommunity() != null ? entity.getCommunity().getId() : null);
         response.setAuthorId(entity.getAuthor() != null ? entity.getAuthor().getId() : null);
         response.setMarkedForDeletion(entity.isMarkedForDeletion());
         return response;
     }
 }
-

@@ -34,6 +34,8 @@ public class AuthUtils {
     }
 
     public static boolean isOwner(TodoEntity todo, UserEntity user) {
-        return user != null && todo.getCreatedBy() != null && todo.getCreatedBy().equals(user.getId());
+        if (user == null || todo.getCreatedBy() == null || user.getId() == null) return false;
+        // todo.getCreatedBy() is String, user.getId() is UUID
+        return todo.getCreatedBy().equals(user.getId().toString());
     }
 }

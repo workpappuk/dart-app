@@ -5,6 +5,7 @@ import com.dart.server.app.peddit.vote.VoteEntity;
 public class VoteMapper {
     public static VoteEntity toEntity(VoteRequest request) {
         VoteEntity entity = new VoteEntity();
+        if (request == null) return entity;
         entity.setTargetId(request.getTargetId());
         entity.setTargetType(request.getTargetType());
         entity.setUpvote(request.isUpvote());
@@ -22,4 +23,3 @@ public class VoteMapper {
         return response;
     }
 }
-
