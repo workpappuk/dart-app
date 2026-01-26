@@ -26,7 +26,7 @@ export default function Login() {
             if (!username || !password) {
                 throw new Error('Please enter username and password.');
             }
-            const response = await loginUser(username, password);
+            const response = await loginUser({username, password});
             console.log('Login response:', response);
             if (!response.success) {
                 throw new Error('Invalid credentials.');
