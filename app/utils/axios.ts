@@ -1,10 +1,10 @@
 
 import axios from 'axios';
-import { AuthorizationKey } from './constants';
+import { API_BASE_URL, AuthorizationKey } from './constants';
 import { isNil } from "lodash";
 
 const api = axios.create({
-	baseURL: 'http://localhost:8080',
+	baseURL: API_BASE_URL,
 	timeout: 60000,
 	headers: {
 		"Content-Type": "application/json",
