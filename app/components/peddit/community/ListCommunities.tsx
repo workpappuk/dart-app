@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, FlatList, TextInput as RNTextInput } from 'react-native';
 import { Card, Text, ActivityIndicator, useTheme, Divider, Button, IconButton, TextInput } from 'react-native-paper';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, InfiniteData } from '@tanstack/react-query';
 import { CommunityResponse, DartApiResponse, PageResponse } from '@/app/utils/types';
 import { getCommunities } from '@/app/utils/services';
 import AppAlert from '../../core/AppAlert';
@@ -33,14 +33,17 @@ export default function ListCommunities(
     } = useInfiniteQuery<DartApiResponse<PageResponse<CommunityResponse>>>(
         {
             queryKey: ['communities', searchTerm],
+            initialPageParam: 0,
             queryFn: async ({ pageParam }) => {
                 const page = typeof pageParam === 'number' ? pageParam : 0;
                 return getCommunities(searchTerm, page, PAGE_SIZE);
             },
-            getNextPageParam: (lastPage) => {
-                // lastPage is DartApiResponse<PageResponse<CommunityResponse>>
-                const currentPage = lastPage?.data && (lastPage.data as any).number !== undefined ? (lastPage.data as any).number : 0;
-                const totalPages = lastPage?.data && (lastPage.data as any).totalPages !== undefined ? (lastPage.data as any).totalPages : 1;
+            getNextPageParam: (lastPage?: DartApiResponse<PageResponse<CommunityResponse>>) => {
+                const pageData = lastPage?.data;
+                if (!pageData) return undefined;
+                // Try both 'page' and 'number' for current page, and 'totalPages' for total
+                const currentPage = typeof (pageData as any).page === 'number' ? (pageData as any).page : (typeof (pageData as any).number === 'number' ? (pageData as any).number : 0);
+                const totalPages = typeof (pageData as any).totalPages === 'number' ? (pageData as any).totalPages : 1;
                 if (currentPage + 1 < totalPages) {
                     return currentPage + 1;
                 }
@@ -59,7 +62,7 @@ export default function ListCommunities(
     }
 
     // Flatten all pages' content into a single array
-    const communities = data?.pages?.flatMap(page => (page as any).data?.content ?? []) || [];
+    const communities = data?.pages?.flatMap((page) => page.data?.content ?? []) || [];
 
     return (
         <View style={{ flex: 1, padding: 16 }}>
