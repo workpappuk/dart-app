@@ -65,14 +65,14 @@ export default function ListCommunities(
     const communities = data?.pages?.flatMap((page) => page.data?.content ?? []) || [];
 
     return (
-        <View style={{ flex: 1, padding: 16 }}>
+        <View style={{ flex: 1 }}>
             <AppAlert
                 visible={alert.visible}
                 title={alert.title}
                 message={alert.message}
                 onDismiss={() => setAlert((a) => ({ ...a, visible: false }))}
             />
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, paddingHorizontal: 16 }}>
                 <TextInput
                     mode="outlined"
                     placeholder="Search communities..."
@@ -96,7 +96,7 @@ export default function ListCommunities(
                     Search
                 </Button>
             </View>
-            <View style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
+            <View style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16, paddingHorizontal: 16 }}>
                 <Text variant="headlineSmall" style={{ marginBottom: 16, textAlign: 'center' }}>
                     Communities
                 </Text>
@@ -146,7 +146,8 @@ export default function ListCommunities(
                     </Card>
                 )}
                 ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 32 }}>No communities found.</Text>}
-                contentContainerStyle={{ paddingBottom: 32 }}
+                contentContainerStyle={{ paddingBottom: 32, paddingHorizontal: 16 }}
+                style={{ flex: 1 }}
                 onEndReached={() => {
                     if (hasNextPage && !isFetchingNextPage) {
                         fetchNextPage();

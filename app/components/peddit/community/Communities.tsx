@@ -1,6 +1,6 @@
 
 import { AddCommunity } from "./AddCommunity";
-import { ScrollView } from 'react-native';
+import { View } from 'react-native';
 import ListCommunities from "./ListCommunities";
 import React from "react";
 import { Button } from "react-native-paper";
@@ -22,7 +22,7 @@ export function Communities() {
     }
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: 16 }}>
+        <View style={{ flex: 1, paddingVertical: 16 }}>
             {view === 'update' &&
                 <UpdateCommunity communityId={selectedCommunityId} callback={changeView} />
             }
@@ -30,7 +30,6 @@ export function Communities() {
             {view === 'list' &&
                 <ListCommunities callback={changeView} onUpdatePress={onUpdatePress} />
             }
-
-        </ScrollView>
+        </View>
     );
 }

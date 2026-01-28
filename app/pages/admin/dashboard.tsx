@@ -20,23 +20,18 @@ export default function AdminDashboard() {
     { value: 'users', label: 'Users' },
   ];
   return (
-    <>
-      <View style={styles.container}>
-        <SegmentedButtons
-          value={value}
-          onValueChange={setValue}
-          buttons={options}
-        />
-
-        <ScrollView style={{ marginVertical: 16 }}  >       
-
-          {value === 'communities' && <CommunitiesSection />}
-          {value === 'posts' && <PostsSection />}
-          {value === 'users' && <UsersSection />}
-        </ScrollView>
-
+    <View style={[styles.container, { flex: 1 }]}> 
+      <SegmentedButtons
+        value={value}
+        onValueChange={setValue}
+        buttons={options}
+      />
+      <View style={{ flex: 1, marginVertical: 16 }}>
+        {value === 'communities' && <CommunitiesSection />}
+        {value === 'posts' && <PostsSection />}
+        {value === 'users' && <UsersSection />}
       </View>
-    </>
+    </View>
   );
 }
 
