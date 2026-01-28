@@ -3,7 +3,14 @@ package com.dart.server.app.peddit.community;
 import com.dart.server.app.peddit.community.dto.CommunityMapper;
 import com.dart.server.app.peddit.community.dto.CommunityRequest;
 import com.dart.server.app.peddit.community.dto.CommunityResponse;
+import com.dart.server.app.peddit.post.dto.PostMapper;
+import com.dart.server.app.peddit.post.dto.PostResponse;
+import com.dart.server.common.utils.AuthUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +22,15 @@ public class CommunityService {
     @Autowired
     private CommunityRepository communityRepository;
 
-    public List<CommunityResponse> getAll() {
-        return communityRepository.findAll().stream()
-                .map(CommunityMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<CommunityResponse> searchCommunities(String q, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (AuthUtils.isAdmin()) {
+            return communityRepository.findByDescriptionContainingIgnoreCaseAndMarkedForDeletionFalse(q, pageable)
+                    .map(CommunityMapper::toResponse);
+        } else {
+            return communityRepository.findByDescriptionContainingIgnoreCase(q, pageable)
+                    .map(CommunityMapper::toResponse);
+        }
     }
 
     public CommunityResponse getById(UUID id) {

@@ -1,11 +1,20 @@
 package com.dart.server.app.peddit.post;
 
+import com.dart.server.app.peddit.comment.dto.CommentResponse;
 import com.dart.server.app.peddit.post.dto.PostRequest;
 import com.dart.server.app.peddit.post.dto.PostResponse;
 import com.dart.server.common.response.DartApiResponse;
+import com.dart.server.common.response.PageResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -19,13 +28,29 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-    @Operation(summary = "Get all posts", description = "Returns a list of all posts.")
-    @GetMapping
-    public DartApiResponse<List<PostResponse>> getAll() {
-        return DartApiResponse.<List<PostResponse>>builder()
+     @Operation(summary = "Search posts", description = "Search posts by description with pagination.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Paginated list of posts returned successfully")
+    })
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public DartApiResponse<PageResponse<PostResponse>> searchPosts(
+            @Parameter(description = "Search query") @RequestParam(defaultValue = "") String q,
+            @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        Page<PostResponse> result = postService.searchPosts(q, page, size);
+        PageResponse<PostResponse> pageResponse = new PageResponse<>(
+                result.getContent(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages()
+        );
+        return DartApiResponse.<PageResponse<PostResponse>>builder()
                 .success(true)
-                .message("OK")
-                .data(postService.getAll())
+                .message("Posts search result fetched successfully")
+                .data(pageResponse)
                 .build();
     }
 

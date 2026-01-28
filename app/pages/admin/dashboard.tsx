@@ -28,7 +28,7 @@ export default function AdminDashboard() {
           buttons={options}
         />
 
-        <ScrollView style={{ marginVertical: 16 }} >
+        <ScrollView style={{ marginVertical: 16 }}  >       
 
           {value === 'communities' && <CommunitiesSection />}
           {value === 'posts' && <PostsSection />}

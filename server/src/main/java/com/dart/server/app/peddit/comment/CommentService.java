@@ -3,7 +3,14 @@ package com.dart.server.app.peddit.comment;
 import com.dart.server.app.peddit.comment.dto.CommentMapper;
 import com.dart.server.app.peddit.comment.dto.CommentRequest;
 import com.dart.server.app.peddit.comment.dto.CommentResponse;
+import com.dart.server.app.todo.dto.TodoMapper;
+import com.dart.server.app.todo.dto.TodoResponse;
+import com.dart.server.common.utils.AuthUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,11 +22,17 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public List<CommentResponse> getAll() {
-        return commentRepository.findAll().stream()
-                .map(CommentMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<CommentResponse> searchComments(String q, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (AuthUtils.isAdmin()) {
+            return commentRepository.findByContentContainingIgnoreCaseAndMarkedForDeletionFalse(q, pageable)
+                    .map(CommentMapper::toResponse);
+        } else {
+            return commentRepository.findByContentContainingIgnoreCase(q, pageable)
+                    .map(CommentMapper::toResponse);
+        }
     }
+
 
     public CommentResponse getById(UUID id) {
         return commentRepository.findById(id)

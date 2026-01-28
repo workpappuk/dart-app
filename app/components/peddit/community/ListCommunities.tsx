@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, FlatList, ScrollView } from 'react-native';
+import { View, FlatList } from 'react-native';
 import { Card, Text, ActivityIndicator, useTheme, Divider, Button, IconButton } from 'react-native-paper';
 import { useQuery } from '@tanstack/react-query';
 import { CommunityResponse, DartApiResponse, PageResponse } from '@/app/utils/types';
@@ -19,7 +19,15 @@ export default function ListCommunities(
 
     const { data, isLoading, isError, error } = useQuery<DartApiResponse<CommunityResponse[]>>({
         queryKey: ['communities'],
-        queryFn: getCommunities,
+        queryFn: async () => {
+            // Call getCommunities with default params for all communities
+            const response = await getCommunities('', 0, 100);
+            // If your API returns a paged response, extract the array
+            return {
+                ...response,
+                data: response.data?.content ?? [],
+            };
+        },
     });
 
     if (isLoading) {
@@ -27,7 +35,7 @@ export default function ListCommunities(
     }
 
     return (
-        <ScrollView style={{ flex: 1, padding: 16 }}>
+        <View style={{ flex: 1, padding: 16 }}>
             <AppAlert
                 visible={alert.visible}
                 title={alert.title}
@@ -42,7 +50,6 @@ export default function ListCommunities(
                     Add New Community
                 </Button>
             </View>
-
             <FlatList
                 data={data?.data || []}
                 keyExtractor={(item) => item.id.toString()}
@@ -85,7 +92,8 @@ export default function ListCommunities(
                     </Card>
                 )}
                 ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 32 }}>No communities found.</Text>}
+                contentContainerStyle={{ paddingBottom: 32 }}
             />
-        </ScrollView>
+        </View>
     );
 }

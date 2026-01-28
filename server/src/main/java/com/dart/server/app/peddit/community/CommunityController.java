@@ -2,10 +2,19 @@ package com.dart.server.app.peddit.community;
 
 import com.dart.server.app.peddit.community.dto.CommunityRequest;
 import com.dart.server.app.peddit.community.dto.CommunityResponse;
+import com.dart.server.app.peddit.post.dto.PostResponse;
 import com.dart.server.common.response.DartApiResponse;
+import com.dart.server.common.response.PageResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -19,15 +28,32 @@ public class CommunityController {
     @Autowired
     private CommunityService communityService;
 
-    @Operation(summary = "Get all communities", description = "Returns a list of all communities.")
-    @GetMapping
-    public DartApiResponse<List<CommunityResponse>> getAll() {
-        return DartApiResponse.<List<CommunityResponse>>builder()
+     @Operation(summary = "Search communities", description = "Search communities by description with pagination.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Paginated list of communities returned successfully")
+    })
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public DartApiResponse<PageResponse<CommunityResponse>> searchCommunities(
+            @Parameter(description = "Search query") @RequestParam(defaultValue = "") String q,
+            @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        Page<CommunityResponse> result = communityService.searchCommunities(q, page, size);
+        PageResponse<CommunityResponse> pageResponse = new PageResponse<>(
+                result.getContent(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages()
+        );
+        return DartApiResponse.<PageResponse<CommunityResponse>>builder()
                 .success(true)
-                .message("OK")
-                .data(communityService.getAll())
+                .message("Communities search result fetched successfully")
+                .data(pageResponse)
                 .build();
     }
+
 
     @Operation(summary = "Get community by ID", description = "Returns a single community by its ID.")
     @GetMapping("/{id}")

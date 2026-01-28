@@ -1,11 +1,18 @@
 package com.dart.server.app.peddit.post;
 
+import com.dart.server.app.peddit.comment.dto.CommentMapper;
+import com.dart.server.app.peddit.comment.dto.CommentResponse;
 import com.dart.server.app.peddit.community.CommunityEntity;
 import com.dart.server.app.peddit.community.CommunityRepository;
 import com.dart.server.app.peddit.post.dto.PostMapper;
 import com.dart.server.app.peddit.post.dto.PostRequest;
 import com.dart.server.app.peddit.post.dto.PostResponse;
+import com.dart.server.common.utils.AuthUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,10 +26,15 @@ public class PostService {
     @Autowired
     private CommunityRepository communityRepository;
 
-    public List<PostResponse> getAll() {
-        return postRepository.findAll().stream()
-                .map(PostMapper::toResponse)
-                .collect(Collectors.toList());
+     public Page<PostResponse> searchPosts(String q, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (AuthUtils.isAdmin()) {
+            return postRepository.findByContentContainingIgnoreCaseAndMarkedForDeletionFalse(q, pageable)
+                    .map(PostMapper::toResponse);
+        } else {
+            return postRepository.findByContentContainingIgnoreCase(q, pageable)
+                    .map(PostMapper::toResponse);
+        }
     }
 
     public PostResponse getById(UUID id) {

@@ -2,10 +2,19 @@ package com.dart.server.app.peddit.comment;
 
 import com.dart.server.app.peddit.comment.dto.CommentRequest;
 import com.dart.server.app.peddit.comment.dto.CommentResponse;
+import com.dart.server.app.todo.dto.TodoResponse;
 import com.dart.server.common.response.DartApiResponse;
+import com.dart.server.common.response.PageResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -19,13 +28,29 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    @Operation(summary = "Get all comments", description = "Returns a list of all comments.")
-    @GetMapping
-    public DartApiResponse<List<CommentResponse>> getAll() {
-        return DartApiResponse.<List<CommentResponse>>builder()
+    @Operation(summary = "Search comments", description = "Search comments by description with pagination.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Paginated list of comments returned successfully")
+    })
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public DartApiResponse<PageResponse<CommentResponse>> searchComments(
+            @Parameter(description = "Search query") @RequestParam(defaultValue = "") String q,
+            @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        Page<CommentResponse> result = commentService.searchComments(q, page, size);
+        PageResponse<CommentResponse> pageResponse = new PageResponse<>(
+                result.getContent(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages()
+        );
+        return DartApiResponse.<PageResponse<CommentResponse>>builder()
                 .success(true)
-                .message("OK")
-                .data(commentService.getAll())
+                .message("Comments search result fetched successfully")
+                .data(pageResponse)
                 .build();
     }
 
