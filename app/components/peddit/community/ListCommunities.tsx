@@ -19,15 +19,11 @@ export default function ListCommunities(
     const [search, setSearch] = React.useState('');
     const [searchTerm, setSearchTerm] = React.useState('');
 
-    const { data, isLoading, isError, error, refetch, isFetching } = useQuery<DartApiResponse<CommunityResponse[]>>({
+    const { data, isLoading, isError, error, refetch, isFetching } = useQuery<DartApiResponse<PageResponse<CommunityResponse>>>({
         queryKey: ['communities', searchTerm],
         queryFn: async () => {
-            // Call getCommunities with search term
             const response = await getCommunities(searchTerm, 0, 100);
-            return {
-                ...response,
-                data: response.data?.content ?? [],
-            };
+            return response;
         },
     });
 
@@ -78,7 +74,7 @@ export default function ListCommunities(
                 </Button>
             </View>
             <FlatList
-                data={data?.data || []}
+                data={data?.data?.content || []}
                 keyExtractor={(item) => item.id.toString()}
                 ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
                 renderItem={({ item }) => (
