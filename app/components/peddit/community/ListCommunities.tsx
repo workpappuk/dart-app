@@ -19,7 +19,7 @@ export default function ListCommunities(
     const [search, setSearch] = React.useState('');
     const [searchTerm, setSearchTerm] = React.useState('');
 
-    const PAGE_SIZE = 20;
+    const PAGE_SIZE = 5;
     const {
         data,
         isLoading,
@@ -57,8 +57,13 @@ export default function ListCommunities(
         refetch();
     }, [searchTerm, refetch]);
 
-    if (isLoading) {
-        return <ActivityIndicator animating color={theme.colors.primary} style={{ marginTop: 32 }} />;
+    // Show a full loader only for the very first load
+    if (isLoading && !isFetchingNextPage) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator animating color={theme.colors.primary} size="large" />
+            </View>
+        );
     }
 
     // Flatten all pages' content into a single array
@@ -154,7 +159,13 @@ export default function ListCommunities(
                     }
                 }}
                 onEndReachedThreshold={0.5}
-                ListFooterComponent={isFetchingNextPage ? <ActivityIndicator animating color={theme.colors.primary} style={{ marginVertical: 16 }} /> : null}
+                ListFooterComponent={
+                    isFetchingNextPage ? (
+                        <View style={{ paddingVertical: 16 }}>
+                            <ActivityIndicator animating color={theme.colors.primary} />
+                        </View>
+                    ) : null
+                }
             />
         </View>
     );
