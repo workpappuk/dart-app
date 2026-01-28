@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, FlatList, TextInput as RNTextInput } from 'react-native';
 import { Card, Text, ActivityIndicator, useTheme, Divider, Button, IconButton, TextInput } from 'react-native-paper';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { CommunityResponse, DartApiResponse, PageResponse } from '@/app/utils/types';
 import { getCommunities } from '@/app/utils/services';
 import AppAlert from '../../core/AppAlert';
@@ -19,17 +19,47 @@ export default function ListCommunities(
     const [search, setSearch] = React.useState('');
     const [searchTerm, setSearchTerm] = React.useState('');
 
-    const { data, isLoading, isError, error, refetch, isFetching } = useQuery<DartApiResponse<PageResponse<CommunityResponse>>>({
-        queryKey: ['communities', searchTerm],
-        queryFn: async () => {
-            const response = await getCommunities(searchTerm, 0, 100);
-            return response;
-        },
-    });
+    const PAGE_SIZE = 20;
+    const {
+        data,
+        isLoading,
+        isError,
+        error,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        refetch,
+        isFetching,
+    } = useInfiniteQuery<DartApiResponse<PageResponse<CommunityResponse>>>(
+        {
+            queryKey: ['communities', searchTerm],
+            queryFn: async ({ pageParam }) => {
+                const page = typeof pageParam === 'number' ? pageParam : 0;
+                return getCommunities(searchTerm, page, PAGE_SIZE);
+            },
+            getNextPageParam: (lastPage) => {
+                // lastPage is DartApiResponse<PageResponse<CommunityResponse>>
+                const currentPage = lastPage?.data && (lastPage.data as any).number !== undefined ? (lastPage.data as any).number : 0;
+                const totalPages = lastPage?.data && (lastPage.data as any).totalPages !== undefined ? (lastPage.data as any).totalPages : 1;
+                if (currentPage + 1 < totalPages) {
+                    return currentPage + 1;
+                }
+                return undefined;
+            },
+        }
+    );
+
+    // Refetch when searchTerm changes
+    React.useEffect(() => {
+        refetch();
+    }, [searchTerm, refetch]);
 
     if (isLoading) {
         return <ActivityIndicator animating color={theme.colors.primary} style={{ marginTop: 32 }} />;
     }
+
+    // Flatten all pages' content into a single array
+    const communities = data?.pages?.flatMap(page => (page as any).data?.content ?? []) || [];
 
     return (
         <View style={{ flex: 1, padding: 16 }}>
@@ -49,7 +79,6 @@ export default function ListCommunities(
                     returnKeyType="search"
                     onSubmitEditing={() => {
                         setSearchTerm(search);
-                        refetch();
                     }}
                     left={<TextInput.Icon icon="magnify" />}
                 />
@@ -57,7 +86,6 @@ export default function ListCommunities(
                     mode="contained"
                     onPress={() => {
                         setSearchTerm(search);
-                        refetch();
                     }}
                     style={{ height: 44, justifyContent: 'center' }}
                     loading={isFetching}
@@ -74,7 +102,7 @@ export default function ListCommunities(
                 </Button>
             </View>
             <FlatList
-                data={data?.data?.content || []}
+                data={communities}
                 keyExtractor={(item) => item.id.toString()}
                 ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
                 renderItem={({ item }) => (
@@ -116,6 +144,13 @@ export default function ListCommunities(
                 )}
                 ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 32 }}>No communities found.</Text>}
                 contentContainerStyle={{ paddingBottom: 32 }}
+                onEndReached={() => {
+                    if (hasNextPage && !isFetchingNextPage) {
+                        fetchNextPage();
+                    }
+                }}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={isFetchingNextPage ? <ActivityIndicator animating color={theme.colors.primary} style={{ marginVertical: 16 }} /> : null}
             />
         </View>
     );
