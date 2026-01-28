@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { View, FlatList } from 'react-native';
-import { Card, Text, ActivityIndicator, useTheme, Divider, Button, IconButton } from 'react-native-paper';
+import { View, FlatList, TextInput as RNTextInput } from 'react-native';
+import { Card, Text, ActivityIndicator, useTheme, Divider, Button, IconButton, TextInput } from 'react-native-paper';
 import { useQuery } from '@tanstack/react-query';
 import { CommunityResponse, DartApiResponse, PageResponse } from '@/app/utils/types';
 import { getCommunities } from '@/app/utils/services';
@@ -16,13 +16,14 @@ export default function ListCommunities(
 ) {
     const theme = useTheme();
     const [alert, setAlert] = React.useState<{ visible: boolean; message: string; title?: string }>({ visible: false, message: '', title: '' });
+    const [search, setSearch] = React.useState('');
+    const [searchTerm, setSearchTerm] = React.useState('');
 
-    const { data, isLoading, isError, error } = useQuery<DartApiResponse<CommunityResponse[]>>({
-        queryKey: ['communities'],
+    const { data, isLoading, isError, error, refetch, isFetching } = useQuery<DartApiResponse<CommunityResponse[]>>({
+        queryKey: ['communities', searchTerm],
         queryFn: async () => {
-            // Call getCommunities with default params for all communities
-            const response = await getCommunities('', 0, 100);
-            // If your API returns a paged response, extract the array
+            // Call getCommunities with search term
+            const response = await getCommunities(searchTerm, 0, 100);
             return {
                 ...response,
                 data: response.data?.content ?? [],
@@ -42,6 +43,32 @@ export default function ListCommunities(
                 message={alert.message}
                 onDismiss={() => setAlert((a) => ({ ...a, visible: false }))}
             />
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                <TextInput
+                    mode="outlined"
+                    placeholder="Search communities..."
+                    value={search}
+                    onChangeText={setSearch}
+                    style={{ flex: 1, marginRight: 8, height: 44 }}
+                    returnKeyType="search"
+                    onSubmitEditing={() => {
+                        setSearchTerm(search);
+                        refetch();
+                    }}
+                    left={<TextInput.Icon icon="magnify" />}
+                />
+                <Button
+                    mode="contained"
+                    onPress={() => {
+                        setSearchTerm(search);
+                        refetch();
+                    }}
+                    style={{ height: 44, justifyContent: 'center' }}
+                    loading={isFetching}
+                >
+                    Search
+                </Button>
+            </View>
             <View style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
                 <Text variant="headlineSmall" style={{ marginBottom: 16, textAlign: 'center' }}>
                     Communities
