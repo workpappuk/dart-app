@@ -58,11 +58,11 @@ export const DUMMY_COMMUNITIES = [
     { id: '7', name: 'GamingGuild', description: 'A community for gamers to discuss games, strategies, and news.', membersCount: 1500 },
     { id: '8', name: 'ArtisticExpressions', description: 'Share your artwork, get feedback, and discuss art techniques.', membersCount: 560 },
     { id: '9', name: 'MusicMakers', description: 'Discuss music production, share tracks, and collaborate with other musicians.', membersCount: 400 },
-    { id: '10', name: 'NatureNook', description: 'A community for nature lovers to share photos, tips, and experiences.', membersCount: 300 }
+    { id: '10', name: 'NatureNook', description: 'A community for nature lovers to share photos, tips, and experiences.', membersCount: 300 },
     { id: '11', name: 'ScienceSquad', description: 'Discuss the latest scientific discoveries and research.', membersCount: 750 },
     { id: '12', name: 'HistoryHub', description: 'A place to discuss historical events, figures, and theories.', membersCount: 520 },
     { id: '13', name: 'PhotographyPros', description: 'Share your photography, get tips, and discuss techniques.', membersCount: 680 },
-    { id: '14', name: 'DIYDreamers', description: 'A community for DIY enthusiasts to share projects and ideas.', membersCount: 410 }
+    { id: '14', name: 'DIYDreamers', description: 'A community for DIY enthusiasts to share projects and ideas.', membersCount: 410 },
     { id: '15', name: 'ParentingPlace', description: 'Discuss parenting tips, challenges, and experiences.', membersCount: 900 },
     { id: '16', name: 'FashionForward', description: 'Talk about the latest fashion trends and styles.', membersCount: 770 },
     { id: '17', name: 'AutoAddicts', description: 'A community for car enthusiasts to discuss vehicles and modifications.', membersCount: 620 },

@@ -6,6 +6,9 @@ import { useSelector } from "react-redux";
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { Communities } from "@/app/components/peddit/community/Communities";
+import { add } from "lodash";
+import { DUMMY_COMMUNITIES } from "@/app/utils/constants";
+import { createCommunity } from "@/app/utils/services";
 export default function AdminDashboard() {
 
   const { session } = useSelector((state: RootState) => state);
@@ -53,7 +56,10 @@ function PostsSection() {
 
 function CommunitiesSection() {
   return (
-    <Communities />
+    <>
+    <LoadDummy type="communities" /> 
+    <Communities />    
+    </>
   );
 }
 
@@ -62,3 +68,32 @@ const styles = StyleSheet.create({
     padding: 16,
   },
 });
+
+function addDummyCommunities() {
+  DUMMY_COMMUNITIES.forEach(async (community) => {
+    await createCommunity(community);
+  });
+}
+
+function LoadDummy({ type }: { type: 'communities' | 'posts' | 'users' }) {
+  const router = useRouter();
+
+  const handleLoadDummy = () => {
+    if (type === 'communities') {
+      console.log('Loading dummy communities');
+      addDummyCommunities();
+    } else if (type === 'posts') {
+      console.log('Loading dummy posts');
+    } else if (type === 'users') {
+      console.log('Loading dummy users');
+    }
+  };
+
+  return (
+    <View style={{ marginBottom: 16, alignItems: 'center' }}>
+      <Text onPress={handleLoadDummy} style={{ color: 'blue' }}>
+        Load Dummy {type.charAt(0).toUpperCase() + type.slice(1)}
+      </Text>
+    </View>
+  );
+}
