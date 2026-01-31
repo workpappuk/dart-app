@@ -1,5 +1,6 @@
 package com.dart.server.app.peddit.community;
 
+import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.auth.UserRepository;
 import com.dart.server.app.peddit.community.dto.CommunityMapper;
 import com.dart.server.app.peddit.community.dto.CommunityRequest;
@@ -25,46 +26,44 @@ public class CommunityService {
     @Autowired
     private UserRepository userRepository;
 
+    private CommunityMapper.CommunityWithUser mapWithUsers(CommunityEntity entity) {
+        return new CommunityMapper.CommunityWithUser(
+                entity,
+                safeFindUser(entity.getCreatedBy()),
+                safeFindUser(entity.getUpdatedBy())
+        );
+    }
+
+    private UserEntity safeFindUser(String uuidStr) {
+        try {
+            return uuidStr == null ? null : userRepository.findById(UUID.fromString(uuidStr)).orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public Page<CommunityResponse> searchCommunities(String q, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        Page<CommunityEntity> entities;
         if (AuthUtils.isAdmin()) {
-            return communityRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(q, q, pageable)
-                    .map(communityEntity -> new CommunityMapper.CommunityWithUser(
-                            communityEntity,
-                            userRepository.findById(UUID.fromString(communityEntity.getCreatedBy())).orElse(null),
-                            userRepository.findById(UUID.fromString(communityEntity.getUpdatedBy())).orElse(null)
-                    ))
-                    .map(CommunityMapper::toResponse);
+            entities = communityRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(q, q, pageable);
         } else {
-            return communityRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndMarkedForDeletionFalse(q, q, pageable)
-                    .map(communityEntity -> new CommunityMapper.CommunityWithUser(
-                            communityEntity,
-                            userRepository.findById(UUID.fromString(communityEntity.getCreatedBy())).orElse(null),
-                            userRepository.findById(UUID.fromString(communityEntity.getUpdatedBy())).orElse(null)
-                    )).map(CommunityMapper::toResponse);
+            entities = communityRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndMarkedForDeletionFalse(q, q, pageable);
         }
+        return entities.map(entity -> CommunityMapper.toResponse(mapWithUsers(entity)));
     }
 
     public CommunityResponse getById(UUID id) {
         return communityRepository.findById(id)
-                .map(communityEntity -> new CommunityMapper.CommunityWithUser(
-                        communityEntity,
-                        userRepository.findById(UUID.fromString(communityEntity.getCreatedBy())).orElse(null),
-                        userRepository.findById(UUID.fromString(communityEntity.getUpdatedBy())).orElse(null)
-                )).map(CommunityMapper::toResponse)
+                .map(this::mapWithUsers)
+                .map(CommunityMapper::toResponse)
                 .orElse(null);
     }
 
     public CommunityResponse create(CommunityRequest request) {
         CommunityEntity entity = CommunityMapper.toEntity(request);
-        CommunityEntity communityEntity = communityRepository.save(entity);
-        return CommunityMapper.toResponse(
-                new CommunityMapper.CommunityWithUser(
-                        communityEntity,
-                        userRepository.findById(UUID.fromString(communityEntity.getCreatedBy())).orElse(null),
-                        userRepository.findById(UUID.fromString(communityEntity.getUpdatedBy())).orElse(null)
-                )
-        );
+        CommunityEntity saved = communityRepository.save(entity);
+        return CommunityMapper.toResponse(mapWithUsers(saved));
     }
 
     public CommunityResponse update(UUID id, CommunityRequest request) {
@@ -72,15 +71,10 @@ public class CommunityService {
                 .map(entity -> {
                     entity.setName(request.getName());
                     entity.setDescription(request.getDescription());
-                    CommunityEntity communityEntity = communityRepository.save(entity);
-                    return CommunityMapper.toResponse(
-                            new CommunityMapper.CommunityWithUser(
-                                    communityEntity,
-                                    userRepository.findById(UUID.fromString(communityEntity.getCreatedBy())).orElse(null),
-                                    userRepository.findById(UUID.fromString(communityEntity.getUpdatedBy())).orElse(null)
-                            )
-                    );
-                }).orElse(null);
+                    CommunityEntity updated = communityRepository.save(entity);
+                    return CommunityMapper.toResponse(mapWithUsers(updated));
+                })
+                .orElse(null);
     }
 
     public boolean delete(UUID id) {

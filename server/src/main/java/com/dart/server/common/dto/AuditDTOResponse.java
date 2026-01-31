@@ -1,12 +1,7 @@
 package com.dart.server.common.dto;
 
 import com.dart.server.app.auth.dto.UserResponse;
-import jakarta.persistence.Column;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -19,9 +14,9 @@ public abstract class AuditDTOResponse {
 
     private Instant updatedAt;
 
-    private UserResponse createdUserInfo;
+    private UserResponse createdByUserInfo;
 
-    private UserResponse updatedUserInfo;
+    private UserResponse updatedByUserInfo;
 
     private boolean markedForDeletion;
 }

@@ -2,7 +2,6 @@ package com.dart.server.app.peddit.community.dto;
 
 import com.dart.server.app.auth.UserEntity;
 import com.dart.server.app.auth.dto.UserMapper;
-import com.dart.server.app.auth.dto.UserResponse;
 import com.dart.server.app.peddit.community.CommunityEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,8 +30,8 @@ public class CommunityMapper {
         response.setCreatedAt(entity.getCreatedAt());
         response.setUpdatedAt(entity.getUpdatedAt());
 
-        response.setCreatedUserInfo(UserMapper.toResponse(createdBy));
-        response.setUpdatedUserInfo(UserMapper.toResponse(updatedBy));
+        response.setCreatedByUserInfo(UserMapper.toResponse(createdBy));
+        response.setUpdatedByUserInfo(UserMapper.toResponse(updatedBy));
         return response;
     }
 
