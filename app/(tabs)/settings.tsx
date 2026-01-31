@@ -9,6 +9,7 @@ import { useRouter } from "expo-router";
 import { logoutUser } from "../utils/services";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { clearUserSessionToken } from "../utils/axios";
+import useAuth from "../utils/hooks/useAuth";
 
 
 export default function SettingsScreen() {
@@ -16,7 +17,7 @@ export default function SettingsScreen() {
 
   const session = useSelector((state: RootState) => state.session);
   const router = useRouter();
-  const dispatch = useDispatch();
+  const { revokeSession } = useAuth();
   return (
     <>
       <AppHeader title="Settings" showBack={false} />
@@ -36,17 +37,12 @@ export default function SettingsScreen() {
             <View style={{ marginTop: 16 }}>
               <Button mode="contained" onPress={async () => {
                 logoutUser()
-                .catch((err) => {
-                  console.error('Logout error:', err);
-                })
-                .finally(async () => {
-                  await AsyncStorage.removeItem('session_token');
-                  clearUserSessionToken();
-                  dispatch(setToken(null));
-
-                  router.replace('/pages/auth/login');
-
-                });
+                  .catch((err) => {
+                    console.error('Logout error:', err);
+                  })
+                  .finally(async () => {
+                    await revokeSession();
+                  });
               }}>
                 Logout
               </Button>
