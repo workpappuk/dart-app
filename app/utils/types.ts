@@ -88,12 +88,18 @@ export interface CommentRequest {
 }
 
 // Community DTOs
-export interface CommunityResponse {
-  id: string;
+export interface CommunityResponse extends AuditInfo {
   name: string;
   description: string;
-  createdBy: string;
+}
+
+export interface AuditInfo {
+  id: string;
   markedForDeletion: boolean;
+  createdAt: string; 
+  updatedAt: string; 
+  createdByUserInfo: UserResponse;
+  updatedByUserInfo: UserResponse;
 }
 
 export interface CommunityRequest {

@@ -1,7 +1,7 @@
 import { RootState } from "@/app/redux/store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Divider, Surface, Text } from "react-native-paper";
+import { Button, Divider, Surface, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
@@ -23,11 +23,12 @@ export default function AdminDashboard() {
     { value: 'users', label: 'Users' },
   ];
   return (
-    <View style={[styles.container, { flex: 1 }]}> 
+    <View style={[styles.container, { flex: 1 }]}>
       <SegmentedButtons
         value={value}
         onValueChange={setValue}
         buttons={options}
+        density="small"
       />
       <View style={{ flex: 1, marginVertical: 8 }}>
         {value === 'communities' && <CommunitiesSection />}
@@ -57,8 +58,7 @@ function PostsSection() {
 function CommunitiesSection() {
   return (
     <>
-    {/* <LoadDummy type="communities" />  */}
-    <Communities />    
+      <Communities />
     </>
   );
 }
@@ -75,7 +75,7 @@ function addDummyCommunities() {
   });
 }
 
-function LoadDummy({ type }: { type: 'communities' | 'posts' | 'users' }) {
+export function LoadDummy({ type }: { type: 'communities' | 'posts' | 'users' }) {
   const router = useRouter();
 
   const handleLoadDummy = () => {
@@ -88,12 +88,12 @@ function LoadDummy({ type }: { type: 'communities' | 'posts' | 'users' }) {
       console.log('Loading dummy users');
     }
   };
-
   return (
     <View style={{ marginBottom: 16, alignItems: 'center' }}>
-      <Text onPress={handleLoadDummy} style={{ color: 'blue' }}>
-        Load Dummy {type.charAt(0).toUpperCase() + type.slice(1)}
-      </Text>
+      <Button mode="contained-tonal" onPress={handleLoadDummy}
+      >
+        Pre Load  {type.charAt(0).toUpperCase() + type.slice(1)} 
+      </Button>
     </View>
   );
 }
