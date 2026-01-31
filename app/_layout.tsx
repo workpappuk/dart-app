@@ -11,6 +11,7 @@ import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SESSION_TOKEN_KEY } from './utils/constants';
 import { setUserSessionToken } from './utils/axios';
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 function InnerRootLayout() {
   const dark = useSelector((state: RootState) => state.theme.dark);
@@ -26,36 +27,41 @@ function InnerRootLayout() {
     loadSession();
   }, []);
 
+
   // Merge MD3 themes with React Navigation theme requirements
   const navigationTheme = dark
     ? {
-        ...DarkTheme,
-        colors: {
-          ...DarkTheme.colors,
-          ...MD3DarkTheme.colors,
-        },
-      }
+      ...DarkTheme,
+      colors: {
+        ...DarkTheme.colors,
+        ...MD3DarkTheme.colors,
+        primary: "#BFFF0B",
+      },
+    }
     : {
-        ...DefaultTheme,
-        colors: {
-          ...DefaultTheme.colors,
-          ...MD3LightTheme.colors,
-        },
-      };
+      ...DefaultTheme,
+      colors: {
+        ...DefaultTheme.colors,
+        ...MD3LightTheme.colors,
+        primary: "#222"
+      },
+    };
 
   return (
-    <PaperProvider>
-      <ThemeProvider value={navigationTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-          <Stack.Screen name="pages/admin/dashboard" options={{ title: 'Admin Dashboard' }} />
-          <Stack.Screen name="pages/auth/login" options={{ title: 'Login' }} />
-        
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
-    </PaperProvider>
+    <SafeAreaProvider>
+
+      <PaperProvider>
+        <ThemeProvider value={navigationTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+            <Stack.Screen name="pages/admin/dashboard" options={{ title: 'Admin Dashboard' }} />
+            <Stack.Screen name="pages/auth/login" options={{ title: 'Login' }} />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 }
 

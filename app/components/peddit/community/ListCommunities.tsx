@@ -77,7 +77,7 @@ export default function ListCommunities(
                 message={alert.message}
                 onDismiss={() => setAlert((a) => ({ ...a, visible: false }))}
             />
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, paddingHorizontal: 16 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8, paddingHorizontal: 8 }}>
                 <TextInput
                     mode="outlined"
                     placeholder="Search communities..."
@@ -101,7 +101,12 @@ export default function ListCommunities(
                     Search
                 </Button>
             </View>
-            <View style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16, paddingHorizontal: 16 }}>
+            <View style={{ alignItems: 'center',
+                display: 'flex', flexDirection: 
+                'row', justifyContent: 
+                'space-between', 
+                // marginBottom: 8, 
+                paddingHorizontal: 16}}>
                 <Text variant="headlineSmall" style={{ marginBottom: 16, textAlign: 'center' }}>
                     Communities
                 </Text>
@@ -114,7 +119,9 @@ export default function ListCommunities(
                 keyExtractor={(item) => item.id.toString()}
                 ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
                 renderItem={({ item }) => (
-                    <Card style={{ marginBottom: 8, borderRadius: 12, backgroundColor: theme.colors.elevation.level1 }}>
+                    <Card style={{ 
+                        borderRadius: 12,
+                     backgroundColor: theme.colors.elevation.level1 }}>
                         <Card.Title title={item.name} titleStyle={{ color: theme.colors.primary }} />
                         <Card.Content>
                             <Text style={{ color: theme.colors.onSurface }}>{item.description}</Text>

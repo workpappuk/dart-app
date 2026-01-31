@@ -22,7 +22,7 @@ export function Communities() {
     }
 
     return (
-        <View style={{ flex: 1, paddingVertical: 16 }}>
+        <View style={{ flex: 1, paddingVertical: 8 }}>
             {view === 'update' &&
                 <UpdateCommunity communityId={selectedCommunityId} callback={changeView} />
             }

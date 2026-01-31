@@ -29,7 +29,7 @@ export default function AdminDashboard() {
         onValueChange={setValue}
         buttons={options}
       />
-      <View style={{ flex: 1, marginVertical: 16 }}>
+      <View style={{ flex: 1, marginVertical: 8 }}>
         {value === 'communities' && <CommunitiesSection />}
         {value === 'posts' && <PostsSection />}
         {value === 'users' && <UsersSection />}
@@ -57,7 +57,7 @@ function PostsSection() {
 function CommunitiesSection() {
   return (
     <>
-    <LoadDummy type="communities" /> 
+    {/* <LoadDummy type="communities" />  */}
     <Communities />    
     </>
   );

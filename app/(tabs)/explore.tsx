@@ -21,7 +21,6 @@ export default function ExploreScreen() {
 
    return (
       <>
-         <AppHeader title="Playgrounds" showBack={false} />
          <Surface style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             {loading ? (
                <ActivityIndicator size="large" />
