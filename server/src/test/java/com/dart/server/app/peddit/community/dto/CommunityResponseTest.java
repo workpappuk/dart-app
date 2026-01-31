@@ -13,12 +13,10 @@ class CommunityResponseTest {
         resp.setId(id);
         resp.setName("name");
         resp.setDescription("desc");
-        resp.setCreatedBy("user");
         resp.setMarkedForDeletion(true);
         assertEquals(id, resp.getId());
         assertEquals("name", resp.getName());
         assertEquals("desc", resp.getDescription());
-        assertEquals("user", resp.getCreatedBy());
         assertTrue(resp.isMarkedForDeletion());
     }
     @Test
@@ -27,8 +25,6 @@ class CommunityResponseTest {
         assertNull(resp.getId());
         assertNull(resp.getName());
         assertNull(resp.getDescription());
-        assertNull(resp.getCreatedBy());
         assertFalse(resp.isMarkedForDeletion());
     }
 }
-

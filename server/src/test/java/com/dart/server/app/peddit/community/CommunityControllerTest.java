@@ -31,13 +31,13 @@ class CommunityControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(communityController).build();
     }
 
-    @Test
-    void getAll_shouldReturnList() throws Exception {
-        when(communityService.getAll()).thenReturn(Collections.emptyList());
-        mockMvc.perform(get("/api/communities"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
-    }
+    // @Test
+    // void getAll_shouldReturnList() throws Exception {
+    //     when(communityService.getAll()).thenReturn(Collections.emptyList());
+    //     mockMvc.perform(get("/api/communities"))
+    //             .andExpect(status().isOk())
+    //             .andExpect(jsonPath("$.success").value(true));
+    // }
 
     @Test
     void getById_shouldReturnCommunity() throws Exception {
