@@ -1,5 +1,6 @@
 package com.dart.server.app.peddit.community;
 
+import com.dart.server.app.auth.UserRepository;
 import com.dart.server.app.peddit.community.dto.CommunityMapper;
 import com.dart.server.app.peddit.community.dto.CommunityRequest;
 import com.dart.server.app.peddit.community.dto.CommunityResponse;
@@ -21,27 +22,49 @@ import java.util.UUID;
 public class CommunityService {
     @Autowired
     private CommunityRepository communityRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public Page<CommunityResponse> searchCommunities(String q, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         if (AuthUtils.isAdmin()) {
-            return communityRepository.findByDescriptionContainingIgnoreCaseAndMarkedForDeletionFalse(q, pageable)
+            return communityRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(q, q, pageable)
+                    .map(communityEntity -> new CommunityMapper.CommunityWithUser(
+                            communityEntity,
+                            userRepository.findById(UUID.fromString(communityEntity.getCreatedBy())).orElse(null),
+                            userRepository.findById(UUID.fromString(communityEntity.getUpdatedBy())).orElse(null)
+                    ))
                     .map(CommunityMapper::toResponse);
         } else {
-            return communityRepository.findByDescriptionContainingIgnoreCase(q, pageable)
-                    .map(CommunityMapper::toResponse);
+            return communityRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndMarkedForDeletionFalse(q, q, pageable)
+                    .map(communityEntity -> new CommunityMapper.CommunityWithUser(
+                            communityEntity,
+                            userRepository.findById(UUID.fromString(communityEntity.getCreatedBy())).orElse(null),
+                            userRepository.findById(UUID.fromString(communityEntity.getUpdatedBy())).orElse(null)
+                    )).map(CommunityMapper::toResponse);
         }
     }
 
     public CommunityResponse getById(UUID id) {
         return communityRepository.findById(id)
-                .map(CommunityMapper::toResponse)
+                .map(communityEntity -> new CommunityMapper.CommunityWithUser(
+                        communityEntity,
+                        userRepository.findById(UUID.fromString(communityEntity.getCreatedBy())).orElse(null),
+                        userRepository.findById(UUID.fromString(communityEntity.getUpdatedBy())).orElse(null)
+                )).map(CommunityMapper::toResponse)
                 .orElse(null);
     }
 
     public CommunityResponse create(CommunityRequest request) {
         CommunityEntity entity = CommunityMapper.toEntity(request);
-        return CommunityMapper.toResponse(communityRepository.save(entity));
+        CommunityEntity communityEntity = communityRepository.save(entity);
+        return CommunityMapper.toResponse(
+                new CommunityMapper.CommunityWithUser(
+                        communityEntity,
+                        userRepository.findById(UUID.fromString(communityEntity.getCreatedBy())).orElse(null),
+                        userRepository.findById(UUID.fromString(communityEntity.getUpdatedBy())).orElse(null)
+                )
+        );
     }
 
     public CommunityResponse update(UUID id, CommunityRequest request) {
@@ -49,7 +72,14 @@ public class CommunityService {
                 .map(entity -> {
                     entity.setName(request.getName());
                     entity.setDescription(request.getDescription());
-                    return CommunityMapper.toResponse(communityRepository.save(entity));
+                    CommunityEntity communityEntity = communityRepository.save(entity);
+                    return CommunityMapper.toResponse(
+                            new CommunityMapper.CommunityWithUser(
+                                    communityEntity,
+                                    userRepository.findById(UUID.fromString(communityEntity.getCreatedBy())).orElse(null),
+                                    userRepository.findById(UUID.fromString(communityEntity.getUpdatedBy())).orElse(null)
+                            )
+                    );
                 }).orElse(null);
     }
 
