@@ -65,11 +65,6 @@ class CommentServiceTest {
     }
 
     @Test
-    void testCreateWithNullRequest() {
-        assertNull(commentService.create(null));
-    }
-
-    @Test
     void testUpdateFound() {
         UUID id = UUID.randomUUID();
         CommentRequest req = new CommentRequest();

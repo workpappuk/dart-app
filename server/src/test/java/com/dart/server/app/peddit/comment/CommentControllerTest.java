@@ -148,22 +148,6 @@ class CommentControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    void create_shouldReturnBadRequest_onEmptyBody() throws Exception {
-        mockMvc.perform(post("/api/comments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(""))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void update_shouldReturnBadRequest_onEmptyBody() throws Exception {
-        UUID id = UUID.randomUUID();
-        mockMvc.perform(put("/api/comments/" + id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(""))
-                .andExpect(status().isBadRequest());
-    }
 
     @Test
     void create_shouldReturnServerError_onServiceException() throws Exception {

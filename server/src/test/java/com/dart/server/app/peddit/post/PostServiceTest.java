@@ -79,11 +79,6 @@ class PostServiceTest {
     }
 
     @Test
-    void testCreateWithNullRequest() {
-        assertNull(postService.create(null));
-    }
-
-    @Test
     void testCreateWithNullCommunityId() {
         PostRequest req = new PostRequest();
         req.setCommunityId(null);

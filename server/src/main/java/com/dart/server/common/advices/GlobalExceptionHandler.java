@@ -18,4 +18,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(jakarta.servlet.ServletException.class)
+    public ResponseEntity<DartApiResponse<Object>> handleServletExceptions(jakarta.servlet.ServletException ex) {
+        log.error("Servlet error occurred: ", ex);
+        DartApiResponse<Object> response = new DartApiResponse<>(false, ex.getMessage(), null);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<DartApiResponse<Object>> handleTypeMismatch(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex) {
+        log.error("Type mismatch error: ", ex);
+        DartApiResponse<Object> response = new DartApiResponse<>(false, "Invalid parameter: " + ex.getName(), null);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 }

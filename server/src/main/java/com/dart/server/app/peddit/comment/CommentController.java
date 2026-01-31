@@ -2,24 +2,22 @@ package com.dart.server.app.peddit.comment;
 
 import com.dart.server.app.peddit.comment.dto.CommentRequest;
 import com.dart.server.app.peddit.comment.dto.CommentResponse;
-import com.dart.server.app.todo.dto.TodoResponse;
 import com.dart.server.common.response.DartApiResponse;
 import com.dart.server.common.response.PageResponse;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -65,29 +63,49 @@ public class CommentController {
 
     @Operation(summary = "Create a new comment", description = "Creates a new comment.")
     @PostMapping
-    public DartApiResponse<CommentResponse> create(@RequestBody CommentRequest request) {
-        return DartApiResponse.<CommentResponse>builder()
-                .success(true)
-                .message("Created")
-                .data(commentService.create(request))
-                .build();
+    public ResponseEntity<DartApiResponse<CommentResponse>> create(@RequestBody @Valid CommentRequest request) {
+        CommentResponse response = commentService.create(request);
+        if (response == null) {
+            return ResponseEntity.ok(
+                    DartApiResponse.<CommentResponse>builder()
+                            .success(false)
+                            .message("Comment creation failed")
+                            .build()
+            );
+        }
+        return ResponseEntity.ok(
+                DartApiResponse.<CommentResponse>builder()
+                        .success(true)
+                        .message("Created")
+                        .data(response)
+                        .build()
+        );
     }
 
     @Operation(summary = "Update a comment", description = "Updates an existing comment by ID.")
     @PutMapping("/{id}")
-    public DartApiResponse<CommentResponse> update(@PathVariable UUID id, @RequestBody CommentRequest request) {
+    public ResponseEntity<DartApiResponse<CommentResponse>> update(@PathVariable UUID id, @RequestBody @Valid CommentRequest request) {
         CommentResponse response = commentService.update(id, request);
-        if (response == null)
-            return DartApiResponse.<CommentResponse>builder().success(false).message("Comment not found").build();
-        return DartApiResponse.<CommentResponse>builder().success(true).message("OK").data(response).build();
+        if (response == null) {
+            return ResponseEntity.ok(
+                    DartApiResponse.<CommentResponse>builder()
+                            .success(false)
+                            .message("Comment not found")
+                            .build()
+            );
+        }
+        return ResponseEntity.ok(
+                DartApiResponse.<CommentResponse>builder().success(true).message("OK").data(response).build()
+        );
     }
 
     @Operation(summary = "Delete a comment", description = "Marks a comment as deleted by ID.")
     @DeleteMapping("/{id}")
     public DartApiResponse<Boolean> delete(@PathVariable UUID id) {
         var entity = commentService.getByIdEntity(id);
-        if (entity == null)
+        if (entity == null) {
             return DartApiResponse.<Boolean>builder().success(false).message("Comment not found").build();
+        }
         if (entity.isMarkedForDeletion()) {
             return DartApiResponse.<Boolean>builder().success(false).message("Comment already marked for deletion").build();
         }

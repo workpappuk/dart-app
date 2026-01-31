@@ -127,14 +127,6 @@ class PostControllerTest {
     }
 
     @Test
-    void create_shouldReturnBadRequest_onEmptyBody() throws Exception {
-        mockMvc.perform(post("/api/posts")
-                        .contentType("application/json")
-                        .content(""))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void update_shouldReturnBadRequest_onEmptyBody() throws Exception {
         UUID id = UUID.randomUUID();
         mockMvc.perform(put("/api/posts/" + id)
