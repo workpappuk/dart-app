@@ -1,6 +1,11 @@
 package com.dart.server.app.peddit.community.dto;
 
+import com.dart.server.app.auth.UserEntity;
+import com.dart.server.app.auth.dto.UserMapper;
 import com.dart.server.app.peddit.community.CommunityEntity;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class CommunityMapper {
     public static CommunityEntity toEntity(CommunityRequest request) {
@@ -11,13 +16,31 @@ public class CommunityMapper {
         return entity;
     }
 
-    public static CommunityResponse toResponse(CommunityEntity entity) {
+    public static CommunityResponse toResponse(CommunityWithUser communityWithUser) {
+
+        CommunityEntity entity = communityWithUser.entity;
+        UserEntity createdBy = communityWithUser.createdBy;
+        UserEntity updatedBy = communityWithUser.updatedBy;
+
         CommunityResponse response = new CommunityResponse();
-        response.setId(entity.getId());
         response.setName(entity.getName());
         response.setDescription(entity.getDescription());
-        response.setCreatedBy(entity.getCreatedBy());
+        response.setId(entity.getId());
         response.setMarkedForDeletion(entity.isMarkedForDeletion());
+        response.setCreatedAt(entity.getCreatedAt());
+        response.setUpdatedAt(entity.getUpdatedAt());
+
+        response.setCreatedByUserInfo(UserMapper.toResponse(createdBy));
+        response.setUpdatedByUserInfo(UserMapper.toResponse(updatedBy));
         return response;
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Data
+    public static class CommunityWithUser {
+        CommunityEntity entity;
+        UserEntity createdBy;
+        UserEntity updatedBy;
     }
 }

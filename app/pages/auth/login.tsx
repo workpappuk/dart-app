@@ -8,10 +8,9 @@ import { loginUser } from '@/app/utils/services';
 import { setToken } from '@/app/redux/store';
 import { useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SESSION_TOKEN_KEY } from '@/app/utils/constants';
+
 import { set } from 'lodash';
-import { clearUserSessionToken, setUserSessionToken } from '@/app/utils/axios';
+import useAuth from '@/app/utils/hooks/useAuth';
 
 export default function Login() {
     const [state, setState] = useState({
@@ -22,6 +21,7 @@ export default function Login() {
 
     const router = useRouter();
     const dispatch = useDispatch();
+    const { intiateSession, revokeSession, } = useAuth();
 
     const loginMutation = useMutation({
         mutationFn: async ({ username, password }: { username: string; password: string }) => {
@@ -42,16 +42,13 @@ export default function Login() {
         onSuccess: async (data) => {
             const { token } = data;
             if (token) {
-                dispatch(setToken(token)); // Set token here
-                await AsyncStorage.setItem(SESSION_TOKEN_KEY, token);
-                setUserSessionToken(token);
+                await intiateSession(token);
             } else {
-                await AsyncStorage.removeItem(SESSION_TOKEN_KEY);
-                clearUserSessionToken();
+               await revokeSession();
             }
 
             setState((prev) => ({ ...prev, error: '' }));
-            router.push('/'); // Navigate to home on success
+           router.push('/'); // Navigate to home on success
         },
     });
 

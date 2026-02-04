@@ -4,22 +4,22 @@ import { AppHeader } from "../components/core/AppHeader";
 import { ThemeSwitch } from "../components/ThemeSwitch";
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, setToken } from '../redux/store';
-import { View } from "react-native";
+import { SafeAreaViewBase, View } from "react-native";
 import { useRouter } from "expo-router";
 import { logoutUser } from "../utils/services";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { clearUserSessionToken } from "../utils/axios";
-
+import useAuth from "../utils/hooks/useAuth";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
   const dark = useSelector((state: RootState) => state.theme.dark);
 
   const session = useSelector((state: RootState) => state.session);
   const router = useRouter();
-  const dispatch = useDispatch();
+  const { revokeSession } = useAuth();
   return (
-    <>
-      <AppHeader title="Settings" showBack={false} />
+    <SafeAreaView style={{ flex: 1 }}>
       <Surface style={{ padding: 16, margin: 16, borderRadius: 8 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text>Switch to {dark ? 'Light' : 'Dark'}</Text>
@@ -36,17 +36,12 @@ export default function SettingsScreen() {
             <View style={{ marginTop: 16 }}>
               <Button mode="contained" onPress={async () => {
                 logoutUser()
-                .catch((err) => {
-                  console.error('Logout error:', err);
-                })
-                .finally(async () => {
-                  await AsyncStorage.removeItem('session_token');
-                  clearUserSessionToken();
-                  dispatch(setToken(null));
-
-                  router.replace('/pages/auth/login');
-
-                });
+                  .catch((err) => {
+                    console.error('Logout error:', err);
+                  })
+                  .finally(async () => {
+                    await revokeSession();
+                  });
               }}>
                 Logout
               </Button>
@@ -61,6 +56,6 @@ export default function SettingsScreen() {
         )}
 
       </Surface>
-    </>
+    </SafeAreaView>
   );
 }

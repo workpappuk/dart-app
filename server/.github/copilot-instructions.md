@@ -1,3 +1,5 @@
+# Copilot Instructions
+
 - [ ] Verify that the copilot-instructions.md file in the .github directory is created.
 - [ ] Clarify Project Requirements
 - [ ] Scaffold the Project
@@ -8,6 +10,4 @@
 - [ ] Launch the Project
 - [ ] Ensure Documentation is Complete
 
-Work through each checklist item systematically.
-Keep communication concise and focused.
-Follow development best practices.
+Follow these steps systematically for all code generation and project setup tasks. Keep communication concise and focused. Follow development best practices.

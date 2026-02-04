@@ -27,8 +27,15 @@ export const createCommunity = async (data: CommunityRequest) => {
 	return response.data;
 }
 
-export const getCommunities = async () : Promise<DartApiResponse<CommunityResponse[]>> => {
-	const response = await api.get('/api/communities');
+
+export const getCommunities = async (q: string, page: number, size: number) : Promise<DartApiResponse<PageResponse<CommunityResponse>>> => {
+	const response = await api.get('/api/communities/search', {
+		params: {
+			q: q,
+			page: page,
+			size: size
+		}
+	});
 	return response.data;
 }
 

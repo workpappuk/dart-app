@@ -1,11 +1,14 @@
 import { RootState } from "@/app/redux/store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Divider, Surface, Text } from "react-native-paper";
+import { Button, Divider, Surface, Text } from "react-native-paper";
 import { useSelector } from "react-redux";
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import { Communities } from "@/app/components/peddit/community/Communities";
+import { add } from "lodash";
+import { DUMMY_COMMUNITIES } from "@/app/utils/constants";
+import { createCommunity } from "@/app/utils/services";
 export default function AdminDashboard() {
 
   const { session } = useSelector((state: RootState) => state);
@@ -20,23 +23,19 @@ export default function AdminDashboard() {
     { value: 'users', label: 'Users' },
   ];
   return (
-    <>
-      <View style={styles.container}>
-        <SegmentedButtons
-          value={value}
-          onValueChange={setValue}
-          buttons={options}
-        />
-
-        <ScrollView style={{ marginVertical: 16 }} >
-
-          {value === 'communities' && <CommunitiesSection />}
-          {value === 'posts' && <PostsSection />}
-          {value === 'users' && <UsersSection />}
-        </ScrollView>
-
+    <View style={[styles.container, { flex: 1 }]}>
+      <SegmentedButtons
+        value={value}
+        onValueChange={setValue}
+        buttons={options}
+        density="small"
+      />
+      <View style={{ flex: 1, marginVertical: 8 }}>
+        {value === 'communities' && <CommunitiesSection />}
+        {value === 'posts' && <PostsSection />}
+        {value === 'users' && <UsersSection />}
       </View>
-    </>
+    </View>
   );
 }
 
@@ -58,7 +57,9 @@ function PostsSection() {
 
 function CommunitiesSection() {
   return (
-    <Communities />
+    <>
+      <Communities />
+    </>
   );
 }
 
@@ -67,3 +68,32 @@ const styles = StyleSheet.create({
     padding: 16,
   },
 });
+
+function addDummyCommunities() {
+  DUMMY_COMMUNITIES.forEach(async (community) => {
+    await createCommunity(community);
+  });
+}
+
+export function LoadDummy({ type }: { type: 'communities' | 'posts' | 'users' }) {
+  const router = useRouter();
+
+  const handleLoadDummy = () => {
+    if (type === 'communities') {
+      console.log('Loading dummy communities');
+      addDummyCommunities();
+    } else if (type === 'posts') {
+      console.log('Loading dummy posts');
+    } else if (type === 'users') {
+      console.log('Loading dummy users');
+    }
+  };
+  return (
+    <View style={{ marginBottom: 16, alignItems: 'center' }}>
+      <Button mode="contained-tonal" onPress={handleLoadDummy}
+      >
+        Pre Load  {type.charAt(0).toUpperCase() + type.slice(1)} 
+      </Button>
+    </View>
+  );
+}

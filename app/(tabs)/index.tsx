@@ -5,7 +5,6 @@ import { AppHeader } from '../components/core/AppHeader';
 
 export default function HomeScreen() {  return (
   <>
-  <AppHeader title="Reddit" showBack={false} />
   </>
   );
 }
