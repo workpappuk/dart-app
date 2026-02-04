@@ -1,5 +1,5 @@
 
-import { Button, Divider, Surface, Switch, Text } from "react-native-paper";
+import { Button, Divider, Surface, Switch, Text, useTheme } from "react-native-paper";
 import { AppHeader } from "../components/core/AppHeader";
 import { ThemeSwitch } from "../components/ThemeSwitch";
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +15,8 @@ import { FeatureFlags } from "../utils/constants";
 
 export default function SettingsScreen() {
   const dark = useSelector((state: RootState) => state.theme.dark);
+  const {colors} = useTheme();
+  const dispatch = useDispatch();
 
   const session = useSelector((state: RootState) => state.session);
   const router = useRouter();
@@ -24,7 +26,7 @@ export default function SettingsScreen() {
 
       <AppHeader title="Settings" showBack={false} />
 
-      <Surface style={{ padding: 16, margin: 16, borderRadius: 8 }}>
+      <Surface style={{ padding: 16, margin: 16, borderRadius: 8, backgroundColor: colors.background}}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text>Switch to {dark ? 'Light' : 'Dark'}</Text>
           <ThemeSwitch />
@@ -35,7 +37,7 @@ export default function SettingsScreen() {
         <Divider style={{ marginVertical: 16 }} />
         {session.token ? (
           <>
-            <View style={{ marginTop: 16 }}>
+            <View style={{ marginTop: 16 ,backgroundColor: colors.background }}>
               <Button mode="contained" onPress={() => { router.push('/pages/admin/dashboard'); }}>
                 Admin Dashoard
               </Button>

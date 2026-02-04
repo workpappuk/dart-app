@@ -18,13 +18,15 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title = '', showBack = tru
 
   return (
     <Appbar.Header
-      style={[styles.header, { backgroundColor: colors.background }]}
+      style={[styles.header, { backgroundColor: colors.background, shadowColor: colors.primary }]} 
     >
       {showBack && <Appbar.BackAction onPress={() => router.back()} color={colors.primary} />}
-      <View style={styles.titleContainer}>
+      <View 
+        style={[styles.titleContainer, { backgroundColor: colors.background }]}
+      >
         <Appbar.Content
           title={title}
-          titleStyle={[styles.title, { color: colors.onSurface }]}
+          titleStyle={[styles.title, { color: colors.onBackground }]}
         />
       </View>
       {children}
@@ -35,7 +37,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title = '', showBack = tru
 const styles = StyleSheet.create({
   header: {
     elevation: 4,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,

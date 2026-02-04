@@ -31,27 +31,60 @@ function InnerRootLayout() {
   // Merge MD3 themes with React Navigation theme requirements
   const navigationTheme = dark
     ? {
-      ...DarkTheme,
+      ...MD3DarkTheme,
       colors: {
-        ...DarkTheme.colors,
         ...MD3DarkTheme.colors,
-        primary: "#BFFF0B",
+
+        primary: '#C7F000',        // Volt green
+        onPrimary: '#0B0B0B',
+
+        background: '#0B0B0B',
+        surface: '#121212',
+        surfaceVariant: '#1A1A1A',
+
+        text: '#FFFFFF',
+        onSurface: '#FFFFFF',
+        onSurfaceVariant: '#B3B3B3',
+
+        outline: '#2A2A2A',
+        disabled: '#6F6F6F',
+
+        error: '#FF4D4D',
+        onError: '#0B0B0B',
       },
     }
     : {
-      ...DefaultTheme,
+      ...MD3LightTheme,
       colors: {
-        ...DefaultTheme.colors,
         ...MD3LightTheme.colors,
-        primary: "#222"
+
+        primary: '#1A1A1A',        // Nike black
+        onPrimary: '#FFFFFF',
+
+        secondary: '#C7F000',      // Volt accent
+        onSecondary: '#0B0B0B',
+
+        background: '#FFFFFF',
+        surface: '#F7F7F7',
+        surfaceVariant: '#EEEEEE',
+
+        text: '#0B0B0B',
+        onSurface: '#0B0B0B',
+        onSurfaceVariant: '#5A5A5A',
+
+        outline: '#D0D0D0',
+        disabled: '#A0A0A0',
+
+        error: '#D32F2F',
+        onError: '#FFFFFF',
       },
-    };
+    };;
 
   return (
     <SafeAreaProvider>
 
-      <PaperProvider>
-        <ThemeProvider value={navigationTheme}>
+      <PaperProvider theme={navigationTheme}>
+        <ThemeProvider value={dark ? DarkTheme : DefaultTheme}>
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
