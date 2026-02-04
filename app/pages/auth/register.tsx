@@ -4,16 +4,11 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { TextInput, Button, Text, Surface } from 'react-native-paper';
 import { useMutation } from '@tanstack/react-query';
-import { loginUser } from '@/app/utils/services';
-import { setToken } from '@/app/redux/store';
+import { registerUser } from '@/app/utils/services';
 import { useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SESSION_TOKEN_KEY } from '@/app/utils/constants';
-import { set } from 'lodash';
-import { clearUserSessionToken, setUserSessionToken } from '@/app/utils/axios';
 
-export default function Login() {
+export default function Register() {
     const [state, setState] = useState({
         username: 'user1',
         password: 'user',
@@ -21,14 +16,13 @@ export default function Login() {
     });
 
     const router = useRouter();
-    const dispatch = useDispatch();
 
-    const loginMutation = useMutation({
+    const registerMutation = useMutation({
         mutationFn: async ({ username, password }: { username: string; password: string }) => {
             if (!username || !password) {
                 throw new Error('Please enter username and password.');
             }
-            const response = await loginUser({ username, password });
+            const response = await registerUser({ username, password });
             console.log('Login response:', response);
             if (!response.success) {
                 throw new Error('Invalid credentials.');
@@ -37,34 +31,24 @@ export default function Login() {
             return response.data; // Only return data
         },
         onError: (error: any) => {
-            setState((prev) => ({ ...prev, error: error.message || 'Login failed.' }));
+            setState((prev) => ({ ...prev, error: error.message || 'Register failed.' }));
         },
         onSuccess: async (data) => {
-            const { token } = data;
-            if (token) {
-                dispatch(setToken(token)); // Set token here
-                await AsyncStorage.setItem(SESSION_TOKEN_KEY, token);
-                setUserSessionToken(token);
-            } else {
-                await AsyncStorage.removeItem(SESSION_TOKEN_KEY);
-                clearUserSessionToken();
-            }
-
             setState((prev) => ({ ...prev, error: '' }));
-            router.push('/'); // Navigate to home on success
+            router.push('/pages/auth/login'); // Navigate to home on success
         },
     });
 
-    const handleLogin = () => {
+    const handleRegister = () => {
         setState((prev) => ({ ...prev, error: '' }));
-        loginMutation.mutate({ username: state.username, password: state.password });
+        registerMutation.mutate({ username: state.username, password: state.password });
     };
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
             <Surface style={{ padding: 24, borderRadius: 12, elevation: 2 }}>
                 <Text variant="headlineMedium" style={{ marginBottom: 16, textAlign: 'center' }}>
-                    Login
+                    Register
                 </Text>
                 <TextInput
                     label="username or email"
@@ -86,18 +70,18 @@ export default function Login() {
                 ) : null}
                 <Button
                     mode="contained"
-                    onPress={handleLogin}
-                    loading={loginMutation.status === 'pending'}
-                    disabled={loginMutation.status === 'pending'}
+                    onPress={handleRegister}
+                    loading={registerMutation.status === 'pending'}
+                    disabled={registerMutation.status === 'pending'}
                 >
-                    Login
+                    Register
                 </Button>
                 <Button
                     mode="text"
-                    onPress={() => router.push('/pages/auth/register')}
+                    onPress={() => router.push('/pages/auth/login')}
                     style={{ marginTop: 12 }}
                 >
-                    Register Here
+                    Login Here
                 </Button>
             </Surface>
         </View>

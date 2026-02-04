@@ -12,6 +12,11 @@ export const loginUser = async (userRequest: UserRequest): Promise<DartApiRespon
 	return response.data;
 }
 
+export const registerUser = async (userRequest: UserRequest): Promise<DartApiResponse<LoginResponse>> => {
+	const response = await api.post('/api/auth/register', { username: userRequest.username, password: userRequest.password });
+	return response.data;
+}
+
 export const logoutUser = async () => {
 	const response = await api.post('/api/auth/logout');
 	return response.data;
