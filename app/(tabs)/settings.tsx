@@ -1,9 +1,9 @@
 
-import { Button, Divider, Surface, Text } from "react-native-paper";
+import { Button, Divider, Surface, Switch, Text } from "react-native-paper";
 import { AppHeader } from "../components/core/AppHeader";
 import { ThemeSwitch } from "../components/ThemeSwitch";
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState, setToken } from '../redux/store';
+import { RootState, setToken, toggleFeatureFlag } from '../redux/store';
 import { SafeAreaViewBase, View } from "react-native";
 import { useRouter } from "expo-router";
 import { logoutUser } from "../utils/services";
@@ -11,6 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { clearUserSessionToken } from "../utils/axios";
 import useAuth from "../utils/hooks/useAuth";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FeatureFlags } from "../utils/constants";
 
 export default function SettingsScreen() {
   const dark = useSelector((state: RootState) => state.theme.dark);
@@ -20,11 +21,17 @@ export default function SettingsScreen() {
   const { revokeSession } = useAuth();
   return (
     <SafeAreaView style={{ flex: 1 }}>
+
+      <AppHeader title="Settings" showBack={false} />
+
       <Surface style={{ padding: 16, margin: 16, borderRadius: 8 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text>Switch to {dark ? 'Light' : 'Dark'}</Text>
           <ThemeSwitch />
         </View>
+
+        <FeatureFlag />
+
         <Divider style={{ marginVertical: 16 }} />
         {session.token ? (
           <>
@@ -57,5 +64,29 @@ export default function SettingsScreen() {
 
       </Surface>
     </SafeAreaView>
+  );
+}
+
+export function FeatureFlag() {
+  const dispatch = useDispatch();
+  const { featureFlags } = useSelector((state: RootState) => state.session);
+
+  return (
+    <>
+      {Object.entries(featureFlags).map(([key, value]) => (
+        <>
+          <Divider style={{ marginTop: 16 }} />
+          <View key={key} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
+            <Text style={{ textTransform: 'capitalize' }}>{key.replace(/_/g, ' ').toLocaleLowerCase()}</Text>
+            <Switch
+              value={value}
+              onValueChange={(value: boolean) => { dispatch(toggleFeatureFlag({ key, value })); }}
+              style={{ marginRight: 8 }}
+              accessibilityLabel="Toggle theme"
+            />
+          </View>
+        </>
+      ))}
+    </>
   );
 }
