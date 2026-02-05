@@ -1,4 +1,4 @@
-import { CommunityResponse, DartApiResponse, PageResponse } from "./types";
+import { AuditInfo, CommunityResponse, DartApiResponse, PageResponse } from "./types";
 
 export const mockSuccessfulLoginResponse = {
     success: true,
@@ -22,12 +22,8 @@ export const mockSuccessfulLogoutResponse = {
     message: 'Mock logout successful',
 };
 
-export const MOCK_COMMUNITY_1 = {
-    id: '1',
-    name: 'Mock Community 1',
-    description: 'This is a mock community for testing.',
+export const MOCK_AUDITABLE_USER: AuditInfo = {
     createdAt: new Date().toISOString(),
-    markedForDeletion: false,
     createdByUserInfo: {
         id: 'user1',
         username: 'mockuser1',
@@ -39,25 +35,20 @@ export const MOCK_COMMUNITY_1 = {
         username: 'mockuser2',
         roles: [],
     },
+    id: Math.random().toString(36).substring(2, 15),
+    markedForDeletion: false,
 };
 
+export const MOCK_COMMUNITY_1 = {
+    ...MOCK_AUDITABLE_USER,
+    name: 'Mock Community 1',
+    description: 'This is a mock community for testing.',
+}
+
 export const MOCK_COMMUNITY_2 = {
-    id: '2',
+    ...MOCK_AUDITABLE_USER,
     name: 'Mock Community 2',
     description: 'This is another mock community for testing.',
-    createdAt: new Date().toISOString(),
-    markedForDeletion: false,
-    createdByUserInfo: {
-        id: 'user3',
-        username: 'mockuser3',
-        roles: [],
-    },
-    updatedAt: new Date().toISOString(),
-    updatedByUserInfo: {
-        id: 'user4',
-        username: 'mockuser4',
-        roles: [],
-    },
 };
 
 export const mockCommunitiesResponse: DartApiResponse<PageResponse<CommunityResponse>> = {

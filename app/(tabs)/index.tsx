@@ -5,6 +5,7 @@ import { AppHeader } from '../components/core/AppHeader';
 
 export default function HomeScreen() {  return (
   <>
+  
   </>
   );
 }
