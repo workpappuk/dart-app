@@ -146,8 +146,9 @@ export interface Post extends AuditInfo {
     author?: string;
     community: string;
     votes?: number;
+    userVote?: -1 | 0 | 1;
     media?: MediaItem[];
-}
+} 
 
 export type MediaItem =
     | ImageMedia

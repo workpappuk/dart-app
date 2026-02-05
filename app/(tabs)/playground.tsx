@@ -40,20 +40,16 @@ export default function PlaygroundsScreen() {
 
 function Posts({ searchQuery }: { searchQuery: string }) {
    const [posts, setPosts] = useState<Post[]>(DUMMY_POSTS);
-   const [userVotes, setUserVotes] = useState<Record<string, number>>({});
    const theme = useTheme();
 
    const handleVote = (postId: string, newVote: -1 | 0 | 1) => {
-      setUserVotes(prevUV => {
-         const oldVote = prevUV[postId] ?? 0;
-         setPosts(prevPosts => prevPosts.map(p => {
-            if (p.id !== postId) return p;
-            const votes = (p.votes ?? 0) + (newVote - oldVote);
-            return { ...p, votes };
-         }));
-         return { ...prevUV, [postId]: newVote };
-      });
-   };
+      setPosts(prevPosts => prevPosts.map(p => {
+         if (p.id !== postId) return p;
+         const oldVote = p.userVote ?? 0;
+         const votes = (p.votes ?? 0) + (newVote - oldVote);
+         return { ...p, votes, userVote: newVote };
+      }));
+   }; 
 
    useEffect(() => {
       if (searchQuery) {
@@ -80,7 +76,7 @@ function Posts({ searchQuery }: { searchQuery: string }) {
                   <VoteControls
                      postId={post.id}
                      votes={post.votes ?? 0}
-                     userVote={userVotes[post.id] ?? 0}
+                     userVote={post.userVote ?? 0}
                      onVote={handleVote}
                      vertical
                   />

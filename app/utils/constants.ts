@@ -142,7 +142,7 @@ export const DUMMY_POSTS: Post[] = [
     {
 
         ...MOCK_AUDITABLE_USER, title: 'Best Programming Languages in 2024', content: 'What are the best programming languages to learn in 2024?',
-        community: 'TechTalk', votes: 120, media: [
+        community: 'TechTalk', votes: 120, userVote: 0, media: [
             { type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Programming Languages 2024' },
             { type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Programming Languages Overview' },
             { type: 'text', text: 'In 2024, the top programming languages are expected to be Python, JavaScript, Rust, and Go.' },
@@ -251,7 +251,7 @@ export const DUMMY_POSTS: Post[] = [
     {
 
         ...MOCK_AUDITABLE_USER, title: 'Top Travel Destinations for 2024', content: 'Share your favorite travel destinations and tips for 2024.',
-        community: 'TravelBuddies', votes: 85,
+        community: 'TravelBuddies', votes: 85, userVote: 0,
         media: [
             { type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Travel Destinations 2024' },
             { type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Top Travel Destinations Overview' },
@@ -264,7 +264,7 @@ export const DUMMY_POSTS: Post[] = [
     {
 
         ...MOCK_AUDITABLE_USER, title: 'Healthy Meal Prep Ideas', content: 'Share your favorite healthy meal prep ideas and recipes.',
-        community: 'FoodiesUnite', votes: 60,
+        community: 'FoodiesUnite', votes: 60, userVote: 0,
         media: [
             { type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Healthy Meal Prep Ideas' },
             { type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Healthy Meal Prep Recipes' },
@@ -276,7 +276,7 @@ export const DUMMY_POSTS: Post[] = [
     {
 
         ...MOCK_AUDITABLE_USER, title: 'Best Workout Routines for Beginners', content: 'What are some effective workout routines for beginners?',
-        community: 'FitnessFreaks', votes: 90,
+        community: 'FitnessFreaks', votes: 90, userVote: 0,
         media: [
             { type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Workout Routines for Beginners' },
             { type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Beginner Workout Routine' },
@@ -289,66 +289,66 @@ export const DUMMY_POSTS: Post[] = [
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Must-Watch Movies of 2024', content: 'What are the must-watch movies coming out in 2024?',
-        community: 'MovieManiacs', votes: 110, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Must-Watch Movies 2024' }]
+        community: 'MovieManiacs', votes: 110, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Must-Watch Movies 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Best Gaming Laptops in 2024', content: 'What are the best gaming laptops available in 2024?',
-        community: 'GamingGuild', votes: 75, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Gaming Laptops 2024' }]
+        community: 'GamingGuild', votes: 75, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Gaming Laptops 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Photography Tips for Beginners', content: 'Share your best photography tips for beginners.',
-        community: 'PhotographyPros', votes: 50, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Photography Tips' }]
+        community: 'PhotographyPros', votes: 50, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Photography Tips' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'DIY Home Decor Ideas', content: 'What are some creative DIY home decor ideas?',
-        community: 'DIYDreamers', votes: 40, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'DIY Home Decor' }]
+        community: 'DIYDreamers', votes: 40, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'DIY Home Decor' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Best Parenting Books', content: 'What are the best books for parenting advice?',
-        community: 'ParentingPlace', votes: 70, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Best Parenting Books' }]
+        community: 'ParentingPlace', votes: 70, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Best Parenting Books' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Latest Fashion Trends for 2024', content: 'What are the latest fashion trends to watch out for in 2024?',
-        community: 'FashionForward', votes: 95, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Latest Fashion Trends 2024' }]
+        community: 'FashionForward', votes: 95, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Latest Fashion Trends 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Top 5 Electric Cars of 2024', content: 'What are the top electric cars available in 2024?',
-        community: 'AutoAddicts', votes: 80, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Top Electric Cars 2024' }]
+        community: 'AutoAddicts', votes: 80, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Top Electric Cars 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Mental Health Awareness Tips', content: 'Share your tips for raising mental health awareness and supporting those in need.',
-        community: 'HealthHaven', votes: 65, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Mental Health Awareness' }]
+        community: 'HealthHaven', votes: 65, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Mental Health Awareness' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Best Sports Moments of 2024', content: 'What are the best sports moments that happened in 2024?',
-        community: 'SportsSpot', votes: 100, media: [{ type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Best Sports Moments 2024' }]
+        community: 'SportsSpot', votes: 100, userVote: 0, media: [{ type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Best Sports Moments 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Funniest Memes of 2024', content: 'Share the funniest memes that you came across in 2024.',
-        community: 'ComedyCorner', votes: 55, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Funniest Memes 2024' }]
+        community: 'ComedyCorner', votes: 55, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Funniest Memes 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Gardening Tips for Spring', content: 'What are your best gardening tips for the spring season?',
-        community: 'GardeningGurus', votes: 45, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Gardening Tips for Spring' }]
+        community: 'GardeningGurus', votes: 45, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Gardening Tips for Spring' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Tech Innovations to Watch in 2024', content: 'What are the most exciting tech innovations to watch out for in 2024?',
-        community: 'TechInnovators', votes: 115, media: [{ type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Tech Innovations 2024' }]
+        community: 'TechInnovators', votes: 115, userVote: 0, media: [{ type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Tech Innovations 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Best Classic Movies to Rewatch', content: 'What are some classic movies that are worth rewatching?',
-        community: 'Cinephiles', votes: 85, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Best Classic Movies' }]
+        community: 'Cinephiles', votes: 85, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Best Classic Movies' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Travel Safety Tips for Solo Travelers', content: 'What are your best travel safety tips for solo travelers?',
-        community: 'TravelTales', votes: 60, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Travel Safety Tips' }]
+        community: 'TravelTales', votes: 60, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Travel Safety Tips' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Best Street Food Around the World', content: 'What are some of the best street food dishes you have tried around the world?',
-        community: 'FoodFanatics', votes: 70, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Best Street Food' }]
+        community: 'FoodFanatics', votes: 70, userVote: 0, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Best Street Food' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Community Guidelines Reminder', content: 'Please remember to follow our community guidelines to keep our space safe and welcoming for everyone.',
-        community: 'TechTalk', votes: 0, media: []
+        community: 'TechTalk', votes: 0, userVote: 0, media: []
     }
 ];
