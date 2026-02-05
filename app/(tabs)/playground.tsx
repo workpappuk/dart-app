@@ -4,7 +4,7 @@ import { Button, Searchbar, Surface, Avatar, Chip, Divider, Title, Caption, Para
 import { AppHeader } from '../components/core/AppHeader';
 import { DUMMY_POSTS } from '../utils/constants';
 import { Post } from '../utils/types';
-import { ScrollView, View, Text, Linking } from 'react-native';
+import { ScrollView, View, Text, Linking, Animated } from 'react-native';
 import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
@@ -72,19 +72,20 @@ function Posts({ searchQuery }: { searchQuery: string }) {
       >
          {posts.map(post => (
             <Card key={post.id} style={{ marginBottom: 12, borderRadius: 8, elevation: 2 }}>
-               <Card.Title
-                  title={post.title}
-                  subtitle={`${post.author ?? 'Unknown'} · ${post.community}`}
-                  left={props => <Avatar.Text {...props} label={(post.author || 'U').slice(0,1).toUpperCase()} />}
-                  right={() => (
-                     <VoteControls
-                        postId={post.id}
-                        votes={post.votes ?? 0}
-                        userVote={userVotes[post.id] ?? 0}
-                        onVote={handleVote}
-                     />
-                  )}
-               />
+               <View style={{ flexDirection: 'row', alignItems: 'flex-start', padding: 12 }}>
+                  <VoteControls
+                     postId={post.id}
+                     votes={post.votes ?? 0}
+                     userVote={userVotes[post.id] ?? 0}
+                     onVote={handleVote}
+                     vertical
+                  />
+
+                  <View style={{ flex: 1, marginLeft: 8 }}>
+                     <Title style={{ marginBottom: 4, color: theme.colors.primary }}>{post.title}</Title>
+                     <Caption>{post.author ?? 'Unknown'} · {post.community}</Caption>
+                  </View>
+               </View>
 
                <Card.Content style={{ backgroundColor: theme.colors.surface }}>
                   {post.content && <Paragraph style={{ marginBottom: 8 }}>{post.content}</Paragraph>}
@@ -114,19 +115,72 @@ function Posts({ searchQuery }: { searchQuery: string }) {
 }
 
 
-function VoteControls({ postId, votes, userVote, onVote }: { postId: string; votes: number; userVote: number; onVote: (postId: string, vote: -1 | 0 | 1) => void }) {
+function VoteControls({ postId, votes, userVote, onVote, vertical }: { postId: string; votes: number; userVote: number; onVote: (postId: string, vote: -1 | 0 | 1) => void; vertical?: boolean }) {
    const theme = useTheme();
+   const scale = React.useRef(new Animated.Value(1)).current;
+   const prev = React.useRef(votes);
+
+   React.useEffect(() => {
+      if (prev.current !== votes) {
+         Animated.sequence([
+            Animated.timing(scale, { toValue: 1.15, duration: 120, useNativeDriver: true }),
+            Animated.timing(scale, { toValue: 1, duration: 120, useNativeDriver: true })
+         ]).start();
+         prev.current = votes;
+      }
+   }, [votes, scale]);
+
+   const isVertical = !!vertical;
+   if (isVertical) {
+      return (
+         <View style={{ width: 56, alignItems: 'center' }}>
+            <IconButton
+               icon="thumb-up"
+               size={28}
+               onPress={() => onVote(postId, userVote === 1 ? 0 : 1)}
+               iconColor={userVote === 1 ? '#fff' : theme.colors.onBackground}
+               containerColor={userVote === 1 ? theme.colors.primary : 'transparent'}
+               accessibilityLabel="Upvote"
+            />
+            <Animated.Text style={{ transform: [{ scale }], fontWeight: 'bold', color: theme.colors.onBackground }}>{votes}</Animated.Text>
+            <IconButton
+               icon="thumb-down"
+               size={28}
+               onPress={() => onVote(postId, userVote === -1 ? 0 : -1)}
+               iconColor={userVote === -1 ? '#fff' : theme.colors.onBackground}
+               containerColor={userVote === -1 ? theme.colors.primary : 'transparent'}
+               accessibilityLabel="Downvote"
+            />
+         </View>
+      );
+   }
+
    return (
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-         <IconButton icon="thumb-up" size={20} onPress={() => onVote(postId, userVote === 1 ? 0 : 1)} iconColor={userVote === 1 ? theme.colors.primary : theme.colors.onBackground} />
-         <Text style={{ marginHorizontal: 4 }}>{votes}</Text>
-         <IconButton icon="thumb-down" size={20} onPress={() => onVote(postId, userVote === -1 ? 0 : -1)} iconColor={userVote === -1 ? theme.colors.primary : theme.colors.onBackground} />
+         <IconButton
+            icon="thumb-up"
+            size={26}
+            onPress={() => onVote(postId, userVote === 1 ? 0 : 1)}
+            iconColor={userVote === 1 ? '#fff' : theme.colors.onBackground}
+            containerColor={userVote === 1 ? theme.colors.primary : 'transparent'}
+            accessibilityLabel="Upvote"
+         />
+         <Animated.Text style={{ transform: [{ scale }], marginHorizontal: 6, fontWeight: 'bold', color: theme.colors.onBackground }}>{votes}</Animated.Text>
+         <IconButton
+            icon="thumb-down"
+            size={26}
+            onPress={() => onVote(postId, userVote === -1 ? 0 : -1)}
+            iconColor={userVote === -1 ? '#fff' : theme.colors.onBackground}
+            containerColor={userVote === -1 ? theme.colors.primary : 'transparent'}
+            accessibilityLabel="Downvote"
+         />
       </View>
    );
 }
 
-function MediaVideo({ url }: { url: string }) {
-   const player = useVideoPlayer({ uri: url }, player => {
+function MediaVideo({ url }: { url: string | number }) {
+   const source: any = typeof url === 'number' ? url : { uri: url };
+   const player = useVideoPlayer(source, player => {
       player.loop = true;
       player.play();
    });

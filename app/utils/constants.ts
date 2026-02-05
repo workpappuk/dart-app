@@ -143,8 +143,8 @@ export const DUMMY_POSTS: Post[] = [
 
         ...MOCK_AUDITABLE_USER, title: 'Best Programming Languages in 2024', content: 'What are the best programming languages to learn in 2024?',
         community: 'TechTalk', votes: 120, media: [
-            { type: 'image', url: 'https://example.com/image1.jpg', caption: 'Programming Languages 2024' },
-            { type: 'video', url: 'https://example.com/video1.mp4', caption: 'Programming Languages Overview' },
+            { type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Programming Languages 2024' },
+            { type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Programming Languages Overview' },
             { type: 'text', text: 'In 2024, the top programming languages are expected to be Python, JavaScript, Rust, and Go.' },
             { type: 'poll', question: 'Which programming language do you prefer?', options: ['Python', 'JavaScript', 'Rust', 'Go'] },
             { type: 'quote', text: 'The best way to predict the future is to invent it. - Alan Kay' },
@@ -176,7 +176,7 @@ export const DUMMY_POSTS: Post[] = [
                 name: '1000 Upvotes', description: 'Reached 1000 upvotes on posts in the TechTalk community', date: '2024-04-15T12:00:00Z', imageUrl: 'https://example.com/milestone1.png'
             },
             { type: 'caseStudy', title: 'Programming Languages in Industry', content: 'A case study on the most popular programming languages used in the industry in 2024.' },
-            { type: 'infographic', url: 'https://example.com/infographic1.jpg', caption: 'Programming Languages Popularity in 2024' },
+            { type: 'infographic', url: 'https://picsum.photos/id/1/200/300', caption: 'Programming Languages Popularity in 2024' },
             { type: 'map', latitude: 37.7749, longitude: -122.4194, caption: 'Tech Hubs Around the World' },
             {
                 type: 'timeline', events: [
@@ -207,22 +207,22 @@ export const DUMMY_POSTS: Post[] = [
             },
             {
                 type: 'slideshow', slides: [
-                    { url: 'https://example.com/slide1.jpg', caption: 'Python Overview' },
-                    { url: 'https://example.com/slide2.jpg', caption: 'JavaScript Overview' },
-                    { url: 'https://example.com/slide3.jpg', caption: 'Rust Overview' },
-                    { url: 'https://example.com/slide4.jpg', caption: 'Go Overview' }
+                    { url: 'https://picsum.photos/id/1/200/300', caption: 'Python Overview' },
+                    { url: 'https://picsum.photos/id/1/200/300', caption: 'JavaScript Overview' },
+                    { url: 'https://picsum.photos/id/1/200/300', caption: 'Rust Overview' },
+                    { url: 'https://picsum.photos/id/1/200/300', caption: 'Go Overview' }
                 ], caption: 'Programming Languages Slideshow'
             },
 
-            { type: 'animation', url: 'https://example.com/animation1.gif', caption: 'Programming Languages Animation' },
-            { type: 'virtualTour', url: 'https://example.com/virtualtour1', caption: 'Virtual Tour of Programming Languages History' },
-            { type: '3dModel', url: 'https://example.com/3dmodel1', caption: '3D Model of Programming Languages Ecosystem' },
+            { type: 'animation', url: 'https://picsum.photos/id/1/200/300', caption: 'Programming Languages Animation' },
+            { type: 'virtualTour', url: 'https://picsum.photos/id/1/200/300', caption: 'Virtual Tour of Programming Languages History' },
+            { type: '3dModel', url: 'https://picsum.photos/id/1/200/300', caption: '3D Model of Programming Languages Ecosystem' },
             { type: 'webinar', title: 'Learn the Best Programming Languages in 2024', date: '2024-06-01T18:00:00Z', description: 'Join our webinar to learn about the best programming languages to learn in 2024.' },
             { type: 'workshop', title: 'Hands-on Workshop on Programming Languages', date: '2024-06-15T10:00:00Z', description: 'Participate in our workshop to get hands-on experience with the top programming languages of 2024.' },
-            { type: 'ebook', title: 'The Ultimate Guide to Programming Languages in 2024', url: 'https://example.com/ebook1.pdf', description: 'Download our comprehensive guide to the best programming languages in 2024.' },
-            { type: 'newsletter', title: 'Programming Languages Newsletter', url: 'https://example.com/newsletter1', description: 'Subscribe to our newsletter for the latest updates on programming languages in 2024.' },
+            { type: 'ebook', title: 'The Ultimate Guide to Programming Languages in 2024', url: 'https://picsum.photos/id/1/200/300', description: 'Download our comprehensive guide to the best programming languages in 2024.' },
+            { type: 'newsletter', title: 'Programming Languages Newsletter', url: 'https://picsum.photos/id/1/200/300', description: 'Subscribe to our newsletter for the latest updates on programming languages in 2024.' },
             { type: 'caseStudy', title: 'Adoption of Programming Languages in Tech Industry', content: 'An in-depth case study on how different programming languages are being adopted in the tech industry in 2024.' },
-            { type: 'researchPaper', title: 'Trends in Programming Languages for 2024', url: 'https://example.com/researchpaper1.pdf', abstract: 'This research paper explores the emerging trends in programming languages for the year 2024.' },
+            { type: 'researchPaper', title: 'Trends in Programming Languages for 2024', url: 'https://picsum.photos/id/1/200/300', abstract: 'This research paper explores the emerging trends in programming languages for the year 2024.' },
             {
                 type: 'faq', faqs: [
                     { question: 'What are the best programming languages to learn in 2024?', answer: 'The best programming languages to learn in 2024 are Python, JavaScript, Rust, and Go.' },
@@ -233,10 +233,10 @@ export const DUMMY_POSTS: Post[] = [
             {
                 type: 'gallery',
                 images: [
-                    { url: 'https://example.com/gallery1.jpg', caption: 'Python' },
-                    { url: 'https://example.com/gallery2.jpg', caption: 'JavaScript' },
-                    { url: 'https://example.com/gallery3.jpg', caption: 'Rust' },
-                    { url: 'https://example.com/gallery4.jpg', caption: 'Go' }
+                    { url: 'https://picsum.photos/id/1/200/300', caption: 'Python' },
+                    { url: 'https://picsum.photos/id/2/200/300', caption: 'JavaScript' },
+                    { url: 'https://picsum.photos/id/3/200/300', caption: 'Rust' },
+                    { url: 'https://picsum.photos/id/4/200/300', caption: 'Go' }
                 ],
                 caption: 'Gallery of Programming Languages'
             },
@@ -253,8 +253,8 @@ export const DUMMY_POSTS: Post[] = [
         ...MOCK_AUDITABLE_USER, title: 'Top Travel Destinations for 2024', content: 'Share your favorite travel destinations and tips for 2024.',
         community: 'TravelBuddies', votes: 85,
         media: [
-            { type: 'image', url: 'https://example.com/travel1.jpg', caption: 'Travel Destinations 2024' },
-            { type: 'video', url: 'https://example.com/travelvideo1.mp4', caption: 'Top Travel Destinations Overview' },
+            { type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Travel Destinations 2024' },
+            { type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Top Travel Destinations Overview' },
             { type: 'text', text: 'The top travel destinations for 2024 include Bali, Japan, Italy, and New Zealand.' },
             { type: 'poll', question: 'Which travel destination are you most excited to visit in 2024?', options: ['Bali', 'Japan', 'Italy', 'New Zealand'] },
             { type: 'quote', text: 'Travel is the only thing you buy that makes you richer. - Anonymous' },
@@ -266,8 +266,8 @@ export const DUMMY_POSTS: Post[] = [
         ...MOCK_AUDITABLE_USER, title: 'Healthy Meal Prep Ideas', content: 'Share your favorite healthy meal prep ideas and recipes.',
         community: 'FoodiesUnite', votes: 60,
         media: [
-            { type: 'image', url: 'https://example.com/mealprep1.jpg', caption: 'Healthy Meal Prep Ideas' },
-            { type: 'video', url: 'https://example.com/mealprepvideo1.mp4', caption: 'Healthy Meal Prep Recipes' },
+            { type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Healthy Meal Prep Ideas' },
+            { type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Healthy Meal Prep Recipes' },
             { type: 'text', text: 'Some of my favorite healthy meal prep ideas include quinoa salad, grilled chicken with veggies, and overnight oats.' },
             { type: 'poll', question: 'What is your go-to healthy meal prep recipe?', options: ['Quinoa Salad', 'Grilled Chicken with Veggies', 'Overnight Oats', 'Other'] },
             { type: 'quote', text: 'Let food be thy medicine and medicine be thy food. - Hippocrates' }
@@ -278,8 +278,8 @@ export const DUMMY_POSTS: Post[] = [
         ...MOCK_AUDITABLE_USER, title: 'Best Workout Routines for Beginners', content: 'What are some effective workout routines for beginners?',
         community: 'FitnessFreaks', votes: 90,
         media: [
-            { type: 'image', url: 'https://example.com/workout1.jpg', caption: 'Workout Routines for Beginners' },
-            { type: 'video', url: 'https://example.com/workoutvideo1.mp4', caption: 'Beginner Workout Routine' },
+            { type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Workout Routines for Beginners' },
+            { type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Beginner Workout Routine' },
             { type: 'text', text: 'A great workout routine for beginners includes a mix of cardio, strength training, and flexibility exercises.' },
             { type: 'poll', question: 'What is your favorite type of workout?', options: ['Cardio', 'Strength Training', 'Flexibility Exercises', 'Other'] },
             { type: 'quote', text: 'The only bad workout is the one that didn\'t happen. - Anonymous' },
@@ -289,63 +289,63 @@ export const DUMMY_POSTS: Post[] = [
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Must-Watch Movies of 2024', content: 'What are the must-watch movies coming out in 2024?',
-        community: 'MovieManiacs', votes: 110, media: [{ type: 'image', url: 'https://example.com/movies1.jpg', caption: 'Must-Watch Movies 2024' }]
+        community: 'MovieManiacs', votes: 110, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Must-Watch Movies 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Best Gaming Laptops in 2024', content: 'What are the best gaming laptops available in 2024?',
-        community: 'GamingGuild', votes: 75, media: [{ type: 'image', url: 'https://example.com/image2.jpg', caption: 'Gaming Laptops 2024' }]
+        community: 'GamingGuild', votes: 75, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Gaming Laptops 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Photography Tips for Beginners', content: 'Share your best photography tips for beginners.',
-        community: 'PhotographyPros', votes: 50, media: [{ type: 'image', url: 'https://example.com/image3.jpg', caption: 'Photography Tips' }]
+        community: 'PhotographyPros', votes: 50, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Photography Tips' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'DIY Home Decor Ideas', content: 'What are some creative DIY home decor ideas?',
-        community: 'DIYDreamers', votes: 40, media: [{ type: 'image', url: 'https://example.com/image4.jpg', caption: 'DIY Home Decor' }]
+        community: 'DIYDreamers', votes: 40, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'DIY Home Decor' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Best Parenting Books', content: 'What are the best books for parenting advice?',
-        community: 'ParentingPlace', votes: 70, media: [{ type: 'image', url: 'https://example.com/parenting1.jpg', caption: 'Best Parenting Books' }]
+        community: 'ParentingPlace', votes: 70, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Best Parenting Books' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Latest Fashion Trends for 2024', content: 'What are the latest fashion trends to watch out for in 2024?',
-        community: 'FashionForward', votes: 95, media: [{ type: 'image', url: 'https://example.com/fashion1.jpg', caption: 'Latest Fashion Trends 2024' }]
+        community: 'FashionForward', votes: 95, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Latest Fashion Trends 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Top 5 Electric Cars of 2024', content: 'What are the top electric cars available in 2024?',
-        community: 'AutoAddicts', votes: 80, media: [{ type: 'image', url: 'https://example.com/cars1.jpg', caption: 'Top Electric Cars 2024' }]
+        community: 'AutoAddicts', votes: 80, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Top Electric Cars 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Mental Health Awareness Tips', content: 'Share your tips for raising mental health awareness and supporting those in need.',
-        community: 'HealthHaven', votes: 65, media: [{ type: 'image', url: 'https://example.com/health1.jpg', caption: 'Mental Health Awareness' }]
+        community: 'HealthHaven', votes: 65, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Mental Health Awareness' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Best Sports Moments of 2024', content: 'What are the best sports moments that happened in 2024?',
-        community: 'SportsSpot', votes: 100, media: [{ type: 'video', url: 'https://example.com/sports1.mp4', caption: 'Best Sports Moments 2024' }]
+        community: 'SportsSpot', votes: 100, media: [{ type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Best Sports Moments 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Funniest Memes of 2024', content: 'Share the funniest memes that you came across in 2024.',
-        community: 'ComedyCorner', votes: 55, media: [{ type: 'image', url: 'https://example.com/memes1.jpg', caption: 'Funniest Memes 2024' }]
+        community: 'ComedyCorner', votes: 55, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Funniest Memes 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Gardening Tips for Spring', content: 'What are your best gardening tips for the spring season?',
-        community: 'GardeningGurus', votes: 45, media: [{ type: 'image', url: 'https://example.com/garden1.jpg', caption: 'Gardening Tips for Spring' }]
+        community: 'GardeningGurus', votes: 45, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Gardening Tips for Spring' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Tech Innovations to Watch in 2024', content: 'What are the most exciting tech innovations to watch out for in 2024?',
-        community: 'TechInnovators', votes: 115, media: [{ type: 'video', url: 'https://example.com/tech1.mp4', caption: 'Tech Innovations 2024' }]
+        community: 'TechInnovators', votes: 115, media: [{ type: 'video', url: require('../../assets/video/7102266-hd_1920_1080_30fps.mp4'), caption: 'Tech Innovations 2024' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Best Classic Movies to Rewatch', content: 'What are some classic movies that are worth rewatching?',
-        community: 'Cinephiles', votes: 85, media: [{ type: 'image', url: 'https://example.com/classicmovies1.jpg', caption: 'Best Classic Movies' }]
+        community: 'Cinephiles', votes: 85, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Best Classic Movies' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Travel Safety Tips for Solo Travelers', content: 'What are your best travel safety tips for solo travelers?',
-        community: 'TravelTales', votes: 60, media: [{ type: 'image', url: 'https://example.com/travelsafety1.jpg', caption: 'Travel Safety Tips' }]
+        community: 'TravelTales', votes: 60, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Travel Safety Tips' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Best Street Food Around the World', content: 'What are some of the best street food dishes you have tried around the world?',
-        community: 'FoodFanatics', votes: 70, media: [{ type: 'image', url: 'https://example.com/streetfood1.jpg', caption: 'Best Street Food' }]
+        community: 'FoodFanatics', votes: 70, media: [{ type: 'image', url: 'https://picsum.photos/id/1/200/300', caption: 'Best Street Food' }]
     },
     {
         ...MOCK_AUDITABLE_USER, title: 'Community Guidelines Reminder', content: 'Please remember to follow our community guidelines to keep our space safe and welcoming for everyone.',

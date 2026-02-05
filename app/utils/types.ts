@@ -194,7 +194,7 @@ export type MediaItem =
     | SponsorshipMedia;
 
 interface ImageMedia { type: 'image'; url: string; caption?: string; alt?: string; }
-interface VideoMedia { type: 'video'; url: string; caption?: string; poster?: string; }
+interface VideoMedia { type: 'video'; url: string | number; caption?: string; poster?: string; }
 interface TextMedia { type: 'text'; text: string; }
 interface PollMedia { type: 'poll'; question: string; options: string[]; results?: Record<string, number>; }
 interface QuoteMedia { type: 'quote'; text: string; author?: string; }
