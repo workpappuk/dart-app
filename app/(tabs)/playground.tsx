@@ -1,10 +1,10 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Button, Searchbar, Surface, Avatar, Chip, Divider, Title, Caption, Paragraph, useTheme, IconButton, Card } from 'react-native-paper';
 import { AppHeader } from '../components/core/AppHeader';
 import { DUMMY_POSTS } from '../utils/constants';
 import { Post } from '../utils/types';
-import { ScrollView, View, Text, Linking, Animated } from 'react-native';
+import { ScrollView, View, Text, Linking, Animated, useWindowDimensions, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
@@ -345,25 +345,208 @@ function MediaTable({ headers, rows }: { headers?: string[]; rows?: (string | nu
    );
 }
 
-function MediaSlideshow({ slides }: { slides?: { url?: string; caption?: string }[] }) {
+function MediaSlideshow({ slides, autoplay = true, intervalMs = 3500 }: { slides?: { url?: string; caption?: string }[]; autoplay?: boolean; intervalMs?: number }) {
+   const windowWidth = useWindowDimensions().width;
+   const theme = useTheme();
+   const [index, setIndex] = useState(0);
+   const scrollX = React.useRef(new Animated.Value(0)).current;
+   const scrollRef = useRef<any>(null);
+   const timerRef = useRef<number | null>(null);
+   const [paused, setPaused] = useState(false);
+   const [containerWidth, setContainerWidth] = useState<number>(windowWidth);
+
+   const startAutoplay = useCallback(() => {
+      if (!autoplay || paused || (slides?.length || 0) <= 1) return;
+      stopAutoplay();
+      // @ts-ignore - setInterval returns number in RN
+      timerRef.current = setInterval(() => {
+         const next = (index + 1) % (slides?.length || 1);
+         const pageW = containerWidth || windowWidth;
+         if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
+            scrollRef.current.scrollTo({ x: next * pageW, animated: true });
+         } else if ((scrollRef.current as any)?.getNode) {
+            (scrollRef.current as any).getNode().scrollTo({ x: next * pageW, animated: true });
+         }
+      }, intervalMs) as unknown as number;
+   }, [autoplay, paused, slides?.length, index, intervalMs, containerWidth]);
+
+   const stopAutoplay = useCallback(() => {
+      if (timerRef.current) {
+         clearInterval(timerRef.current as any);
+         timerRef.current = null;
+      }
+   }, []);
+
+   const togglePause = useCallback(() => {
+      if (paused) {
+         setPaused(false);
+         startAutoplay();
+      } else {
+         setPaused(true);
+         stopAutoplay();
+      }
+   }, [paused, startAutoplay, stopAutoplay]);
+
+   useEffect(() => {
+      startAutoplay();
+      return () => stopAutoplay();
+   }, [startAutoplay, stopAutoplay]);
+
+   if (!slides || slides.length === 0) return null;
+
    return (
-      <View style={{ marginTop: 4 }}>
-         {slides?.map((s, i) => (
-            <View key={i} style={{ marginBottom: 8 }}>
-               {s.caption && <Text>{s.caption}</Text>}
-               {s.url && <Image source={{ uri: s.url }} style={{ width: '100%', height: 180, marginTop: 6 }} />}
-            </View>
-         ))}
+      <View style={{ marginTop: 4 }} onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
+         <Animated.ScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={Animated.event(
+               [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+               { useNativeDriver: true }
+            )}
+            onMomentumScrollEnd={e => setIndex(Math.round(e.nativeEvent.contentOffset.x / (containerWidth || windowWidth)))}
+            onScrollBeginDrag={() => stopAutoplay()}
+            onScrollEndDrag={() => startAutoplay()}
+            scrollEventThrottle={16}
+         >
+            {slides.map((s, i) => (
+               <Pressable key={i} onPress={() => togglePause()} accessibilityRole="button">
+                  <View style={{ width: containerWidth, alignItems: 'center', justifyContent: 'center' }}>
+                     {s.url && <Image source={{ uri: s.url }} style={{ width: (containerWidth || windowWidth) - 32, height: 180, borderRadius: 8, marginHorizontal: 16 }} contentFit="cover" />}
+                     {s.caption && <Caption style={{ marginTop: 6 }}>{s.caption}</Caption>}
+                  </View>
+               </Pressable>
+            ))}
+         </Animated.ScrollView>
+
+         <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8 }}>
+            {slides.map((_, i) => {
+               const pageW = containerWidth || windowWidth;
+               const inputRange = [(i - 1) * pageW, i * pageW, (i + 1) * pageW];
+               const scale = scrollX.interpolate({ inputRange, outputRange: [1, 1.6, 1], extrapolate: 'clamp' });
+               const opacity = scrollX.interpolate({ inputRange, outputRange: [0.6, 1, 0.6], extrapolate: 'clamp' });
+               return (
+                  <Pressable key={i} onPress={() => {
+                     // jump to tapped slide and resume autoplay
+                     const pageW2 = containerWidth || windowWidth;
+                     if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
+                        scrollRef.current.scrollTo({ x: i * pageW2, animated: true });
+                     } else if ((scrollRef.current as any)?.getNode) {
+                        (scrollRef.current as any).getNode().scrollTo({ x: i * pageW2, animated: true });
+                     }
+                     setIndex(i);
+                     setPaused(false);
+                     startAutoplay();
+                  }} accessibilityRole="button">
+                     <Animated.View style={{ width: 8, height: 8, borderRadius: 4, margin: 4, backgroundColor: theme.colors.primary, transform: [{ scale }], opacity }} />
+                  </Pressable>
+               );
+            })}
+         </View>
       </View>
    );
 }
 
-function MediaGallery({ images }: { images?: { url?: string; caption?: string }[] }) {
+function MediaGallery({ images, autoplay = true, intervalMs = 3500 }: { images?: { url?: string; caption?: string }[]; autoplay?: boolean; intervalMs?: number }) {
+   const windowWidth = useWindowDimensions().width;
+   const theme = useTheme();
+   const [index, setIndex] = useState(0);
+   const scrollX = React.useRef(new Animated.Value(0)).current;
+   const scrollRef = useRef<any>(null);
+   const timerRef = useRef<number | null>(null);
+
+   const [paused, setPaused] = useState(false);
+   const [containerWidth, setContainerWidth] = useState<number>(windowWidth);
+
+   const startAutoplay = useCallback(() => {
+      if (!autoplay || paused || (images?.length || 0) <= 1) return;
+      stopAutoplay();
+      // @ts-ignore
+      timerRef.current = setInterval(() => {
+         const next = (index + 1) % (images?.length || 1);
+         const pageW = containerWidth || windowWidth;
+         if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
+            scrollRef.current.scrollTo({ x: next * pageW, animated: true });
+         } else if ((scrollRef.current as any)?.getNode) {
+            (scrollRef.current as any).getNode().scrollTo({ x: next * pageW, animated: true });
+         }
+      }, intervalMs) as unknown as number;
+   }, [autoplay, paused, images?.length, index, intervalMs, containerWidth]);
+
+   const stopAutoplay = useCallback(() => {
+      if (timerRef.current) {
+         clearInterval(timerRef.current as any);
+         timerRef.current = null;
+      }
+   }, []);
+
+   const togglePause = useCallback(() => {
+      if (paused) {
+         setPaused(false);
+         startAutoplay();
+      } else {
+         setPaused(true);
+         stopAutoplay();
+      }
+   }, [paused, startAutoplay, stopAutoplay]);
+
+   useEffect(() => {
+      startAutoplay();
+      return () => stopAutoplay();
+   }, [startAutoplay, stopAutoplay]);
+
+   if (!images || images.length === 0) return null;
+
    return (
-      <View style={{ marginTop: 4 }}>
-         {images?.map((img, i) => (
-            <Image key={i} source={{ uri: img.url }} style={{ width: '100%', height: 150, marginBottom: 8 }} />
-         ))}
+      <View style={{ marginTop: 4 }} onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
+         <Animated.ScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={Animated.event(
+               [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+               { useNativeDriver: true }
+            )}
+            onMomentumScrollEnd={e => setIndex(Math.round(e.nativeEvent.contentOffset.x / (containerWidth || windowWidth)))}
+            onScrollBeginDrag={() => stopAutoplay()}
+            onScrollEndDrag={() => startAutoplay()}
+            scrollEventThrottle={16}
+         >
+            {images.map((img, i) => (
+               <Pressable key={i} onPress={() => togglePause()} accessibilityRole="button">
+                  <View style={{ width: containerWidth, alignItems: 'center', justifyContent: 'center' }}>
+                     {img.url && <Image source={{ uri: img.url }} style={{ width: (containerWidth || windowWidth) - 48, height: 150, borderRadius: 8, marginHorizontal: 16 }} contentFit="cover" />}
+                     {img.caption && <Caption style={{ marginTop: 6 }}>{img.caption}</Caption>}
+                  </View>
+               </Pressable>
+            ))}
+         </Animated.ScrollView>
+
+         <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8 }}>
+            {images.map((_, i) => {
+               const pageW = containerWidth || windowWidth;
+               const inputRange = [(i - 1) * pageW, i * pageW, (i + 1) * pageW];
+               const scale = scrollX.interpolate({ inputRange, outputRange: [1, 1.6, 1], extrapolate: 'clamp' });
+               const opacity = scrollX.interpolate({ inputRange, outputRange: [0.6, 1, 0.6], extrapolate: 'clamp' });
+               return (
+                  <Pressable key={i} onPress={() => {
+                     const pageW2 = containerWidth || windowWidth;
+                     if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
+                        scrollRef.current.scrollTo({ x: i * pageW2, animated: true });
+                     } else if ((scrollRef.current as any)?.getNode) {
+                        (scrollRef.current as any).getNode().scrollTo({ x: i * pageW2, animated: true });
+                     }
+                     setIndex(i);
+                     setPaused(false);
+                     startAutoplay();
+                  }} accessibilityRole="button">
+                     <Animated.View style={{ width: 8, height: 8, borderRadius: 4, margin: 4, backgroundColor: theme.colors.primary, transform: [{ scale }], opacity }} />
+                  </Pressable>
+               );
+            })}
+         </View>
       </View>
    );
 }
