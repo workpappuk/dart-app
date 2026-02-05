@@ -28,7 +28,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="playground"
         options={{
           title: 'Playgrounds',
           tabBarIcon: ({ color, size }) => (

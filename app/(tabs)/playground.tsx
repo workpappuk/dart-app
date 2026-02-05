@@ -5,14 +5,14 @@ import { AppHeader } from '../components/core/AppHeader';
 
 
 
-export default function ExploreScreen() {
+export default function PlaygroundsScreen() {
 
    useEffect(() => {
    }, []);
 
    return (
       <>
-         
+         <AppHeader title="Playgrounds" />
       </>
    );
 }

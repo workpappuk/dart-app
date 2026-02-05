@@ -2,15 +2,15 @@ export const SESSION_TOKEN_KEY = 'session_token';
 export const AuthorizationKey = "Authorization";
 
 export const FeatureFlags = {
-    ENABLE_OFFLINE_MODE: true,
+    ENABLE_OFFLINE_MODE: false,
     ENABLE_COMMUNITY_CREATION: true,
     ENABLE_POST_CREATION: true,
     ENABLE_VOTE_SYSTEM: true,
     ENABLE_COMMENTS: true,
 };
 
-// export const API_BASE_URL = 'https://jubilant-spork-4jvq9vw99gpr3q746-8080.app.github.dev';
-export const API_BASE_URL = 'http://localhost:8080';
+export const API_BASE_URL = 'https://jubilant-spork-4jvq9vw99gpr3q746-8080.app.github.dev';
+// export const API_BASE_URL = 'http://localhost:8080';
 
 
 export const INTERESTING_AREAS = [
