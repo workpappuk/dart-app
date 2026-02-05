@@ -44,8 +44,8 @@ export default function ListCommunities(
                 const pageData = lastPage?.data;
                 if (!pageData) return undefined;
                 // Try both 'page' and 'number' for current page, and 'totalPages' for total
-                const currentPage = typeof (pageData as any).page === 'number' ? (pageData as any).page : (typeof (pageData as any).number === 'number' ? (pageData as any).number : 0);
-                const totalPages = typeof (pageData as any).totalPages === 'number' ? (pageData as any).totalPages : 1;
+                const currentPage = typeof pageData?.page === 'number' ? pageData.page : 0;
+                const totalPages = typeof pageData?.totalPages === 'number' ? pageData.totalPages : 1;
                 if (currentPage + 1 < totalPages) {
                     return currentPage + 1;
                 }

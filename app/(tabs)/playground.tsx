@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Button, Searchbar, Surface, Avatar, Chip, Divider, Title, Caption, Paragraph, useTheme, IconButton, Card } from 'react-native-paper';
 import { AppHeader } from '../components/core/AppHeader';
 import { DUMMY_POSTS } from '../utils/constants';
@@ -9,6 +9,10 @@ import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import type { MediaItem } from '../utils/types';
+
+type CollaborationMedia = Extract<MediaItem, { type: 'collaboration' }>;
+type ChallengeMedia = Extract<MediaItem, { type: 'challenge' }>;
+
 
 export default function PlaygroundsScreen() {
    const [searchQuery, setSearchQuery] = React.useState('');
@@ -95,7 +99,7 @@ function Posts({ searchQuery }: { searchQuery: string }) {
                         {post.media.map((mediaItem, index) => (
                            <View key={index} style={{ marginBottom: 12 }}>
                               <MediaItemRenderer mediaItem={mediaItem} />
-                              {(mediaItem as any).caption && <Caption style={{ marginTop: 4 }}>{(mediaItem as any).caption}</Caption>}
+                              {'caption' in mediaItem && mediaItem.caption && <Caption style={{ marginTop: 4 }}>{mediaItem.caption}</Caption>}
                            </View>
                         ))}
                      </View>
@@ -115,12 +119,12 @@ function Posts({ searchQuery }: { searchQuery: string }) {
 }
 
 
-function VoteControls({ postId, votes, userVote, onVote, vertical }: { postId: string; votes: number; userVote: number; onVote: (postId: string, vote: -1 | 0 | 1) => void; vertical?: boolean }) {
+const VoteControls: React.FC<{ postId: string; votes: number; userVote: number; onVote: (postId: string, vote: -1 | 0 | 1) => void; vertical?: boolean }> = React.memo(({ postId, votes, userVote, onVote, vertical }) => {
    const theme = useTheme();
-   const scale = React.useRef(new Animated.Value(1)).current;
-   const prev = React.useRef(votes);
+   const scale = useRef(new Animated.Value(1)).current;
+   const prev = useRef(votes);
 
-   React.useEffect(() => {
+   useEffect(() => {
       if (prev.current !== votes) {
          Animated.sequence([
             Animated.timing(scale, { toValue: 1.15, duration: 120, useNativeDriver: true }),
@@ -131,13 +135,16 @@ function VoteControls({ postId, votes, userVote, onVote, vertical }: { postId: s
    }, [votes, scale]);
 
    const isVertical = !!vertical;
+   const handleUp = useCallback(() => onVote(postId, userVote === 1 ? 0 : 1), [onVote, postId, userVote]);
+   const handleDown = useCallback(() => onVote(postId, userVote === -1 ? 0 : -1), [onVote, postId, userVote]);
+
    if (isVertical) {
       return (
          <View style={{ width: 56, alignItems: 'center' }}>
             <IconButton
                icon="thumb-up"
                size={28}
-               onPress={() => onVote(postId, userVote === 1 ? 0 : 1)}
+               onPress={handleUp}
                iconColor={userVote === 1 ? '#fff' : theme.colors.onBackground}
                containerColor={userVote === 1 ? theme.colors.primary : 'transparent'}
                accessibilityLabel="Upvote"
@@ -146,7 +153,7 @@ function VoteControls({ postId, votes, userVote, onVote, vertical }: { postId: s
             <IconButton
                icon="thumb-down"
                size={28}
-               onPress={() => onVote(postId, userVote === -1 ? 0 : -1)}
+               onPress={handleDown}
                iconColor={userVote === -1 ? '#fff' : theme.colors.onBackground}
                containerColor={userVote === -1 ? theme.colors.primary : 'transparent'}
                accessibilityLabel="Downvote"
@@ -160,7 +167,7 @@ function VoteControls({ postId, votes, userVote, onVote, vertical }: { postId: s
          <IconButton
             icon="thumb-up"
             size={26}
-            onPress={() => onVote(postId, userVote === 1 ? 0 : 1)}
+            onPress={handleUp}
             iconColor={userVote === 1 ? '#fff' : theme.colors.onBackground}
             containerColor={userVote === 1 ? theme.colors.primary : 'transparent'}
             accessibilityLabel="Upvote"
@@ -169,16 +176,16 @@ function VoteControls({ postId, votes, userVote, onVote, vertical }: { postId: s
          <IconButton
             icon="thumb-down"
             size={26}
-            onPress={() => onVote(postId, userVote === -1 ? 0 : -1)}
+            onPress={handleDown}
             iconColor={userVote === -1 ? '#fff' : theme.colors.onBackground}
             containerColor={userVote === -1 ? theme.colors.primary : 'transparent'}
             accessibilityLabel="Downvote"
          />
       </View>
    );
-}
+}, (p, n) => p.votes === n.votes && p.userVote === n.userVote && p.vertical === n.vertical);
 
-function MediaVideo({ url }: { url: string | number }) {
+const MediaVideo = React.memo(({ url }: { url: string | number }) => {
    const source: any = typeof url === 'number' ? url : { uri: url };
    const player = useVideoPlayer(source, player => {
       player.loop = true;
@@ -191,72 +198,73 @@ function MediaVideo({ url }: { url: string | number }) {
    return (
       <VideoView player={player} allowsFullscreen allowsPictureInPicture style={{ width: '100%', height: 200 }} />
    );
-}
+}, (p, n) => p.url === n.url);
 
-function MediaImage({ url }: { url: string }) {
-   return <Image source={{ uri: url }} style={{ width: '100%', height: 200 }} />;
-}
+const MediaImage = React.memo(({ url }: { url: string }) => {
+   const style = useMemo(() => ({ height: 200, alignSelf: 'stretch' as const }), []);
+   return <Image source={{ uri: url }} style={style} contentFit="cover" />;
+}, (p, n) => p.url === n.url);
 
-function MediaText({ text }: { text: string }) {
+const MediaText = React.memo(({ text }: { text: string }) => {
    return <Text style={{ marginTop: 4 }}>{text}</Text>;
-}
+}, (p, n) => p.text === n.text);
 
-function MediaPoll({ question, options }: { question: string; options: string[] }) {
+const MediaPoll = React.memo(({ question, options }: { question: string; options: string[] }) => {
    const theme = useTheme();
+   const renderOption = useCallback((option: string, index: number) => (
+      <Button key={index} mode="outlined" style={{ marginTop: 4 }} color={theme.colors.primary}>{option}</Button>
+   ), [theme.colors.primary]);
    return (
       <View style={{ marginTop: 4 }}>
          <Text>{question}</Text>
-         {options.map((option, index) => (
-            <Button key={index} mode="outlined" style={{ marginTop: 4 }} color={theme.colors.primary}>
-               {option}
-            </Button>
-         ))}
+         {options.map(renderOption)}
       </View>
    );
-}
+}, (p, n) => p.question === n.question && p.options === n.options);
 
-function MediaQuote({ quote, author }: { quote: string; author: string }) {
+const MediaQuote = React.memo(({ quote, author }: { quote: string; author: string }) => {
    return (
       <View style={{ marginTop: 4, padding: 12, backgroundColor: '#f0f0f0', borderRadius: 8 }}>
-         <Text style={{ fontStyle: 'italic' }}>"{quote}"</Text>
+         <Text style={{ fontStyle: 'italic' }}>&quot;{quote}&quot;</Text>
          {author && <Text style={{ marginTop: 4, textAlign: 'right', fontWeight: 'bold' }}>- {author}</Text>}
       </View>
    );
+}, (p, n) => p.quote === n.quote && p.author === n.author);
 
-}
-
-function MediaCode({ code, language }: { code: string; language?: string }) {
+const MediaCode = React.memo(({ code, language }: { code: string; language?: string }) => {
    return (
       <View style={{ marginTop: 4, padding: 12, backgroundColor: '#e0e0e0', borderRadius: 8 }}>
          {language && <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>{language}</Text>}
          <Text style={{ fontFamily: 'monospace' }}>{code}</Text>
       </View>
    );
-}
+}, (p, n) => p.code === n.code && p.language === n.language);
 
-function MediaFile({ url, caption }: { url?: string; caption?: string }) {
+const MediaFile = React.memo(({ url, caption }: { url?: string; caption?: string }) => {
    const theme = useTheme();
+   const open = useCallback(() => url && Linking.openURL(url), [url]);
    if (!url) return null;
    return (
       <View style={{ marginTop: 4 }}>
          {caption && <Text>{caption}</Text>}
-         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }} color={theme.colors.primary}>Open file</Button>
+         <Button mode="outlined" onPress={open} style={{ marginTop: 8 }} color={theme.colors.primary}>Open file</Button>
       </View>
    );
-}
+}, (p, n) => p.url === n.url && p.caption === n.caption);
 
-function MediaAudio({ url, caption }: { url?: string; caption?: string }) {
+const MediaAudio = React.memo(({ url, caption }: { url?: string; caption?: string }) => {
    const theme = useTheme();
+   const open = useCallback(() => url && Linking.openURL(url), [url]);
    if (!url) return null;
    return (
       <View style={{ marginTop: 4 }}>
          {caption && <Text>{caption}</Text>}
-         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }} color={theme.colors.primary}>Play audio</Button>
+         <Button mode="outlined" onPress={open} style={{ marginTop: 8 }} color={theme.colors.primary}>Play audio</Button>
       </View>
    );
-}
+}, (p, n) => p.url === n.url && p.caption === n.caption);
 
-function MediaEvent({ title, date, description }: { title?: string; date?: string; description?: string }) {
+const MediaEvent = React.memo(({ title, date, description }: { title?: string; date?: string; description?: string }) => {
    return (
       <View style={{ marginTop: 4 }}>
          {title && <Text style={{ fontWeight: 'bold' }}>{title}</Text>}
@@ -264,118 +272,132 @@ function MediaEvent({ title, date, description }: { title?: string; date?: strin
          {description && <Text style={{ marginTop: 4 }}>{description}</Text>}
       </View>
    );
-}
+}, (p, n) => p.title === n.title && p.date === n.date && p.description === n.description);
 
-function MediaLocation({ latitude, longitude, caption }: { latitude?: number; longitude?: number; caption?: string }) {
+const MediaLocation = React.memo(({ latitude, longitude, caption }: { latitude?: number; longitude?: number; caption?: string }) => {
    const theme = useTheme();
+   const open = useCallback(() => {
+      if (latitude == null || longitude == null) return;
+      const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+      Linking.openURL(url);
+   }, [latitude, longitude]);
    if (latitude == null || longitude == null) return null;
-   const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
    return (
       <View style={{ marginTop: 4 }}>
          {caption && <Text>{caption}</Text>}
-         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }} color={theme.colors.primary}>Open map</Button>
+         <Button mode="outlined" onPress={open} style={{ marginTop: 8 }} color={theme.colors.primary}>Open map</Button>
       </View>
    );
-}
+}, (p, n) => p.latitude === n.latitude && p.longitude === n.longitude && p.caption === n.caption);
 
-function MediaProduct({ name, price, url, caption }: { name?: string; price?: number; url?: string; caption?: string }) {
+const MediaProduct = React.memo(({ name, price, url, caption }: { name?: string; price?: number; url?: string; caption?: string }) => {
    const theme = useTheme();
+   const open = useCallback(() => url && Linking.openURL(url), [url]);
    return (
       <View style={{ marginTop: 4 }}>
          {name && <Text style={{ fontWeight: 'bold' }}>{name}</Text>}
          {typeof price === 'number' && <Text>{`$${price}`}</Text>}
          {caption && <Text style={{ marginTop: 4 }}>{caption}</Text>}
-         {url && <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }} color={theme.colors.primary}>View product</Button>}
+         {url && <Button mode="outlined" onPress={open} style={{ marginTop: 8 }} color={theme.colors.primary}>View product</Button>}
       </View>
    );
-}
+}, (p, n) => p.name === n.name && p.price === n.price && p.url === n.url && p.caption === n.caption);
 
-function MediaProfile({ username, displayName, avatarUrl, caption }: { username?: string; displayName?: string; avatarUrl?: string; caption?: string }) {
+const MediaProfile = React.memo(({ username, displayName, avatarUrl, caption }: { username?: string; displayName?: string; avatarUrl?: string; caption?: string }) => {
    return (
       <View style={{ marginTop: 4 }}>
          <Text style={{ fontWeight: 'bold' }}>{displayName || username}</Text>
          {caption && <Text>{caption}</Text>}
       </View>
    );
-}
+}, (p, n) => p.username === n.username && p.displayName === n.displayName && p.avatarUrl === n.avatarUrl && p.caption === n.caption);
 
-function MediaAnnouncement({ title, content }: { title?: string; content?: string }) {
+const MediaAnnouncement = React.memo(({ title, content }: { title?: string; content?: string }) => {
    return (
       <View style={{ marginTop: 4, padding: 8, backgroundColor: '#fff3cd', borderRadius: 6 }}>
          {title && <Text style={{ fontWeight: 'bold' }}>{title}</Text>}
          {content && <Text style={{ marginTop: 4 }}>{content}</Text>}
       </View>
    );
-}
+}, (p, n) => p.title === n.title && p.content === n.content);
 
-function MediaBadge({ name, description, imageUrl }: { name?: string; description?: string; imageUrl?: string }) {
+const MediaBadge = React.memo(({ name, description, imageUrl }: { name?: string; description?: string; imageUrl?: string }) => {
    return (
       <View style={{ marginTop: 4 }}>
          {name && <Text style={{ fontWeight: 'bold' }}>{name}</Text>}
          {description && <Text>{description}</Text>}
       </View>
    );
-}
+}, (p, n) => p.name === n.name && p.description === n.description && p.imageUrl === n.imageUrl);
 
-function MediaSimpleList({ title, items }: { title?: string; items?: string[] }) {
+const MediaSimpleList = React.memo(({ title, items }: { title?: string; items?: string[] }) => {
    return (
       <View style={{ marginTop: 4 }}>
          {title && <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>{title}</Text>}
          {items?.map((it, i) => <Text key={i}>• {it}</Text>)}
       </View>
    );
-}
+}, (p, n) => p.title === n.title && p.items === n.items);
 
-function MediaInfographic({ url, caption }: { url?: string; caption?: string }) {
+const MediaInfographic = React.memo(({ url, caption }: { url?: string; caption?: string }) => {
    if (!url) return null;
    return (
       <View style={{ marginTop: 4 }}>
          {caption && <Text>{caption}</Text>}
-         <Image source={{ uri: url }} style={{ width: '100%', height: 200, marginTop: 8 }} />
+         <Image source={{ uri: url }} style={{ width: '100%', height: 200, marginTop: 8 }} contentFit="contain" />
       </View>
    );
-}
+}, (p, n) => p.url === n.url && p.caption === n.caption);
 
-function MediaTable({ headers, rows }: { headers?: string[]; rows?: (string | number)[][] }) {
+const MediaTable = React.memo(({ headers, rows }: { headers?: string[]; rows?: (string | number)[][] }) => {
    return (
       <View style={{ marginTop: 4 }}>
          {headers && <Text style={{ fontWeight: 'bold' }}>{headers.join(' | ')}</Text>}
          {rows?.map((r, i) => <Text key={i}>{r.join(' | ')}</Text>)}
       </View>
    );
-}
+}, (p, n) => p.headers === n.headers && p.rows === n.rows);
 
-function MediaSlideshow({ slides, autoplay = true, intervalMs = 3500 }: { slides?: { url?: string; caption?: string }[]; autoplay?: boolean; intervalMs?: number }) {
+const MediaSlideshow = React.memo(function MediaSlideshow({ slides, autoplay = true, intervalMs = 3500 }: { slides?: { url?: string; caption?: string }[]; autoplay?: boolean; intervalMs?: number }) {
    const windowWidth = useWindowDimensions().width;
    const theme = useTheme();
    const [index, setIndex] = useState(0);
    const scrollX = React.useRef(new Animated.Value(0)).current;
-   const scrollRef = useRef<any>(null);
-   const timerRef = useRef<number | null>(null);
+   const scrollRef = useRef<ScrollView | null>(null);
+   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
    const [paused, setPaused] = useState(false);
    const [containerWidth, setContainerWidth] = useState<number>(windowWidth);
+   const indexRef = useRef<number>(index);
 
-   const startAutoplay = useCallback(() => {
-      if (!autoplay || paused || (slides?.length || 0) <= 1) return;
-      stopAutoplay();
-      // @ts-ignore - setInterval returns number in RN
-      timerRef.current = setInterval(() => {
-         const next = (index + 1) % (slides?.length || 1);
-         const pageW = containerWidth || windowWidth;
-         if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
-            scrollRef.current.scrollTo({ x: next * pageW, animated: true });
-         } else if ((scrollRef.current as any)?.getNode) {
-            (scrollRef.current as any).getNode().scrollTo({ x: next * pageW, animated: true });
-         }
-      }, intervalMs) as unknown as number;
-   }, [autoplay, paused, slides?.length, index, intervalMs, containerWidth]);
+   useEffect(() => { indexRef.current = index; }, [index]);
 
    const stopAutoplay = useCallback(() => {
       if (timerRef.current) {
-         clearInterval(timerRef.current as any);
+         clearTimeout(timerRef.current);
          timerRef.current = null;
       }
    }, []);
+
+   const scheduleNext = useCallback(() => {
+      if (timerRef.current) return;
+      timerRef.current = setTimeout(() => {
+         timerRef.current = null;
+         if (paused || !autoplay || (slides?.length || 0) <= 1) return;
+         const next = (indexRef.current + 1) % (slides?.length || 1);
+         const pageW = containerWidth || windowWidth;
+         if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
+            scrollRef.current.scrollTo({ x: next * pageW, animated: true });
+         }
+         // schedule another
+         scheduleNext();
+      }, intervalMs);
+   }, [autoplay, paused, slides?.length, intervalMs, containerWidth, windowWidth]);
+
+   const startAutoplay = useCallback(() => {
+      stopAutoplay();
+      if (!autoplay || paused || (slides?.length || 0) <= 1) return;
+      scheduleNext();
+   }, [autoplay, paused, slides?.length, scheduleNext, stopAutoplay]);
 
    const togglePause = useCallback(() => {
       if (paused) {
@@ -401,6 +423,8 @@ function MediaSlideshow({ slides, autoplay = true, intervalMs = 3500 }: { slides
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
+            removeClippedSubviews
+            decelerationRate="fast"
             onScroll={Animated.event(
                [{ nativeEvent: { contentOffset: { x: scrollX } } }],
                { useNativeDriver: true }
@@ -410,14 +434,21 @@ function MediaSlideshow({ slides, autoplay = true, intervalMs = 3500 }: { slides
             onScrollEndDrag={() => startAutoplay()}
             scrollEventThrottle={16}
          >
-            {slides.map((s, i) => (
-               <Pressable key={i} onPress={() => togglePause()} accessibilityRole="button">
-                  <View style={{ width: containerWidth, alignItems: 'center', justifyContent: 'center' }}>
-                     {s.url && <Image source={{ uri: s.url }} style={{ width: (containerWidth || windowWidth) - 32, height: 180, borderRadius: 8, marginHorizontal: 16 }} contentFit="cover" />}
-                     {s.caption && <Caption style={{ marginTop: 6 }}>{s.caption}</Caption>}
-                  </View>
-               </Pressable>
-            ))}
+            {slides.map((s, i) => {
+               const visible = Math.abs(i - index) <= 1;
+               return (
+                  <Pressable key={i} onPress={() => togglePause()} accessibilityRole="button">
+                     <View style={{ width: containerWidth, alignItems: 'center', justifyContent: 'center' }}>
+                        {visible ? (
+                           s.url && <Image source={{ uri: s.url }} style={{ width: (containerWidth || windowWidth) - 32, height: 180, borderRadius: 8, marginHorizontal: 16 }} contentFit="cover" />
+                        ) : (
+                           <View style={{ width: (containerWidth || windowWidth) - 32, height: 180, borderRadius: 8, marginHorizontal: 16, backgroundColor: '#f6f6f6' }} />
+                        )}
+                        {s.caption && <Caption style={{ marginTop: 6 }}>{s.caption}</Caption>}
+                     </View>
+                  </Pressable>
+               );
+            })}
          </Animated.ScrollView>
 
          <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8 }}>
@@ -431,9 +462,7 @@ function MediaSlideshow({ slides, autoplay = true, intervalMs = 3500 }: { slides
                      // jump to tapped slide and resume autoplay
                      const pageW2 = containerWidth || windowWidth;
                      if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
-                        scrollRef.current.scrollTo({ x: i * pageW2, animated: true });
-                     } else if ((scrollRef.current as any)?.getNode) {
-                        (scrollRef.current as any).getNode().scrollTo({ x: i * pageW2, animated: true });
+                        scrollRef.current.scrollTo({ x: i * pageW, animated: true });
                      }
                      setIndex(i);
                      setPaused(false);
@@ -446,40 +475,48 @@ function MediaSlideshow({ slides, autoplay = true, intervalMs = 3500 }: { slides
          </View>
       </View>
    );
-}
+}, (p, n) => p.slides === n.slides && p.autoplay === n.autoplay && p.intervalMs === n.intervalMs);
 
-function MediaGallery({ images, autoplay = true, intervalMs = 3500 }: { images?: { url?: string; caption?: string }[]; autoplay?: boolean; intervalMs?: number }) {
+const MediaGallery = React.memo(function MediaGallery({ images, autoplay = true, intervalMs = 3500 }: { images?: { url?: string; caption?: string }[]; autoplay?: boolean; intervalMs?: number }) {
    const windowWidth = useWindowDimensions().width;
    const theme = useTheme();
    const [index, setIndex] = useState(0);
    const scrollX = React.useRef(new Animated.Value(0)).current;
-   const scrollRef = useRef<any>(null);
-   const timerRef = useRef<number | null>(null);
+   const scrollRef = useRef<ScrollView | null>(null);
+   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
    const [paused, setPaused] = useState(false);
    const [containerWidth, setContainerWidth] = useState<number>(windowWidth);
+   const indexRef = useRef<number>(index);
 
-   const startAutoplay = useCallback(() => {
-      if (!autoplay || paused || (images?.length || 0) <= 1) return;
-      stopAutoplay();
-      // @ts-ignore
-      timerRef.current = setInterval(() => {
-         const next = (index + 1) % (images?.length || 1);
-         const pageW = containerWidth || windowWidth;
-         if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
-            scrollRef.current.scrollTo({ x: next * pageW, animated: true });
-         } else if ((scrollRef.current as any)?.getNode) {
-            (scrollRef.current as any).getNode().scrollTo({ x: next * pageW, animated: true });
-         }
-      }, intervalMs) as unknown as number;
-   }, [autoplay, paused, images?.length, index, intervalMs, containerWidth]);
+   useEffect(() => { indexRef.current = index; }, [index]);
 
    const stopAutoplay = useCallback(() => {
       if (timerRef.current) {
-         clearInterval(timerRef.current as any);
+         clearTimeout(timerRef.current);
          timerRef.current = null;
       }
    }, []);
+
+   const scheduleNext = useCallback(() => {
+      if (timerRef.current) return;
+      timerRef.current = setTimeout(() => {
+         timerRef.current = null;
+         if (paused || !autoplay || (images?.length || 0) <= 1) return;
+         const next = (indexRef.current + 1) % (images?.length || 1);
+         const pageW = containerWidth || windowWidth;
+         if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
+            scrollRef.current.scrollTo({ x: next * pageW, animated: true });
+         }
+         scheduleNext();
+      }, intervalMs);
+   }, [autoplay, paused, images?.length, intervalMs, containerWidth, windowWidth]);
+
+   const startAutoplay = useCallback(() => {
+      stopAutoplay();
+      if (!autoplay || paused || (images?.length || 0) <= 1) return;
+      scheduleNext();
+   }, [autoplay, paused, images?.length, scheduleNext, stopAutoplay]);
 
    const togglePause = useCallback(() => {
       if (paused) {
@@ -505,6 +542,8 @@ function MediaGallery({ images, autoplay = true, intervalMs = 3500 }: { images?:
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
+            removeClippedSubviews
+            decelerationRate="fast"
             onScroll={Animated.event(
                [{ nativeEvent: { contentOffset: { x: scrollX } } }],
                { useNativeDriver: true }
@@ -514,14 +553,21 @@ function MediaGallery({ images, autoplay = true, intervalMs = 3500 }: { images?:
             onScrollEndDrag={() => startAutoplay()}
             scrollEventThrottle={16}
          >
-            {images.map((img, i) => (
-               <Pressable key={i} onPress={() => togglePause()} accessibilityRole="button">
-                  <View style={{ width: containerWidth, alignItems: 'center', justifyContent: 'center' }}>
-                     {img.url && <Image source={{ uri: img.url }} style={{ width: (containerWidth || windowWidth) - 48, height: 150, borderRadius: 8, marginHorizontal: 16 }} contentFit="cover" />}
-                     {img.caption && <Caption style={{ marginTop: 6 }}>{img.caption}</Caption>}
-                  </View>
-               </Pressable>
-            ))}
+            {images.map((img, i) => {
+               const visible = Math.abs(i - index) <= 1;
+               return (
+                  <Pressable key={i} onPress={() => togglePause()} accessibilityRole="button">
+                     <View style={{ width: containerWidth, alignItems: 'center', justifyContent: 'center' }}>
+                        {visible ? (
+                           img.url && <Image source={{ uri: img.url }} style={{ width: (containerWidth || windowWidth) - 48, height: 150, borderRadius: 8, marginHorizontal: 16 }} contentFit="cover" />
+                        ) : (
+                           <View style={{ width: (containerWidth || windowWidth) - 48, height: 150, borderRadius: 8, marginHorizontal: 16, backgroundColor: '#f6f6f6' }} />
+                        )}
+                        {img.caption && <Caption style={{ marginTop: 6 }}>{img.caption}</Caption>}
+                     </View>
+                  </Pressable>
+               );
+            })}
          </Animated.ScrollView>
 
          <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8 }}>
@@ -535,8 +581,6 @@ function MediaGallery({ images, autoplay = true, intervalMs = 3500 }: { images?:
                      const pageW2 = containerWidth || windowWidth;
                      if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
                         scrollRef.current.scrollTo({ x: i * pageW2, animated: true });
-                     } else if ((scrollRef.current as any)?.getNode) {
-                        (scrollRef.current as any).getNode().scrollTo({ x: i * pageW2, animated: true });
                      }
                      setIndex(i);
                      setPaused(false);
@@ -549,9 +593,10 @@ function MediaGallery({ images, autoplay = true, intervalMs = 3500 }: { images?:
          </View>
       </View>
    );
-}
+}, (p, n) => p.images === n.images && p.autoplay === n.autoplay && p.intervalMs === n.intervalMs);
 
-function MediaFAQ({ faqs }: { faqs?: { question: string; answer: string }[] }) {
+
+const MediaFAQ = React.memo(({ faqs }: { faqs?: { question: string; answer: string }[] }) => {
    return (
       <View style={{ marginTop: 4 }}>
          {faqs?.map((f, i) => (
@@ -562,20 +607,21 @@ function MediaFAQ({ faqs }: { faqs?: { question: string; answer: string }[] }) {
          ))}
       </View>
    );
-}
+}, (p, n) => p.faqs === n.faqs);
 
-function MediaLink({ url, caption }: { url?: string; caption?: string }) {
+const MediaLink = React.memo(({ url, caption }: { url?: string; caption?: string }) => {
    const theme = useTheme();
+   const open = useCallback(() => url && Linking.openURL(url), [url]);
    if (!url) return null;
    return (
       <View style={{ marginTop: 4 }}>
          {caption && <Text>{caption}</Text>}
-         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }} color={theme.colors.primary}>Open link</Button>
+         <Button mode="outlined" onPress={open} style={{ marginTop: 8 }} color={theme.colors.primary}>Open link</Button>
       </View>
    );
-}
+}, (p, n) => p.url === n.url && p.caption === n.caption);
 
-function MediaItemRenderer({ mediaItem }: { mediaItem: MediaItem }) {
+const MediaItemRenderer = React.memo(({ mediaItem }: { mediaItem: MediaItem }) => {
    switch (mediaItem.type) {
       case 'image':
          return <MediaImage url={mediaItem.url} />;
@@ -591,66 +637,69 @@ function MediaItemRenderer({ mediaItem }: { mediaItem: MediaItem }) {
       case 'code':
          return <MediaCode code={mediaItem.code || ''} language={mediaItem.language} />;
       case 'file':
-         return <MediaFile url={(mediaItem as any).url} caption={(mediaItem as any).caption} />;
+         return <MediaFile url={mediaItem.url} caption={mediaItem.caption} />;
       case 'audio':
-         return <MediaAudio url={(mediaItem as any).url} caption={(mediaItem as any).caption} />;
+         return <MediaAudio url={mediaItem.url} caption={mediaItem.caption} />;
       case 'event':
-         return <MediaEvent title={(mediaItem as any).title} date={(mediaItem as any).date} description={(mediaItem as any).description} />;
+         return <MediaEvent title={mediaItem.title} date={mediaItem.date} description={mediaItem.description} />;
       case 'location':
       case 'map':
-         return <MediaLocation latitude={(mediaItem as any).latitude} longitude={(mediaItem as any).longitude} caption={(mediaItem as any).caption} />;
+         return <MediaLocation latitude={mediaItem.latitude} longitude={mediaItem.longitude} caption={mediaItem.caption} />;
       case 'product':
-         return <MediaProduct name={(mediaItem as any).name} price={(mediaItem as any).price} url={(mediaItem as any).url} caption={(mediaItem as any).caption} />;
+         return <MediaProduct name={mediaItem.name} price={mediaItem.price} url={mediaItem.url} caption={mediaItem.caption} />;
       case 'profile':
-         return <MediaProfile username={(mediaItem as any).username} displayName={(mediaItem as any).displayName} avatarUrl={(mediaItem as any).avatarUrl} caption={(mediaItem as any).caption} />;
+         return <MediaProfile username={mediaItem.username} displayName={mediaItem.displayName} avatarUrl={mediaItem.avatarUrl} caption={mediaItem.caption} />;
       case 'announcement':
-         return <MediaAnnouncement title={(mediaItem as any).title} content={(mediaItem as any).content} />;
+         return <MediaAnnouncement title={mediaItem.title} content={mediaItem.content} />;
       case 'badge':
       case 'achievement':
       case 'milestone':
-         return <MediaBadge name={(mediaItem as any).name} description={(mediaItem as any).description} imageUrl={(mediaItem as any).imageUrl} />;
+         return <MediaBadge name={mediaItem.name} description={mediaItem.description} imageUrl={mediaItem.imageUrl} />;
       case 'testimonial':
-         return <MediaQuote quote={(mediaItem as any).content || (mediaItem as any).text || ''} author={(mediaItem as any).author || ''} />;
+         return <MediaQuote quote={mediaItem.content} author={mediaItem.author || ''} />;
       case 'caseStudy':
-         return <MediaSimpleList title={(mediaItem as any).title} items={[(mediaItem as any).content || '']} />;
+         return <MediaSimpleList title={mediaItem.title} items={[mediaItem.content || '']} />;
       case 'infographic':
-         return <MediaInfographic url={(mediaItem as any).url} caption={(mediaItem as any).caption} />;
+         return <MediaInfographic url={mediaItem.url} caption={mediaItem.caption} />;
       case 'timeline':
-         return <MediaSimpleList title={(mediaItem as any).caption} items={(mediaItem as any).events?.map((e: any) => `${e.date}: ${e.event}`) || []} />;
+         return <MediaSimpleList title={mediaItem.caption} items={mediaItem.events?.map((e) => `${e.date}: ${e.event}`) || []} />;
       case 'chart':
-         return <MediaSimpleList title={(mediaItem as any).caption} items={[(mediaItem as any).chartType || '', JSON.stringify((mediaItem as any).data || {})]} />;
+         return <MediaSimpleList title={mediaItem.caption} items={[mediaItem.chartType || '', JSON.stringify(mediaItem.data || {})]} />;
       case 'table':
-         return <MediaTable headers={(mediaItem as any).headers} rows={(mediaItem as any).rows} />;
+         return <MediaTable headers={mediaItem.headers} rows={mediaItem.rows as string[][]} />;
       case 'slideshow':
-         return <MediaSlideshow slides={(mediaItem as any).slides} />;
+         return <MediaSlideshow slides={mediaItem.slides} />;
       case 'animation':
       case 'virtualTour':
       case '3dModel':
-         return <MediaLink url={(mediaItem as any).url} caption={(mediaItem as any).caption} />;
+         return <MediaLink url={mediaItem.url} caption={mediaItem.caption} />;
       case 'webinar':
       case 'workshop':
-         return <MediaEvent title={(mediaItem as any).title} date={(mediaItem as any).date} description={(mediaItem as any).description} />;
+         return <MediaEvent title={mediaItem.title} date={mediaItem.date} description={mediaItem.description} />;
       case 'ebook':
       case 'researchPaper':
-         return <MediaLink url={(mediaItem as any).url} caption={(mediaItem as any).title || (mediaItem as any).caption} />;
+         return <MediaLink url={mediaItem.url} caption={mediaItem.title} />;
       case 'newsletter':
-         return <MediaLink url={(mediaItem as any).url} caption={(mediaItem as any).title} />;
+         return <MediaLink url={mediaItem.url} caption={mediaItem.title} />;
       case 'faq':
-         return <MediaFAQ faqs={(mediaItem as any).faqs} />;
+         return <MediaFAQ faqs={mediaItem.faqs} />;
       case 'gallery':
-         return <MediaGallery images={(mediaItem as any).images} />;
+         return <MediaGallery images={mediaItem.images} />;
       case 'link':
-         return <MediaLink url={(mediaItem as any).url} caption={(mediaItem as any).caption} />;
+         return <MediaLink url={mediaItem.url} caption={mediaItem.caption} />;
       case 'summary':
-         return <MediaText text={(mediaItem as any).text || ''} />;
+         return <MediaText text={mediaItem.text || ''} />;
       case 'reflection':
-         return <MediaSimpleList title={(mediaItem as any).prompt} items={[(mediaItem as any).response || '']} />;
+         return <MediaSimpleList title={mediaItem.prompt} items={[mediaItem.response || '']} />;
       case 'challenge':
       case 'collaboration':
-      case 'sponsorship':
-         return <MediaSimpleList title={(mediaItem as any).title} items={[(mediaItem as any).description || (mediaItem as any).roles || ''] } />;
+      case 'sponsorship': {
+         const title = 'title' in mediaItem ? mediaItem.title : ('projectTitle' in mediaItem ? (mediaItem as CollaborationMedia).projectTitle || '' : '');
+         const rolesOrRules = 'roles' in mediaItem ? (mediaItem as CollaborationMedia).roles || '' : ('rules' in mediaItem ? (mediaItem as ChallengeMedia).rules || '' : '');
+         return <MediaSimpleList title={title} items={[mediaItem.description || rolesOrRules || ''] } />;
+      }
       default:
          return <Text>Unsupported media type: {String(mediaItem.type)}</Text>;
    }
-}
+}, (p, n) => p.mediaItem === n.mediaItem);
 

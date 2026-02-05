@@ -10,7 +10,7 @@ export const ThemeSwitch: React.FC = () => {
   return (
     <Switch
       value={dark}
-      onValueChange={(value: boolean) => { dispatch(toggleTheme(value)); }}
+      onValueChange={(value: boolean) => { dispatch(toggleTheme()); }}
       style={{ marginRight: 8 }}
       accessibilityLabel="Toggle theme"
     />
