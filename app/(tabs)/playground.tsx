@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { Button, Searchbar, Surface, Avatar, Chip, Divider, Title, Caption, Paragraph } from 'react-native-paper';
+import { Button, Searchbar, Surface, Avatar, Chip, Divider, Title, Caption, Paragraph, useTheme, IconButton, Card } from 'react-native-paper';
 import { AppHeader } from '../components/core/AppHeader';
 import { DUMMY_POSTS } from '../utils/constants';
 import { Post } from '../utils/types';
@@ -12,20 +12,22 @@ import type { MediaItem } from '../utils/types';
 
 export default function PlaygroundsScreen() {
    const [searchQuery, setSearchQuery] = React.useState('');
+   const theme = useTheme();
 
    useEffect(() => {
    }, []);
 
    return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
          <Searchbar
             placeholder="Search"
             onChangeText={setSearchQuery}
             value={searchQuery}
             style={{ margin: 16 }}
-            inputStyle={{ fontSize: 16 }}
+            iconColor={theme.colors.primary}
+            inputStyle={{ fontSize: 16, color: theme.colors.onBackground }}
          />
-         <Surface style={{ margin: 16, padding: 16, flex: 1 }}>
+         <Surface style={{ margin: 16, padding: 16, flex: 1, backgroundColor: theme.colors.surface }}>
             <Posts searchQuery={searchQuery} />
          </Surface>
       </View>
@@ -34,6 +36,20 @@ export default function PlaygroundsScreen() {
 
 function Posts({ searchQuery }: { searchQuery: string }) {
    const [posts, setPosts] = useState<Post[]>(DUMMY_POSTS);
+   const [userVotes, setUserVotes] = useState<Record<string, number>>({});
+   const theme = useTheme();
+
+   const handleVote = (postId: string, newVote: -1 | 0 | 1) => {
+      setUserVotes(prevUV => {
+         const oldVote = prevUV[postId] ?? 0;
+         setPosts(prevPosts => prevPosts.map(p => {
+            if (p.id !== postId) return p;
+            const votes = (p.votes ?? 0) + (newVote - oldVote);
+            return { ...p, votes };
+         }));
+         return { ...prevUV, [postId]: newVote };
+      });
+   };
 
    useEffect(() => {
       if (searchQuery) {
@@ -55,30 +71,36 @@ function Posts({ searchQuery }: { searchQuery: string }) {
          keyboardShouldPersistTaps="handled"
       >
          {posts.map(post => (
-            <Surface key={post.id} style={{ marginBottom: 12, padding: 12, borderRadius: 8, elevation: 2 }}>
-               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <View style={{ flex: 1 }}>
-                     <Title style={{ marginBottom: 4 }}>{post.title}</Title>
-                     <Caption>{post.author ?? 'Unknown'} · {post.community}</Caption>
-                  </View>
-                  <Chip style={{ marginLeft: 8 }}>{String(post.votes ?? 0)}</Chip>
-               </View>
+            <Card key={post.id} style={{ marginBottom: 12, borderRadius: 8, elevation: 2 }}>
+               <Card.Title
+                  title={post.title}
+                  subtitle={`${post.author ?? 'Unknown'} · ${post.community}`}
+                  left={props => <Avatar.Text {...props} label={(post.author || 'U').slice(0,1).toUpperCase()} />}
+                  right={() => (
+                     <VoteControls
+                        postId={post.id}
+                        votes={post.votes ?? 0}
+                        userVote={userVotes[post.id] ?? 0}
+                        onVote={handleVote}
+                     />
+                  )}
+               />
 
-               <Divider style={{ marginVertical: 8 }} />
+               <Card.Content style={{ backgroundColor: theme.colors.surface }}>
+                  {post.content && <Paragraph style={{ marginBottom: 8 }}>{post.content}</Paragraph>}
 
-               {post.content && <Paragraph style={{ marginBottom: 8 }}>{post.content}</Paragraph>}
-
-               {post.media && post.media.length > 0 && (
-                  <View style={{ marginTop: 8 }}>
-                     {post.media.map((mediaItem, index) => (
-                        <View key={index} style={{ marginBottom: 12 }}>
-                           <MediaItemRenderer mediaItem={mediaItem} />
-                           {(mediaItem as any).caption && <Caption style={{ marginTop: 4 }}>{(mediaItem as any).caption}</Caption>}
-                        </View>
-                     ))}
-                  </View>
-               )}
-            </Surface>
+                  {post.media && post.media.length > 0 && (
+                     <View style={{ marginTop: 8 }}>
+                        {post.media.map((mediaItem, index) => (
+                           <View key={index} style={{ marginBottom: 12 }}>
+                              <MediaItemRenderer mediaItem={mediaItem} />
+                              {(mediaItem as any).caption && <Caption style={{ marginTop: 4 }}>{(mediaItem as any).caption}</Caption>}
+                           </View>
+                        ))}
+                     </View>
+                  )}
+               </Card.Content>
+            </Card>
          ))}
 
          {posts.length === 0 && (
@@ -91,6 +113,17 @@ function Posts({ searchQuery }: { searchQuery: string }) {
 
 }
 
+
+function VoteControls({ postId, votes, userVote, onVote }: { postId: string; votes: number; userVote: number; onVote: (postId: string, vote: -1 | 0 | 1) => void }) {
+   const theme = useTheme();
+   return (
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+         <IconButton icon="thumb-up" size={20} onPress={() => onVote(postId, userVote === 1 ? 0 : 1)} iconColor={userVote === 1 ? theme.colors.primary : theme.colors.onBackground} />
+         <Text style={{ marginHorizontal: 4 }}>{votes}</Text>
+         <IconButton icon="thumb-down" size={20} onPress={() => onVote(postId, userVote === -1 ? 0 : -1)} iconColor={userVote === -1 ? theme.colors.primary : theme.colors.onBackground} />
+      </View>
+   );
+}
 
 function MediaVideo({ url }: { url: string }) {
    const player = useVideoPlayer({ uri: url }, player => {
@@ -115,11 +148,12 @@ function MediaText({ text }: { text: string }) {
 }
 
 function MediaPoll({ question, options }: { question: string; options: string[] }) {
+   const theme = useTheme();
    return (
       <View style={{ marginTop: 4 }}>
          <Text>{question}</Text>
          {options.map((option, index) => (
-            <Button key={index} mode="outlined" style={{ marginTop: 4 }}>
+            <Button key={index} mode="outlined" style={{ marginTop: 4 }} color={theme.colors.primary}>
                {option}
             </Button>
          ))}
@@ -147,21 +181,23 @@ function MediaCode({ code, language }: { code: string; language?: string }) {
 }
 
 function MediaFile({ url, caption }: { url?: string; caption?: string }) {
+   const theme = useTheme();
    if (!url) return null;
    return (
       <View style={{ marginTop: 4 }}>
          {caption && <Text>{caption}</Text>}
-         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }}>Open file</Button>
+         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }} color={theme.colors.primary}>Open file</Button>
       </View>
    );
 }
 
 function MediaAudio({ url, caption }: { url?: string; caption?: string }) {
+   const theme = useTheme();
    if (!url) return null;
    return (
       <View style={{ marginTop: 4 }}>
          {caption && <Text>{caption}</Text>}
-         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }}>Play audio</Button>
+         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }} color={theme.colors.primary}>Play audio</Button>
       </View>
    );
 }
@@ -177,23 +213,25 @@ function MediaEvent({ title, date, description }: { title?: string; date?: strin
 }
 
 function MediaLocation({ latitude, longitude, caption }: { latitude?: number; longitude?: number; caption?: string }) {
+   const theme = useTheme();
    if (latitude == null || longitude == null) return null;
    const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
    return (
       <View style={{ marginTop: 4 }}>
          {caption && <Text>{caption}</Text>}
-         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }}>Open map</Button>
+         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }} color={theme.colors.primary}>Open map</Button>
       </View>
    );
 }
 
 function MediaProduct({ name, price, url, caption }: { name?: string; price?: number; url?: string; caption?: string }) {
+   const theme = useTheme();
    return (
       <View style={{ marginTop: 4 }}>
          {name && <Text style={{ fontWeight: 'bold' }}>{name}</Text>}
          {typeof price === 'number' && <Text>{`$${price}`}</Text>}
          {caption && <Text style={{ marginTop: 4 }}>{caption}</Text>}
-         {url && <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }}>View product</Button>}
+         {url && <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }} color={theme.colors.primary}>View product</Button>}
       </View>
    );
 }
@@ -290,11 +328,12 @@ function MediaFAQ({ faqs }: { faqs?: { question: string; answer: string }[] }) {
 }
 
 function MediaLink({ url, caption }: { url?: string; caption?: string }) {
+   const theme = useTheme();
    if (!url) return null;
    return (
       <View style={{ marginTop: 4 }}>
          {caption && <Text>{caption}</Text>}
-         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }}>Open link</Button>
+         <Button mode="outlined" onPress={() => Linking.openURL(url)} style={{ marginTop: 8 }} color={theme.colors.primary}>Open link</Button>
       </View>
    );
 }
