@@ -46,9 +46,9 @@ public class CommunityService {
         Pageable pageable = PageRequest.of(page, size);
         Page<CommunityEntity> entities;
         if (AuthUtils.isAdmin()) {
-            entities = communityRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(q, q, pageable);
+            entities = communityRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrderByUpdatedAtDesc(q, q, pageable);
         } else {
-            entities = communityRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndMarkedForDeletionFalse(q, q, pageable);
+            entities = communityRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndMarkedForDeletionFalseOrderByUpdatedAtDesc(q, q, pageable);
         }
         return entities.map(entity -> CommunityMapper.toResponse(mapWithUsers(entity)));
     }
