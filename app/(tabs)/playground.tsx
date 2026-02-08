@@ -9,6 +9,7 @@ import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEvent } from 'expo';
 import type { MediaItem } from '../utils/types';
+import Fab from '../components/Fab';
 
 type CollaborationMedia = Extract<MediaItem, { type: 'collaboration' }>;
 type ChallengeMedia = Extract<MediaItem, { type: 'challenge' }>;
@@ -32,6 +33,7 @@ export default function PlaygroundsScreen() {
             inputStyle={{ fontSize: 16, color: theme.colors.onBackground }}
          />
          <Posts searchQuery={searchQuery} />
+         <Fab />
       </>
    );
 }
