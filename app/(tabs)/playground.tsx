@@ -22,7 +22,7 @@ export default function PlaygroundsScreen() {
    }, []);
 
    return (
-      <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <>
          <Searchbar
             placeholder="Search"
             onChangeText={setSearchQuery}
@@ -31,10 +31,8 @@ export default function PlaygroundsScreen() {
             iconColor={theme.colors.primary}
             inputStyle={{ fontSize: 16, color: theme.colors.onBackground }}
          />
-         <Surface style={{ margin: 16, padding: 16, flex: 1, backgroundColor: theme.colors.surface }}>
-            <Posts searchQuery={searchQuery} />
-         </Surface>
-      </View>
+         <Posts searchQuery={searchQuery} />
+      </>
    );
 }
 
@@ -49,7 +47,7 @@ function Posts({ searchQuery }: { searchQuery: string }) {
          const votes = (p.votes ?? 0) + (newVote - oldVote);
          return { ...p, votes, userVote: newVote };
       }));
-   }; 
+   };
 
    useEffect(() => {
       if (searchQuery) {
@@ -692,7 +690,7 @@ const MediaItemRenderer = React.memo(({ mediaItem }: { mediaItem: MediaItem }) =
       case 'sponsorship': {
          const title = 'title' in mediaItem ? mediaItem.title : ('projectTitle' in mediaItem ? (mediaItem as CollaborationMedia).projectTitle || '' : '');
          const rolesOrRules = 'roles' in mediaItem ? (mediaItem as CollaborationMedia).roles || '' : ('rules' in mediaItem ? (mediaItem as ChallengeMedia).rules || '' : '');
-         return <MediaSimpleList title={title} items={[mediaItem.description || rolesOrRules || ''] } />;
+         return <MediaSimpleList title={title} items={[mediaItem.description || rolesOrRules || '']} />;
       }
       default:
          return <Text>Unsupported media type: {String(mediaItem.type)}</Text>;
