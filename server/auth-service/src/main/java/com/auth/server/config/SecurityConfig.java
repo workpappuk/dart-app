@@ -1,4 +1,4 @@
-package com.dart.server.config;
+package com.auth.server.config;
 
 import com.auth.server.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;

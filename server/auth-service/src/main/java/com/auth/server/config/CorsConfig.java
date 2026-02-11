@@ -1,4 +1,4 @@
-package com.dart.server.config;
+package com.auth.server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

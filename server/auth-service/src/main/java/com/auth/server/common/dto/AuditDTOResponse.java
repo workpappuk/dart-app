@@ -1,4 +1,4 @@
-package com.dart.server.common.dto;
+package com.auth.server.common.dto;
 
 import com.auth.server.dto.UserResponse;
 import lombok.Data;

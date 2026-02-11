@@ -1,4 +1,4 @@
-package com.dart.server.common.db;
+package com.auth.server.common.db;
 
 import jakarta.persistence.*;
 import lombok.Data;

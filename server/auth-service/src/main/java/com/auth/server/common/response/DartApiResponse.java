@@ -1,4 +1,4 @@
-package com.dart.server.common.response;
+package com.auth.server.common.response;
 
 
 import lombok.AllArgsConstructor;

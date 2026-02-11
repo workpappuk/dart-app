@@ -3,7 +3,7 @@ package com.auth.server;
 import com.auth.server.dto.UserMapper;
 import com.auth.server.dto.UserRequest;
 import com.auth.server.dto.UserResponse;
-import com.dart.server.common.response.DartApiResponse;
+import com.auth.server.common.response.DartApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

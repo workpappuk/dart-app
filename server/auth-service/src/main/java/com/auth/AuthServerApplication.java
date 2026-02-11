@@ -1,4 +1,4 @@
-package com.auth.server;
+package com.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;

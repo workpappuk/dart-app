@@ -1,4 +1,4 @@
-package com.dart.server.config.db;
+package com.auth.server.config.db;
 
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;

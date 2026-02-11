@@ -1,6 +1,6 @@
 package com.auth.server;
 
-import com.dart.server.common.db.Auditable;
+import com.auth.server.common.db.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
 

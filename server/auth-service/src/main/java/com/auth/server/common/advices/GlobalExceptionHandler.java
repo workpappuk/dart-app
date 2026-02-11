@@ -1,6 +1,6 @@
-package com.dart.server.common.advices;
+package com.auth.server.common.advices;
 
-import com.dart.server.common.response.DartApiResponse;
+import com.auth.server.common.response.DartApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
