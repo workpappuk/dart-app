@@ -1,0 +1,54 @@
+package com.auth.server;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private RoleService roleService;
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public UserEntity findByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
+    public void assignRole(UUID userId, UUID roleId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow();
+        RoleEntity role = roleService.findById(roleId).orElseThrow();
+        user.getRoles().add(role);
+        userRepository.save(user);
+    }
+
+    public void removeRole(UUID userId, UUID roleId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow();
+        RoleEntity role = roleService.findById(roleId).orElseThrow();
+        user.getRoles().remove(role);
+        userRepository.save(user);
+    }
+
+    public List<UserEntity> findAll() {
+        return userRepository.findAll();
+    }
+
+    public Optional<UserEntity> findById(UUID id) {
+        return userRepository.findById(id);
+    }
+
+    public UserEntity save(UserEntity user) {
+        return userRepository.save(user);
+    }
+
+    public void deleteById(UUID id) {
+        userRepository.deleteById(id);
+    }
+}
