@@ -5,3 +5,8 @@ psql -U pappukumar -d postgres -c "CREATE ROLE dart_user WITH LOGIN PASSWORD 'da
 http://localhost:8080/swagger-ui/index.html
 
 sudo service postgresql start
+
+
+cd /root/dart-app
+git pull && ./scripts/run-frontend-docker.sh  start
+L9/Ah.ZEw3zrnWmFj9bq
