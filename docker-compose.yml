@@ -12,3 +12,11 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+
+  config-service:
+    build:
+      context: ./server/config-service
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    restart: unless-stopped
