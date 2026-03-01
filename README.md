@@ -8,5 +8,5 @@ sudo service postgresql start
 
 
 cd /root/dart-app
-git pull && ./scripts/run-frontend-docker.sh  start
+git pull && docker-compose down --rmi all --volumes --remove-orphans && docker-compose build --no-cache && docker-compose up -d
 L9/Ah.ZEw3zrnWmFj9bq
