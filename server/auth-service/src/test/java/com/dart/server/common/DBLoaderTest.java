@@ -1,0 +1,85 @@
+package com.dart.server.common;
+
+import com.auth.server.PermissionService;
+import com.auth.server.RoleEntity;
+import com.auth.server.RoleService;
+import com.auth.server.UserService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+class DBLoaderTest {
+    @Mock
+    RoleService roleService;
+    @Mock
+    PermissionService permissionService;
+    @Mock
+    UserService userService;
+    @Mock
+    PasswordEncoder passwordEncoder;
+    @InjectMocks
+    DBLoader dbLoader;
+
+    @BeforeEach
+    @SuppressWarnings("resource")
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testWarmDB() {
+        // Mock permissionService
+        when(permissionService.findByName(any())).thenReturn(null);
+        when(permissionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        // Mock roleService
+        // Return null for first call (role creation), then a RoleEntity for subsequent calls (user assignment)
+        when(roleService.findByName(any())).thenAnswer(new org.mockito.stubbing.Answer<RoleEntity>() {
+            private boolean firstCall = true;
+
+            @Override
+            public RoleEntity answer(org.mockito.invocation.InvocationOnMock invocation) {
+                if (firstCall) {
+                    firstCall = false;
+                    return null;
+                } else {
+                    RoleEntity role = new RoleEntity();
+                    role.setId(UUID.randomUUID());
+                    role.setName(invocation.getArgument(0));
+                    return role;
+                }
+            }
+        });
+        when(roleService.save(any())).thenAnswer(invocation -> {
+            RoleEntity role = invocation.getArgument(0);
+            role.setId(UUID.randomUUID());
+            return role;
+        });
+        // Mock userService
+        when(userService.existsByUsername(any())).thenReturn(false);
+        when(userService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        // Mock passwordEncoder
+        when(passwordEncoder.encode(any())).thenReturn("encoded");
+
+        dbLoader.warmDB();
+        verify(permissionService, atLeastOnce()).save(any());
+        verify(roleService, atLeastOnce()).save(any());
+        verify(userService, atLeastOnce()).save(any());
+    }
+
+    @Test
+    void testKeyGenerator() {
+        DBLoader loader = new DBLoader(roleService, permissionService, userService, passwordEncoder);
+        String key = loader.keyGenerator();
+        assertNotNull(key);
+        assertTrue(key.length() > 0);
+    }
+}

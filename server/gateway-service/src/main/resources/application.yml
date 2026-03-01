@@ -1,0 +1,6 @@
+springdoc:
+  swagger-ui:
+    urls:
+      - name: auth-service
+        url: /auth-service/v3/api-docs
+      # Add more services as needed

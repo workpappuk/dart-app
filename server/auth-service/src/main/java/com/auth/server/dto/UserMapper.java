@@ -1,0 +1,29 @@
+package com.auth.server.dto;
+
+import com.auth.server.UserEntity;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class UserMapper {
+    public static UserResponse toResponse(UserEntity entity) {
+        if (entity == null) return null;
+        UserResponse response = new UserResponse();
+        response.setId(entity.getId());
+        response.setUsername(entity.getUsername());
+
+        Set<RoleResponse> roleResponses = entity.getRoles() == null ? null : entity.getRoles()
+                .stream().map(RoleMapper::toResponse)
+                .collect(Collectors.toSet());
+
+        response.setRoles(roleResponses);
+        return response;
+    }
+
+    public static UserEntity toEntity(UserRequest request) {
+        UserEntity entity = new UserEntity();
+        entity.setUsername(request.getUsername());
+        entity.setPassword(request.getPassword());
+        return entity;
+    }
+}
