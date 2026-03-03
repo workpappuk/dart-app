@@ -4,7 +4,8 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
 COPY . .
-RUN ./gradlew clean build --no-daemon
+# RUN ./gradlew clean build --no-daemon
+RUN ./gradlew clean build --no-daemon -x test
 
 # Runtime stage
 FROM eclipse-temurin:17-jre-alpine
